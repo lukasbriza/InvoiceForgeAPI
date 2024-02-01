@@ -2,7 +2,7 @@
 {
     public enum ClientType
     {
-        Entrpreneur,
+        Entrepreneur,
         LegalEntity
     }
 }

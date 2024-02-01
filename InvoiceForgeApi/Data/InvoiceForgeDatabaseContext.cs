@@ -16,5 +16,12 @@ namespace InvoiceForgeApi.Data
         public DbSet<InvoiceTemplate> InvoiceTemplate { get; set; }
         public DbSet<User> User { get; set; }
         public DbSet<UserAccount> UserAccount { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<User>()
+                .Property(u => u.Id)
+                .ValueGeneratedOnAdd();
+        }
     }
 }

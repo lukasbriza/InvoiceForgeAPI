@@ -1,11 +1,14 @@
 using InvoiceForgeApi.Data;
+using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -16,15 +19,12 @@ builder.Services.AddDbContext<InvoiceForgeDatabaseContext>(options =>
 });
 
 var app = builder.Build();
+app.UseDeveloperExceptionPage();
 
 //Seed setup
-if(args.Length == 1 && args[0].ToLower() == "seedCodeLists")
+if (args.Length == 1 && args[0].ToLower() == "seed")
 {
-    Seed.SeedCodeLists(app);
-}
-if (args.Length == 1 && args[0].ToLower() == "seedData")
-{
-    Seed.SeedCodeLists(app);
+    Seed.SeedData(app);
 }
 
 // Configure the HTTP request pipeline.

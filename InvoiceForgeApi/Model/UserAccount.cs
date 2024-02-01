@@ -6,11 +6,17 @@ namespace InvoiceForgeApi.Model
 {
     public class UserAccount
     {
-        [Key] public int Id { get; set; }
-        [Required] public int Owner { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        [ForeignKey("User")] public int Owner { get; set; }
         [ForeignKey("Bank")] public int BankId { get; set; }
-        [Required] public Bank Bank { get; set; }
+
         [Required] public string AccountNumber { get; set; }
-        public string? IBAN { get; set; }
+        public string? IBAN { get; set; } = null;
+
+        // reference
+        public virtual Bank Bank { get; set; }
+        public virtual User User { get; set; }
     }
 }

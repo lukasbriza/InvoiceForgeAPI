@@ -6,7 +6,9 @@ namespace InvoiceForgeApi.Model
 {
     public class Address
     {
-        [Key] public int Id { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         [ForeignKey("Country")] public int CountryId { get; set; }
         
         [Required] public int Owner {  get; set; }
@@ -14,7 +16,8 @@ namespace InvoiceForgeApi.Model
         [Required] public int StreetNumber { get; set; }
         [Required] public string City { get; set; }
         [Required] public int PostalCode { get; set; }
-        [Required] public Country Country { get; set; }
 
+        //reference
+        public virtual Country Country { get; set; }
     }
 }

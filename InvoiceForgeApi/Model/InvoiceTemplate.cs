@@ -5,16 +5,18 @@ namespace InvoiceForgeApi.Model
 {
     public class InvoiceTemplate
     {
-        [Key] public int Id { get; set; }
-        [ForeignKey("Client")] public int ClientId { get; set; }
-        [ForeignKey("Contractor")] public int ContractorId { get; set; }
-        [ForeignKey("UserAccount")] public int UserAccountId { get; set; }
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+         public int Id { get; set; }
+        [ForeignKey("User")] public int Owner { get; set; }
         
-        [Required] public int Owner { get; set; }
+        [Required] public int ClientId { get; set; }
+        [Required] public int ContractorId { get; set; }
+        [Required] public int UserAccountId { get; set; }
         [Required] public string TemplateName { get; set; }
         [Required] public DateTime Created { get; set; }
-        [Required] public Contractor Contractor { get; set; }
-        [Required] public UserAccount UserAccount { get; set; }
-        [Required] public Client Client { get; set; }
+
+        // reference
+        public virtual User User { get; set; }
     }
 }
