@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvoiceForgeApi.Migrations
 {
     [DbContext(typeof(InvoiceForgeDatabaseContext))]
-    [Migration("20240105230111_InitialCreate")]
+    [Migration("20240216184932_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,7 +32,7 @@ namespace InvoiceForgeApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("ClientName")
@@ -102,6 +102,8 @@ namespace InvoiceForgeApi.Migrations
 
                     b.HasIndex("CountryId");
 
+                    b.HasIndex("Owner");
+
                     b.ToTable("Address");
                 });
 
@@ -158,7 +160,7 @@ namespace InvoiceForgeApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<int>("ClientType")
@@ -262,7 +264,7 @@ namespace InvoiceForgeApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("BankId")
+                    b.Property<int?>("BankId")
                         .HasColumnType("int");
 
                     b.Property<string>("IBAN")
@@ -283,13 +285,12 @@ namespace InvoiceForgeApi.Migrations
             modelBuilder.Entity("InvoiceForgeApi.Client", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Model.Address", "Address")
-                        .WithMany()
+                        .WithMany("Clients")
                         .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("InvoiceForgeApi.Model.User", "User")
-                        .WithMany()
+                        .WithMany("Clients")
                         .HasForeignKey("Owner")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -302,24 +303,31 @@ namespace InvoiceForgeApi.Migrations
             modelBuilder.Entity("InvoiceForgeApi.Model.Address", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Model.CodeLists.Country", "Country")
-                        .WithMany()
+                        .WithMany("Addresses")
                         .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.User", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("Owner")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Country");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Model.Contractor", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Model.Address", "Address")
-                        .WithMany()
+                        .WithMany("Contractors")
                         .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("InvoiceForgeApi.Model.User", "User")
-                        .WithMany()
+                        .WithMany("Contractors")
                         .HasForeignKey("Owner")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -332,7 +340,7 @@ namespace InvoiceForgeApi.Migrations
             modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceTemplate", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Model.User", "User")
-                        .WithMany()
+                        .WithMany("InvoiceTemplates")
                         .HasForeignKey("Owner")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -343,13 +351,12 @@ namespace InvoiceForgeApi.Migrations
             modelBuilder.Entity("InvoiceForgeApi.Model.UserAccount", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Model.CodeLists.Bank", "Bank")
-                        .WithMany()
+                        .WithMany("UserAccounts")
                         .HasForeignKey("BankId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.HasOne("InvoiceForgeApi.Model.User", "User")
-                        .WithMany()
+                        .WithMany("UserAccounts")
                         .HasForeignKey("Owner")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -357,6 +364,36 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("Bank");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Address", b =>
+                {
+                    b.Navigation("Clients");
+
+                    b.Navigation("Contractors");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.CodeLists.Bank", b =>
+                {
+                    b.Navigation("UserAccounts");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.CodeLists.Country", b =>
+                {
+                    b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.User", b =>
+                {
+                    b.Navigation("Addresses");
+
+                    b.Navigation("Clients");
+
+                    b.Navigation("Contractors");
+
+                    b.Navigation("InvoiceTemplates");
+
+                    b.Navigation("UserAccounts");
                 });
 #pragma warning restore 612, 618
         }

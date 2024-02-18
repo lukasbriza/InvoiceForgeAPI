@@ -71,6 +71,11 @@ namespace InvoiceForgeApi.Migrations
                         name: "FK_Address_Country_CountryId",
                         column: x => x.CountryId,
                         principalTable: "Country",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Address_User_Owner",
+                        column: x => x.Owner,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -106,7 +111,7 @@ namespace InvoiceForgeApi.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Owner = table.Column<int>(type: "int", nullable: false),
-                    BankId = table.Column<int>(type: "int", nullable: false),
+                    BankId = table.Column<int>(type: "int", nullable: true),
                     AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IBAN = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -117,8 +122,7 @@ namespace InvoiceForgeApi.Migrations
                         name: "FK_UserAccount_Bank_BankId",
                         column: x => x.BankId,
                         principalTable: "Bank",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserAccount_User_Owner",
                         column: x => x.Owner,
@@ -133,7 +137,7 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: true),
                     Owner = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     ClientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -150,8 +154,7 @@ namespace InvoiceForgeApi.Migrations
                         name: "FK_Client_Address_AddressId",
                         column: x => x.AddressId,
                         principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Client_User_Owner",
                         column: x => x.Owner,
@@ -166,7 +169,7 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: true),
                     Owner = table.Column<int>(type: "int", nullable: false),
                     ClientType = table.Column<int>(type: "int", nullable: false),
                     ContractorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -184,8 +187,7 @@ namespace InvoiceForgeApi.Migrations
                         name: "FK_Contractor_Address_AddressId",
                         column: x => x.AddressId,
                         principalTable: "Address",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Contractor_User_Owner",
                         column: x => x.Owner,
@@ -198,6 +200,11 @@ namespace InvoiceForgeApi.Migrations
                 name: "IX_Address_CountryId",
                 table: "Address",
                 column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Address_Owner",
+                table: "Address",
+                column: "Owner");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Client_AddressId",
@@ -256,10 +263,10 @@ namespace InvoiceForgeApi.Migrations
                 name: "Bank");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Country");
 
             migrationBuilder.DropTable(
-                name: "Country");
+                name: "User");
         }
     }
 }
