@@ -10,7 +10,7 @@ namespace InvoiceForgeApi
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [ForeignKey("Address")] public int AddressId { get; set; }
+        [ForeignKey("Address")] public int? AddressId { get; set; }
         [ForeignKey("User")] public int Owner { get; set; }
 
         [Required] public ClientType Type { get; set; }
@@ -21,8 +21,8 @@ namespace InvoiceForgeApi
         public string? Tel { get; set; } = null;
         public string? Email { get; set; } = null;
 
-        // reference
-        public virtual Address Address { get; set; }
-        public virtual User User { get; set; }
+        //Reference
+        public virtual Address? Address { get; set; }
+        public virtual User User { get; set; } = null!;
     }
 }

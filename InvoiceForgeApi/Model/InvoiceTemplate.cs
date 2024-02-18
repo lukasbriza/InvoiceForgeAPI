@@ -17,6 +17,6 @@ namespace InvoiceForgeApi.Model
         [Required] public DateTime Created { get; set; }
 
         // reference
-        public virtual User User { get; set; }
+        public virtual User User { get; set; } = null!;
     }
 }

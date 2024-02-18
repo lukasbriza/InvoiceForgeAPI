@@ -10,5 +10,8 @@ namespace InvoiceForgeApi.Model.CodeLists
         public int Id { get; set; }
         [Required] public string Value { get; set; }
         [Required] public string Shortcut { get; set; }
+
+        //Reference
+        public virtual ICollection<Address>? Addresses { get; set; } = new List<Address>();
     }
 }

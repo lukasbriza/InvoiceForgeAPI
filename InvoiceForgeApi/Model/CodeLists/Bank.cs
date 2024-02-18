@@ -11,5 +11,8 @@ namespace InvoiceForgeApi.Model.CodeLists
         [Required] public string Value { get; set; }
         [Required] public string Shortcut { get; set; }
         public string? SWIFT { get; set; } = null;
+
+        //Reference
+        public virtual ICollection<UserAccount>? UserAccounts { get; set; } = new List<UserAccount>();
     }
 }

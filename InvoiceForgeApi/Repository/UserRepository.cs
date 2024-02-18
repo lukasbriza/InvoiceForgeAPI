@@ -1,8 +1,9 @@
 ﻿using InvoiceForgeApi.Data;
-using InvoiceForgeApi.Handlers;
 using InvoiceForgeApi.Interfaces;
 using InvoiceForgeApi.Model;
 using InvoiceForgeApi.DTO;
+using Microsoft.EntityFrameworkCore;
+using InvoiceForgeApi.DTO.Model;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -13,117 +14,169 @@ namespace InvoiceForgeApi.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<RequestHandler<User?>> GetById(int id)
+        public async Task<UserGetRequest?> GetById(int id)
         {
-            var RHandler = new RequestHandler<User?>();
-            try
-            {
-                var user = await _dbContext.User.FindAsync(id);
-
-                if (user == null)
+            var user = await _dbContext.User
+                .Include(u => u.Clients)
+                .Include(u => u.Contractors)
+                .Include(u => u.UserAccounts)
+                .Select(u => new UserGetRequest
                 {
-                    throw new DatabaseCallError("User does not exist.");
-                }
+                    Id =  u.Id,
+                    Contractors = u.Contractors.Select(c => new ContractorGetRequest
+                            {
+                                Id = c.Id,
+                                Owner = c.Owner,
+                                ClientType = c.ClientType,
+                                ContractorName = c.ContractorName,
+                                IN = c.IN,
+                                TIN = c.TIN,
+                                Email = c.Email,
+                                Mobil = c.Mobil,
+                                Tel = c.Tel,
+                                www = c.www,
+                                Address = new AddressGetRequest
+                                {
+                                    Id = c.Address.Id,
+                                    Owner = c.Address.Owner,
+                                    Street = c.Address.Street,
+                                    StreetNumber = c.Address.StreetNumber,
+                                    City = c.Address.City,
+                                    PostalCode = c.Address.PostalCode,
+                                    Country = new CountryGetRequest
+                                    {
+                                        Id = c.Address.Country.Id,
+                                        Value = c.Address.Country.Value,
+                                        Shortcut = c.Address.Country.Shortcut,
+                                    }
+                                }
+                            }
+                        ),
+                        Clients =  u.Clients.Select(c => new ClientGetRequest
+                            {
+                                Id = c.Id,
+                                AddressId = c.AddressId,
+                                Owner = c.Owner,
+                                Type = c.Type,
+                                ClientName = c.ClientName,
+                                IN = c.IN,
+                                TIN = c.TIN,
+                                Mobil = c.Mobil,
+                                Tel = c.Tel,
+                                Email = c.Email,
+                                Address = new AddressGetRequest
+                                {
+                                    Id = c.Address.Id,
+                                    Owner = c.Address.Owner,
+                                    Street = c.Address.Street,
+                                    StreetNumber = c.Address.StreetNumber,
+                                    City = c.Address.City,
+                                    PostalCode = c.Address.PostalCode,
+                                    Country = new CountryGetRequest
+                                    {
+                                        Id = c.Address.Country.Id,
+                                        Value = c.Address.Country.Value,
+                                        Shortcut = c.Address.Country.Shortcut,
+                                    }
 
-                RHandler.SetData(user);
+                                }
+                            }
+                        ),
+                        UserAccounts = u.UserAccounts.Select(u => new UserAccountGetRequest
+                            {
+                                Id = u.Id,
+                                Owner = u.Owner,
+                                BankId = u.BankId,
+                                AccountNumber = u.AccountNumber,
+                                IBAN = u.IBAN,
+                                Bank = new BankGetRequest
+                                {
+                                    Id = u.Bank.Id,
+                                    Value = u.Bank.Value,
+                                    Shortcut = u.Bank.Shortcut,
+                                    SWIFT = u.Bank.SWIFT
+                                }
+                            }
+                        ),
+                    }
+                )
+                .Where(u => u.Id == id).ToListAsync();
+
+            if (user.Count == 0)
+            {
+                throw new DatabaseCallError("User is not in database.");
             }
-            catch (Exception ex) { RHandler.AddError(ex); }
 
-            return RHandler;
+            return user[0];
         }
-        public async Task<RequestHandler<bool>> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var RHandler = new RequestHandler<bool>();
-            var user = await GetById(id);
-
-            if (user.HasErrors())
+            var user = await Get(id);
+                
+            if (user is null)
             {
-                RHandler.AddErrors(user.Exceptions);
-                RHandler.SetData(false);
-                return RHandler;
+                throw new DatabaseCallError("User is not in database.");
             }
-            if (user.Data is not null)
-            {
-                _dbContext.User.Remove(user.Data);
-                var SHandler = await Save();
-                RHandler.SetData(SHandler.Data);
 
-                if (SHandler.HasErrors() | !SHandler.Data )
-                {
-                    RHandler.AddErrors(SHandler.Exceptions);
-                    return RHandler;
-                }
-            }
-            return RHandler;
-
+            _dbContext.User.Remove(user);
+            await Save();
+            return true;
         }
 
-        public async Task<RequestHandler<bool>> Update(UserUpdateDTO user)
+        public async Task<bool> Update(UserUpdateRequest user)
         {
-            var RHandler = new RequestHandler<bool>();
-            try
+            if (user is null)
             {
-                if (user is null)
-                {
-                    RHandler.SetData(false);
-                    throw new ValidationError("User is not provided.");
-                }
-
-                _dbContext.User.Update(user);
-                var SHandler = await Save();
-                RHandler.SetData(SHandler.Data);
-
-                if (SHandler.HasErrors() | !SHandler.Data)
-                {
-                    RHandler.AddErrors(SHandler.Exceptions);
-                    return RHandler;
-                }
+                throw new ValidationError("User is not provided.");
             }
-            catch (Exception ex) { RHandler.AddError(ex); }
-            return RHandler;
+
+            var localUser = await Get(user.Id);
+
+            if (localUser == null)
+            {
+                throw new DatabaseCallError("User is not in database.");
+            }
+
+            var userWithNewAuthIdExists = await _dbContext.User
+                .Where(u => u.AuthenticationId == user.AuthenticationId)
+                .ToListAsync();
+
+            if (userWithNewAuthIdExists.Count > 0)
+            {
+                throw new ValidationError("Provided values are incorrect.");
+            }
+
+            localUser.AuthenticationId = user.AuthenticationId;
+            await Save();
+            return true;
         }
 
-        public async Task<RequestHandler<bool>> Add(UserAddDTO user)
+        public async Task<bool> Add(UserAddRequest user)
         {
-            var RHandler = new RequestHandler<bool>();
-            try
+
+            if(user is null)
             {
-                if(user is null)
-                {
-                    RHandler.SetData(false);
-                    throw new ValidationError("User is not provided.");
-                }
-
-                var newUser = new User {AuthenticationId = user.AuthenticationId};
-                await _dbContext.User.AddAsync(newUser);
-                var SHandler = await Save();
-                RHandler.SetData(SHandler.Data);
-
-                if (SHandler.HasErrors() | !SHandler.Data)
-                {
-                    RHandler.AddErrors(SHandler.Exceptions);
-                    return RHandler;
-                }
+                throw new ValidationError("User is not provided.");
             }
-            catch(Exception ex) { RHandler.AddError(ex); }
-            return RHandler;
+
+            var newUser = new User {AuthenticationId = user.AuthenticationId};
+            await _dbContext.User.AddAsync(newUser);
+            await Save();
+            return true;
         }
 
-        private async Task<RequestHandler<bool>> Save()
+        private async Task Save()
         {
-            var RHandler = new RequestHandler<bool>();
-            try
-            {
-                int save = await _dbContext.SaveChangesAsync();
-                RHandler.SetData(save > 0);
 
-                if (!RHandler.Data)
-                {
-                    throw new DatabaseCallError("User saving failed.");
-                }
+            int save = await _dbContext.SaveChangesAsync();
+            if (!(save > 0))
+            {
+                throw new DatabaseCallError("User saving failed.");
             }
-            catch (Exception ex){ RHandler.AddError(ex); }
-            return RHandler;
+        }
+        private async Task<User?> Get(int id)
+        {
+            return await _dbContext.User.FindAsync(id);
         }
     }
 }

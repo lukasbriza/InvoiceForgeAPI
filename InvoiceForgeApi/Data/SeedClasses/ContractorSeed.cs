@@ -11,7 +11,7 @@ namespace InvoiceForgeApi.Data.SeedClasses
                 {
                     AddressId= 1,
                     Owner = 1,
-                    ClientType = Enum.ClientType.Entrpreneur,
+                    ClientType = Enum.ClientType.Entrepreneur,
                     ContractorName = "Contractor1",
                     IN = 123456789,
                     TIN = "CZ123456789",

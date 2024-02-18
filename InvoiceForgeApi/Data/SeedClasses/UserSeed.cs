@@ -11,6 +11,7 @@ namespace InvoiceForgeApi.Data.SeedClasses
                 new User()
                 {
                     AuthenticationId = 1,
+
                 },
                 new User()
                 {

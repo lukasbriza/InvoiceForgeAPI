@@ -19,7 +19,7 @@
                 {
                     AddressId = 1,
                     Owner = 1,
-                    Type = Enum.ClientType.Entrpreneur,
+                    Type = Enum.ClientType.Entrepreneur,
                     ClientName = "ClientName2",
                     IN = 1111111111,
                     TIN = "CZ1111111111",

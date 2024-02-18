@@ -1,7 +1,5 @@
-﻿using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Handlers;
+﻿using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
-using InvoiceForgeApi.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
@@ -19,24 +17,28 @@ namespace InvoiceForgeApi.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ResponseHandler<User?>> Get(int id)
-        {
-            //validate model
-            
-            var User = await _userRepository.GetById(id);
-            var response = User.BuildResponse(Response);
-            return response;
+        public async Task<UserGetRequest?> Get(int id)
+        {   
+            return await _userRepository.GetById(id);
         }
+
         [HttpPost]
-        public async Task<ResponseHandler<bool>> Add(UserAddDTO user)
+        public async Task<bool> Add(UserAddRequest user)
         {
-            RequestHandler<bool> UserAdd = await _userRepository.Add(user);
-            
+            return await _userRepository.Add(user);
 
-            ResponseHandler<bool> UserResponse = new(Response, UserAdd);
-            
-            return UserResponse;
         }
 
+        [HttpPut]
+        public async Task<bool> Update(UserUpdateRequest user)
+        { 
+            return await _userRepository.Update(user);
+        }
+
+        [HttpDelete]
+        public async Task<bool> Delete(int id)
+        {
+            return await _userRepository.Delete(id);
+        }
     }
 }

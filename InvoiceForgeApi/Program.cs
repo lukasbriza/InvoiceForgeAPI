@@ -1,5 +1,7 @@
+using InvoiceForgeApi.Controllers;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Middleware;
 using InvoiceForgeApi.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<ICodeListsRepository, CodeListsRepository>();
+
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -34,8 +41,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//Add middleware
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

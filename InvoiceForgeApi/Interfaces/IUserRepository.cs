@@ -1,15 +1,15 @@
-﻿using InvoiceForgeApi.Handlers;
-using InvoiceForgeApi.Model;
-using InvoiceForgeApi.DTO;
+﻿using InvoiceForgeApi.Model;
+using InvoiceForgeApi.DTO.Model;
 
 namespace InvoiceForgeApi.Interfaces
 {
     public interface IUserRepository
     {
-        Task<RequestHandler<User?>> GetById(int id);
-        Task<RequestHandler<bool>> Delete(int id);
-        Task<RequestHandler<bool>> Update(UserUpdateDTO user);
-        Task<RequestHandler<bool>> Add(UserAddDTO user);
-        private static Task<RequestHandler<bool>> Save() => null;
+        Task<UserGetRequest?> GetById(int id);
+        Task<bool> Delete(int id);
+        Task<bool> Update(UserUpdateRequest user);
+        Task<bool> Add(UserAddRequest user);
+        private static Task<bool> Save() => null;
+        private static Task<User?> Get(int id) => null;
     }
 }
