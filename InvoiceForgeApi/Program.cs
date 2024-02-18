@@ -1,4 +1,4 @@
-using InvoiceForgeApi.Controllers;
+
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Interfaces;
 using InvoiceForgeApi.Middleware;
@@ -8,9 +8,7 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IClientRepository, ClientRepository>();
-builder.Services.AddScoped<ICodeListsRepository, CodeListsRepository>();
+builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

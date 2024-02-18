@@ -8,14 +8,14 @@ namespace InvoiceForgeApi.Data
     {
         public InvoiceForgeDatabaseContext(DbContextOptions<InvoiceForgeDatabaseContext> options): base(options) {}
 
-        public DbSet<Bank> Bank { get; set; }
-        public DbSet<Country> Country { get; set; }
-        public DbSet<Address> Address { get; set; }
-        public DbSet<Client> Client {  get; set; }
-        public DbSet<Contractor> Contractor { get; set; }
-        public DbSet<InvoiceTemplate> InvoiceTemplate { get; set; }
-        public DbSet<User> User { get; set; }
-        public DbSet<UserAccount> UserAccount { get; set; }
+        public DbSet<Bank> Bank { get; set; } = null!;
+        public DbSet<Country> Country { get; set; } = null!;
+        public DbSet<Address> Address { get; set; } = null!;
+        public DbSet<Client> Client {  get; set; } = null!;
+        public DbSet<Contractor> Contractor { get; set; } = null!;
+        public DbSet<InvoiceTemplate> InvoiceTemplate { get; set; } = null!;
+        public DbSet<User> User { get; set; } = null!;
+        public DbSet<UserAccount> UserAccount { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

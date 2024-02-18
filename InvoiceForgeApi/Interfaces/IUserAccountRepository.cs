@@ -1,14 +1,10 @@
-﻿using InvoiceForgeApi.Model;
+﻿using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Model;
 
 namespace InvoiceForgeApi.Interfaces
 {
-    public interface IUserAccountRepository
+    public interface IUserAccountRepository: IRepositoryBaseExtended<UserAccountGetRequest, UserAccountAddRequest, UserAccountUpdateRequest> 
     {
-        Task<IEnumerable<UserAccount>> GetAll(int? owner);
-        Task<UserAccount?> GetbyId(int id);
-        bool Delete(int id);
-        bool Update(UserAccount user);
-        bool Add(UserAccount user);
-        bool Save();
+        private static Task<UserAccount?> Get(int id) => null!;
     }
 }

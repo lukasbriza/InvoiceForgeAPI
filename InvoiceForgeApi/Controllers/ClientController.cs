@@ -16,32 +16,32 @@ namespace InvoiceForgeApi.Controllers
 
         [HttpGet]
         [Route("all/{userId}")]
-        public async Task<List<ClientGetRequest>> GetAll(int userId)
+        public async Task<List<ClientGetRequest>?> GetAllClients(int userId)
         {
             return await _clientRepository.GetAll(userId);
         }
         [HttpGet]
         [Route("{clientId}")]
-        public async Task<ClientGetRequest> GetById(int clientId)
+        public async Task<ClientGetRequest?> GetByClientId(int clientId)
         {
             return await _clientRepository.GetById(clientId);
 
         }
         [HttpPost]
         [Route("{userId}")]
-        public async Task<bool> Add(int userId, ClientAddRequest client)
+        public async Task<bool> AddClient(int userId, ClientAddRequest client)
         {
             return await _clientRepository.Add(userId, client);
         }
         [HttpPut]
         [Route("{clientId}")]
-        public async Task<bool> Update(int clientId, ClientUpdateRequest client)
+        public async Task<bool> UpdateClient(int clientId, ClientUpdateRequest client)
         {
             return await _clientRepository.Update(clientId, client);
         }
         [HttpDelete]
         [Route("{clientId}")]
-        public async Task<bool> Delete(int clientId)
+        public async Task<bool> DeleteClient(int clientId)
         {
             return await _clientRepository.Delete(clientId);
         }

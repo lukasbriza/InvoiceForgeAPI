@@ -13,81 +13,81 @@ namespace InvoiceForgeApi.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<List<ClientGetRequest>> GetAll(int owner)
+        public async Task<List<ClientGetRequest>?> GetAll(int userId)
         {
-            var clients = await _dbContext.Client.Select(c => new ClientGetRequest
-            {
-                    Id = c.Id,
-                    AddressId = c.AddressId,
-                    Owner = c.Owner,
-                    Type = c.Type,
-                    ClientName = c.ClientName,
-                    IN = c.IN,
-                    TIN = c.TIN,
-                    Mobil = c.Mobil,
-                    Tel = c.Tel,
-                    Email = c.Email,
-                    Address = new AddressGetRequest
+            var clients = await _dbContext.Client
+                .Include(c => c.Address)
+                .Include(c => c.Address!.Country)
+                .Select(c => new ClientGetRequest
                     {
-                        Id = c.Address.Id,
-                        Owner = c.Address.Owner,
-                        Street = c.Address.Street,
-                        StreetNumber = c.Address.StreetNumber,
-                        City = c.Address.City,
-                        PostalCode = c.Address.PostalCode,
-                        Country = new CountryGetRequest
+                        Id = c.Id,
+                        AddressId = (int)c.AddressId!,
+                        Owner = c.Owner,
+                        Type = c.Type,
+                        ClientName = c.ClientName,
+                        IN = c.IN,
+                        TIN = c.TIN,
+                        Mobil = c.Mobil,
+                        Tel = c.Tel,
+                        Email = c.Email,
+                        Address = new AddressGetRequest
                         {
-                            Id = c.Address.Country.Id,
-                            Value = c.Address.Country.Value,
-                            Shortcut = c.Address.Country.Shortcut
+                            Id = c.Address!.Id,
+                            Owner = c.Address.Owner,
+                            Street = c.Address.Street,
+                            StreetNumber = c.Address.StreetNumber,
+                            City = c.Address.City,
+                            PostalCode = c.Address.PostalCode,
+                            Country = new CountryGetRequest
+                            {
+                                Id = c.Address.Country!.Id,
+                                Value = c.Address.Country.Value,
+                                Shortcut = c.Address.Country.Shortcut
+                            }
                         }
                     }
-                }
-            )
-            .Where(c => c.Owner == owner).ToListAsync();
-            if(clients.Count == 0)
-            {
-                throw new DatabaseCallError("Clients does not exist");
-            }
+                )
+                .Where(c => c.Owner == userId).ToListAsync();
+                
             return clients;
 
 
         }
-        public async Task<ClientGetRequest> GetById(int clientId)
+        public async Task<ClientGetRequest?> GetById(int clientId)
         {
-            var client = await _dbContext.Client.Select(c => new ClientGetRequest
-            {
-                Id = c.Id,
-                AddressId = c.AddressId,
-                Owner = c.Owner,
-                Type = c.Type,
-                ClientName = c.ClientName,
-                IN = c.IN,
-                TIN = c.TIN,
-                Mobil = c.Mobil,
-                Tel = c.Tel,
-                Email = c.Email,
-                Address = new AddressGetRequest
-                {
-                    Id = c.Address.Id,
-                    Owner = c.Address.Owner,
-                    Street = c.Address.Street,
-                    StreetNumber = c.Address.StreetNumber,
-                    City = c.Address.City,
-                    PostalCode = c.Address.PostalCode,
-                    Country = new CountryGetRequest
+            var client = await _dbContext.Client
+                .Include(c => c.Address)
+                .Include(c => c.Address!.Country)
+                .Select(c => new ClientGetRequest
                     {
-                        Id = c.Address.Country.Id,
-                        Value = c.Address.Country.Value,
-                        Shortcut = c.Address.Country.Shortcut
+                        Id = c.Id,
+                        AddressId = (int)c.AddressId!,
+                        Owner = c.Owner,
+                        Type = c.Type,
+                        ClientName = c.ClientName,
+                        IN = c.IN,
+                        TIN = c.TIN,
+                        Mobil = c.Mobil,
+                        Tel = c.Tel,
+                        Email = c.Email,
+                        Address = new AddressGetRequest
+                        {
+                            Id = c.Address!.Id,
+                            Owner = c.Address.Owner,
+                            Street = c.Address.Street,
+                            StreetNumber = c.Address.StreetNumber,
+                            City = c.Address.City,
+                            PostalCode = c.Address.PostalCode,
+                            Country = new CountryGetRequest
+                            {
+                                Id = c.Address.Country!.Id,
+                                Value = c.Address.Country.Value,
+                                Shortcut = c.Address.Country.Shortcut
+                            }
+                        }
                     }
-                }
-            }
-            ).Where(c => c.Id == clientId).ToListAsync();
-            if (client.Count == 0)
-            {
-                throw new DatabaseCallError("Clients does not exist");
-            }
+                ).Where(c => c.Id == clientId).ToListAsync();
+
             if (client.Count > 1)
             {
                 throw new DatabaseCallError("Something unexpected happened. There are more than one client with this ID.");
@@ -115,7 +115,6 @@ namespace InvoiceForgeApi.Repository
                 Email = client.Email
             };
             await _dbContext.Client.AddAsync(newClient);
-            await Save();
             return true;
         }
         public async Task<bool> Update(int clientId, ClientUpdateRequest client)
@@ -154,8 +153,6 @@ namespace InvoiceForgeApi.Repository
             localClient.Mobil = client.Mobil ?? localClient.Mobil;
             localClient.Tel = client.Tel ?? localClient.Tel;
             localClient.Email = client.Email ?? localClient.Email;
-
-            await Save();
             return true;
         }
         public async Task<bool> Delete(int id)
@@ -168,16 +165,7 @@ namespace InvoiceForgeApi.Repository
             }
 
             _dbContext.Client.Remove(client);
-            await Save();
             return true;
-        }
-        private async Task Save()
-        {
-            int save = await _dbContext.SaveChangesAsync();
-            if(!(save > 0))
-            {
-                throw new DatabaseCallError("Client saving failed.");
-            }
         }
         private async Task<Client?> Get(int id)
         {

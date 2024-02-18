@@ -9,10 +9,12 @@ namespace InvoiceForgeApi.Controllers
     public class UserController: ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IRepositoryWrapper _repository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IRepositoryWrapper repository)
         {
-            _userRepository = userRepository;
+            _userRepository = repository.User;
+            _repository = repository;
         }
 
         [HttpGet]
@@ -25,20 +27,25 @@ namespace InvoiceForgeApi.Controllers
         [HttpPost]
         public async Task<bool> Add(UserAddRequest user)
         {
-            return await _userRepository.Add(user);
-
+            var userAdd = await _userRepository.Add(1,user);
+            if (userAdd)  await _repository.Save();
+            return userAdd;
         }
 
         [HttpPut]
         public async Task<bool> Update(UserUpdateRequest user)
         { 
-            return await _userRepository.Update(user);
+            var userUpdate = await _userRepository.Update(user.Id, user);
+            if(userUpdate) await _repository.Save();
+            return userUpdate;
         }
 
         [HttpDelete]
         public async Task<bool> Delete(int id)
         {
-            return await _userRepository.Delete(id);
+            var userDelete = await _userRepository.Delete(id);
+            if(userDelete) await _repository.Save();
+            return userDelete;
         }
     }
 }

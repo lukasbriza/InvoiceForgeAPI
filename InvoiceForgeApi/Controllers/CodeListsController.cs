@@ -10,9 +10,9 @@ namespace InvoiceForgeApi.Controllers
     {
         private readonly ICodeListsRepository _codeListsRepository;
 
-        public CodeListsController(ICodeListsRepository codeListsRepository)
+        public CodeListsController(IRepositoryWrapper repository)
         {
-            _codeListsRepository = codeListsRepository;
+            _codeListsRepository = repository.CodeLists;
         }
 
         [HttpGet]

@@ -12,7 +12,7 @@ namespace InvoiceForgeApi.Model
         [ForeignKey("User")] public int Owner { get; set; }
         [ForeignKey("Bank")] public int? BankId { get; set; }
 
-        [Required] public string AccountNumber { get; set; }
+        [Required] public string AccountNumber { get; set; } = null!;
         public string? IBAN { get; set; } = null;
 
         //Reference

@@ -14,9 +14,9 @@ namespace InvoiceForgeApi
         [ForeignKey("User")] public int Owner { get; set; }
 
         [Required] public ClientType Type { get; set; }
-        [Required] public string ClientName { get; set; }
+        [Required] public string ClientName { get; set; } = null!;
         [Required] public long IN { get; set; }
-        [Required] public string TIN { get; set; }
+        [Required] public string TIN { get; set; } = null!;
         public string? Mobil { get; set; } = null;
         public string? Tel { get; set; } = null;
         public string? Email { get; set; } = null;
