@@ -53,8 +53,9 @@ namespace InvoiceForgeApi.Controllers
         public async Task<bool> UpdateUserAccount(int userAccountId, UserAccountUpdateRequest userAccount)
         {
             var user = await _userRepository.GetById(userAccount.Owner);
-            var isOwnerOfUserAccount = user.UserAccounts.Where(a => a.Id == userAccountId);
+            if (user is null) return false;
 
+            var isOwnerOfUserAccount = user.UserAccounts.Where(a => a.Id == userAccountId);
             if(isOwnerOfUserAccount is null || isOwnerOfUserAccount.Count() != 1)
             {
                 throw new ValidationError("Provided values are wrong.");

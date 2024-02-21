@@ -1,14 +1,10 @@
-﻿using InvoiceForgeApi.Model;
+﻿using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Model;
 
 namespace InvoiceForgeApi.Interfaces
 {
-    public interface IAddressRepository
+    public interface IAddressRepository: IRepositoryBaseExtended<AddressGetRequest, AddressAddRequest, AddressUpdateRequest>
     {
-        Task<List<Address>> GetAll(int owner);
-        Task<Address?> GetById(int id);
-        bool Add(Address address);
-        bool Update(Address address);
-        bool Delete(int id);
-        bool Save();
+       private static Task<Address?> Get(int id) => null!;
     }
 }

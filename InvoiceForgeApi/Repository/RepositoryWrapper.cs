@@ -10,7 +10,7 @@ namespace InvoiceForgeApi.Repository
         private IUserRepository _user = null!;
         private IUserAccountRepository _userAccount = null!;
         private IClientRepository _client = null!;
-
+        private IAddressRepository _address = null!;
         private ICodeListsRepository _codeLists = null!;
 
         public RepositoryWrapper(InvoiceForgeDatabaseContext context)
@@ -44,6 +44,16 @@ namespace InvoiceForgeApi.Repository
                     _client = new ClientRepository(_context);
                 }
                 return _client;
+            }
+        }
+        public IAddressRepository Address
+        {
+            get {
+                if(_address == null)
+                {
+                    _address = new AddressRepository(_context);
+                }
+                return _address;
             }
         }
         public ICodeListsRepository CodeLists

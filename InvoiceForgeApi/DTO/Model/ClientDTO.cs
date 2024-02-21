@@ -1,4 +1,5 @@
 ﻿using InvoiceForgeApi.Data.Enum;
+using Microsoft.Net.Http.Headers;
 
 namespace InvoiceForgeApi.DTO.Model
 {
@@ -33,6 +34,7 @@ namespace InvoiceForgeApi.DTO.Model
     public class ClientUpdateRequest
     {
         public int? AddressId { get; set; }
+        public int Owner { get; set; }
         public ClientType? Type { get; set; }
         public string? ClientName { get; set; } = null!;
         public long? IN { get; set; }

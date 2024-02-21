@@ -19,6 +19,7 @@ namespace InvoiceForgeApi.Repository
         {
             var user = await _dbContext.User
                 .Include(u => u.Clients)
+                .Include(u => u.Addresses)
                 .Include(u => u.Contractors)
                 .Include(u => u.UserAccounts)
                 .Select(u => new UserGetRequest
@@ -99,6 +100,22 @@ namespace InvoiceForgeApi.Repository
                                 }
                             }
                         ),
+                        Addresses = u.Addresses.Select(u => new AddressGetRequest
+                            {
+                                Id = u.Id,
+                                Owner = u.Owner,
+                                City = u.City,
+                                PostalCode = u.PostalCode,
+                                Street = u.Street,
+                                StreetNumber = u.StreetNumber,
+                                Country = new CountryGetRequest
+                                {
+                                    Id = u.Country!.Id,
+                                    Value = u.Country!.Value,
+                                    Shortcut = u.Country.Shortcut
+                                }
+                            }
+                        )
                     }
                 )
                 .Where(u => u.Id == id).ToListAsync();
