@@ -28,6 +28,12 @@ namespace InvoiceForgeApi.Controllers
             return await _codeListsRepository.GetBanks();
         }
         [HttpGet]
+        [Route("client-type")]
+        public List<ClientTypeGetRequest>? GetClientTypes()
+        {
+            return _codeListsRepository.GetClientTypes();
+        }
+        [HttpGet]
         [Route("all")]
         public async Task<CodeListsAllGetRequest> GetCodeListsAll()
         {

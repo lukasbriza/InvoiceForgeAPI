@@ -1,7 +1,9 @@
 ﻿using InvoiceForgeApi.Data;
+using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -37,12 +39,30 @@ namespace InvoiceForgeApi.Repository
                     }
                 );
         }
+        public List<ClientTypeGetRequest> GetClientTypes()
+        {
+            var list = new List<ClientTypeGetRequest>()
+            {
+                new ClientTypeGetRequest()
+                {
+                    Id = (int)ClientType.LegalEntity,
+                    Description = ClientType.LegalEntity.GetDisplayName()
+                },
+                new ClientTypeGetRequest()
+                {
+                    Id = (int)ClientType.Entrepreneur,
+                    Description = ClientType.Entrepreneur.GetDisplayName()
+                }
+            };
+            return list;
+        }
         public async Task<CodeListsAllGetRequest> GetCodeListsAll()
         {
             var bankList = await GetBanks();
             var countriesList = await GetCountries();
+            var clientTypes =  GetClientTypes();
 
-            return new CodeListsAllGetRequest { Banks = bankList, Countries = countriesList };
+            return new CodeListsAllGetRequest { Banks = bankList, Countries = countriesList, ClientTypes = clientTypes };
         }
     }
 }

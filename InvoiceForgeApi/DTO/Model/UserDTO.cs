@@ -21,5 +21,6 @@ namespace InvoiceForgeApi.DTO.Model
         public IEnumerable<ContractorGetRequest> Contractors { get; set; } = new List<ContractorGetRequest>();
         public IEnumerable<UserAccountGetRequest> UserAccounts { get; set; } = new List<UserAccountGetRequest>();
         public IEnumerable<InvoiceTemplateGetRequest> InvoiceTemplates { get; set; } = new List<InvoiceTemplateGetRequest>();
+        public IEnumerable<AddressGetRequest> Addresses { get; set; } = new List<AddressGetRequest>();
     }
 }

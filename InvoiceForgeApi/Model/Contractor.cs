@@ -16,7 +16,7 @@ namespace InvoiceForgeApi.Model
         [Required] public string ContractorName { get; set; }
         [Required] public long IN { get; set; }
         [Required] public string TIN { get; set; }
-        [Required] public string Email { get; set; }
+        [Required] public string Email { get; set; } 
         public string? Mobil { get; set; } = null;
         public string? Tel { get; set; } = null;
         public string? www { get; set; } = null;
