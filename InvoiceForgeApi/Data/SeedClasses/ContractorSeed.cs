@@ -16,7 +16,7 @@ namespace InvoiceForgeApi.Data.SeedClasses
                     IN = 123456789,
                     TIN = "CZ123456789",
                     Email = "email@seznam.cz",
-                    www = "www.web.cz",
+                    Www = "www.web.cz",
                     Tel = "774876504",
                     Mobil = "774876504"
                 }

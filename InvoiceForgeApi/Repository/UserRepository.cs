@@ -36,7 +36,7 @@ namespace InvoiceForgeApi.Repository
                                 Email = c.Email,
                                 Mobil = c.Mobil,
                                 Tel = c.Tel,
-                                www = c.www,
+                                Www = c.Www,
                                 Address = new AddressGetRequest
                                 {
                                     Id = c.Address!.Id,

@@ -10,7 +10,7 @@ namespace InvoiceForgeApi.Data
             {
                 var context = serviceScope.ServiceProvider.GetService<InvoiceForgeDatabaseContext>();
 
-                context.Database.EnsureCreated();
+                context!.Database.EnsureCreated();
                 //Bank
                 if(!context.Bank.Any())
                 {

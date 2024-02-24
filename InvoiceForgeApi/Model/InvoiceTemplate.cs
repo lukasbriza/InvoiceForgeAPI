@@ -13,7 +13,7 @@ namespace InvoiceForgeApi.Model
         [Required] public int ClientId { get; set; }
         [Required] public int ContractorId { get; set; }
         [Required] public int UserAccountId { get; set; }
-        [Required] public string TemplateName { get; set; }
+        [Required] public string TemplateName { get; set; } = null!;
         [Required] public DateTime Created { get; set; }
 
         // reference

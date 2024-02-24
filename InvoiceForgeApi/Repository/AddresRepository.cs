@@ -1,10 +1,8 @@
-using System.Net.WebSockets;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
 using InvoiceForgeApi.Model;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
@@ -15,10 +13,9 @@ namespace InvoiceForgeApi.Repository
         public AddressRepository(InvoiceForgeDatabaseContext dbContext)
         {
             _dbContext = dbContext;
-          
         }
-         public async Task<List<AddressGetRequest>?> GetAll(int userId)
-         {
+        public async Task<List<AddressGetRequest>?> GetAll(int userId)
+        {
             var addresses = await _dbContext.Address
                 .Include(a => a.Country)
                 .Select( a => new AddressGetRequest
@@ -39,9 +36,9 @@ namespace InvoiceForgeApi.Repository
                 )
                 .Where(a => a.Owner == userId).ToListAsync();
             return addresses;
-         }
-         public async Task<AddressGetRequest?> GetById(int addressId)
-         {
+        }
+        public async Task<AddressGetRequest?> GetById(int addressId)
+        {
                 var address = await _dbContext.Address
                     .Include(a => a.Country)
                     .Select( a => new AddressGetRequest
@@ -67,21 +64,9 @@ namespace InvoiceForgeApi.Repository
                     throw new DatabaseCallError("Something unexpected happended. There are more than one address with this ID.");
                 }
                 return address[0];
-         }
-         public async Task<bool> Add(int userId, AddressAddRequest address)
-         {
-            if (address is null)
-            {
-                throw new ValidationError("Address is not provided.");
-            }
-
-            var countryExists = await _dbContext.Country.FindAsync(address.CountryId);
-
-            if (countryExists is null)
-            {
-                throw new ValidationError("Provided countryId is invalid.");
-            }
-
+        }
+        public async Task<bool> Add(int userId, AddressAddRequest address)
+        {
             var newAddress = new Address
             {
                 Owner = userId,
@@ -93,9 +78,9 @@ namespace InvoiceForgeApi.Repository
             };
             await _dbContext.Address.AddAsync(newAddress);
             return true;
-         }
-         public async Task<bool> Update(int addressId, AddressUpdateRequest address)
-         {
+        }
+        public async Task<bool> Update(int addressId, AddressUpdateRequest address)
+        {
             if (address is null)
             {
                 throw new ValidationError("Address is not provided");
@@ -122,9 +107,24 @@ namespace InvoiceForgeApi.Repository
             localAddress.StreetNumber = address.StreetNumber ?? localAddress.StreetNumber;
             localAddress.PostalCode = address.PostalCode ?? localAddress.PostalCode;
             return true;
-         }
-         public async Task<bool> Delete(int addressId)
-         {
+        }
+        public async Task<bool> HasDependentReferences(int addressId)
+        {
+            var address = await _dbContext.Address
+                .Include(a => a.Clients)
+                .Include(a => a.Contractors)
+                .Where(a => a.Id == addressId).ToListAsync();
+            
+            if (address.Count() == 0) throw new DatabaseCallError("Address is not in database.");
+            if (address.Count() > 1) throw new DatabaseCallError("Somethin unexpected happened. There is More than one address with that id");
+            var clients = address[0].Clients;
+            var contractors = address[0].Contractors;
+            if (clients is null || contractors is null) return false;
+            if (clients.Count() == 0 || address.Count() == 0) return false;
+            return true;
+        }
+        public async Task<bool> Delete(int addressId)
+        {
             var address = await Get(addressId);
 
             if (address is null)
@@ -134,11 +134,11 @@ namespace InvoiceForgeApi.Repository
 
             _dbContext.Address.Remove(address);
             return true;
-         }
-         private async Task<Address?> Get(int id)
-         {
+        }
+        private async Task<Address?> Get(int id)
+        {
             return await _dbContext.Address.FindAsync(id);
-         }
+        }
 
     }
 }

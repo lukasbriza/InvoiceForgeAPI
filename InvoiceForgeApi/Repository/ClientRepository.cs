@@ -1,4 +1,5 @@
 ﻿using InvoiceForgeApi.Data;
+using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
@@ -95,18 +96,17 @@ namespace InvoiceForgeApi.Repository
 
             return client[0];
         }
-        public async Task<bool> Add(int userId ,ClientAddRequest client)
+        public async Task<bool> Add(int userId ,ClientAddRequest client, ClientType? clientType)
         {
-            if(client is null)
+            if (clientType is null)
             {
-                throw new ValidationError("Client is not provided.");
+                throw new ValidationError("ClientType is not provided.");
             }
-
             var newClient = new Client
             {
                 AddressId = client.AddressId,
                 Owner = userId,
-                Type = client.Type,
+                Type = (ClientType)clientType,
                 ClientName = client.ClientName,
                 IN = client.IN,
                 TIN = client.TIN,
@@ -117,7 +117,7 @@ namespace InvoiceForgeApi.Repository
             await _dbContext.Client.AddAsync(newClient);
             return true;
         }
-        public async Task<bool> Update(int clientId, ClientUpdateRequest client)
+        public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType? clientType)
         {
             if (client is null)
             {
@@ -126,27 +126,13 @@ namespace InvoiceForgeApi.Repository
 
             var localClient = await Get(clientId);
 
-            if (localClient is null)
+            if(localClient is null)
             {
-                throw new DatabaseCallError("Client is not in database.");
-            }
-
-            if (client.AddressId is not null)
-            {
-                var addressControl = await _dbContext.Address.FindAsync(client.AddressId);
-                
-                if (addressControl is null)
-                {
-                    throw new ValidationError("Provided address is not in database.");
-                }
-                if (addressControl.Owner != localClient.Owner)
-                {
-                    throw new ValidationError("Provided address is not in your possession.");
-                }
+                return false;
             }
 
             localClient.AddressId = client.AddressId ?? localClient.AddressId;
-            localClient.Type = client.Type ?? localClient.Type;
+            localClient.Type = clientType ?? localClient.Type;
             localClient.ClientName = client.ClientName ?? localClient.ClientName;
             localClient.IN = client.IN ?? localClient.IN;
             localClient.TIN = client.TIN ?? localClient.TIN;

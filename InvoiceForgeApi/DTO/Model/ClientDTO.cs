@@ -21,8 +21,8 @@ namespace InvoiceForgeApi.DTO.Model
 
     public class ClientAddRequest
     {
-        public int? AddressId { get; set; }
-        public ClientType Type { get; set; }
+        public int AddressId { get; set; }
+        public int TypeId { get; set; }
         public string ClientName { get; set; } = null!;
         public long IN { get; set; }
         public string TIN { get; set; } = null!;
@@ -33,9 +33,9 @@ namespace InvoiceForgeApi.DTO.Model
 
     public class ClientUpdateRequest
     {
-        public int? AddressId { get; set; }
         public int Owner { get; set; }
-        public ClientType? Type { get; set; }
+        public int? AddressId { get; set; }
+        public int? TypeId { get; set; }
         public string? ClientName { get; set; } = null!;
         public long? IN { get; set; }
         public string? TIN { get; set; } = null!;
