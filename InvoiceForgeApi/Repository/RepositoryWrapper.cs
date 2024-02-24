@@ -6,12 +6,13 @@ namespace InvoiceForgeApi.Repository
 {
     public class RepositoryWrapper: IRepositoryWrapper
     {
-        private InvoiceForgeDatabaseContext _context = null!;
+        private readonly InvoiceForgeDatabaseContext _context = null!;
         private IUserRepository _user = null!;
         private IUserAccountRepository _userAccount = null!;
         private IClientRepository _client = null!;
         private IAddressRepository _address = null!;
         private ICodeListsRepository _codeLists = null!;
+        private IContractorRepository _contractor = null!;
 
         public RepositoryWrapper(InvoiceForgeDatabaseContext context)
         {
@@ -54,6 +55,16 @@ namespace InvoiceForgeApi.Repository
                     _address = new AddressRepository(_context);
                 }
                 return _address;
+            }
+        }
+        public IContractorRepository Contractor
+        {
+            get{
+                if(_contractor == null)
+                {
+                    _contractor = new ContractorRepository(_context);
+                }
+                return _contractor;
             }
         }
         public ICodeListsRepository CodeLists
