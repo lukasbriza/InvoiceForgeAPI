@@ -31,6 +31,7 @@ namespace InvoiceForgeApi.DTO.Model
     }
     public class ContractorUpdateRequest
     {
+        public int Owner { get; set; }
         public int? AddressId { get; set; }
         public int? TypeId { get; set; }
         public string? ContractorName { get; set; } = null!;

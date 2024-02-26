@@ -1,4 +1,5 @@
-﻿using InvoiceForgeApi.DTO;
+﻿using InvoiceForgeApi.Data.Enum;
+using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace InvoiceForgeApi.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IAddressRepository _addressRepository;
         private readonly ICodeListsRepository _codeListsRepository;
+        private readonly IInvoiceTemplateRepository _invoiceTemplate;
         private readonly IRepositoryWrapper _repository;
         public ClientController(IRepositoryWrapper repository)
         {
@@ -20,6 +22,7 @@ namespace InvoiceForgeApi.Controllers
             _addressRepository = repository.Address;
             _userRepository = repository.User;
             _codeListsRepository = repository.CodeLists;
+            _invoiceTemplate = repository.InvoiceTemplate;
             _repository = repository;
         }
 
@@ -52,7 +55,7 @@ namespace InvoiceForgeApi.Controllers
             var isValidOwner = await _userRepository.GetById(userId);
             if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
             
-            var addClient = await _clientRepository.Add(userId, client, clientTypeValidation);
+            var addClient = await _clientRepository.Add(userId, client, (ClientType)clientTypeValidation);
             if (addClient) await _repository.Save();
             return addClient;
         }
@@ -60,6 +63,8 @@ namespace InvoiceForgeApi.Controllers
         [Route("{clientId}")]
         public async Task<bool> UpdateClient(int clientId, ClientUpdateRequest client)
         {
+            if (client is null) throw new ValidationError("Client is not provided.");
+            
             var user = await _userRepository.GetById(client.Owner);
             if (user is null) return false;
 
@@ -86,6 +91,9 @@ namespace InvoiceForgeApi.Controllers
         [Route("{clientId}")]
         public async Task<bool> DeleteClient(int clientId)
         {
+            var hasInvoiceTemplatesReference = await _invoiceTemplate.GetByCondition((template) => template.ClientId == clientId);
+            if (hasInvoiceTemplatesReference is not null && hasInvoiceTemplatesReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+
             var deleteClient = await _clientRepository.Delete(clientId);
             if (deleteClient) await _repository.Save();
             return deleteClient;

@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -108,21 +109,6 @@ namespace InvoiceForgeApi.Repository
             localAddress.PostalCode = address.PostalCode ?? localAddress.PostalCode;
             return true;
         }
-        public async Task<bool> HasDependentReferences(int addressId)
-        {
-            var address = await _dbContext.Address
-                .Include(a => a.Clients)
-                .Include(a => a.Contractors)
-                .Where(a => a.Id == addressId).ToListAsync();
-            
-            if (address.Count() == 0) throw new DatabaseCallError("Address is not in database.");
-            if (address.Count() > 1) throw new DatabaseCallError("Somethin unexpected happened. There is More than one address with that id");
-            var clients = address[0].Clients;
-            var contractors = address[0].Contractors;
-            if (clients is null || contractors is null) return false;
-            if (clients.Count() == 0 || address.Count() == 0) return false;
-            return true;
-        }
         public async Task<bool> Delete(int addressId)
         {
             var address = await Get(addressId);
@@ -138,6 +124,11 @@ namespace InvoiceForgeApi.Repository
         private async Task<Address?> Get(int id)
         {
             return await _dbContext.Address.FindAsync(id);
+        }
+        public async Task<List<Address>?> GetByCondition(Expression<Func<Address,bool>> condition)
+        {
+            var result = await _dbContext.Address.Where(condition).ToListAsync();
+            return result;
         }
 
     }

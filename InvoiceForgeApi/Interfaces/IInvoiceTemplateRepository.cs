@@ -1,14 +1,10 @@
-﻿using InvoiceForgeApi.Model;
+﻿using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Model;
 
 namespace InvoiceForgeApi.Interfaces
 {
-    public interface IInvoiceTemplateRepository
+    public interface IInvoiceTemplateRepository: IRepositoryBaseExtended<InvoiceTemplateGetRequest,IvoiceTemplateAddRequest,InvoiceTemplateUpdateRequest, InvoiceTemplate>
     {
-        Task<IEnumerable<InvoiceTemplate>> GetAll(int? owner);
-        Task<InvoiceTemplate?> GetById(int? owner);
-        bool Delete(int id);
-        bool Update(InvoiceTemplate user);
-        bool Add(InvoiceTemplate user);
-        bool Save();
+        private static Task<InvoiceTemplate> Get(int id) => null!;
     }
 }
