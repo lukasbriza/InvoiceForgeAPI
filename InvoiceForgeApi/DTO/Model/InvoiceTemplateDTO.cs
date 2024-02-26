@@ -10,4 +10,22 @@
         public string TemplateName { get; set; } = null!;
         public DateTime Created { get; set; }
     }
+
+    public class IvoiceTemplateAddRequest
+    {
+        public  int ClientId { get; set; }
+        public int ContractorId { get; set; }
+        public int UserAccountId { get; set; }
+        public string TemplateName { get; set; } = null!;
+        public DateTime Created { get; set; }
+    }
+
+    public class InvoiceTemplateUpdateRequest
+    {
+        public int Owner { get; set; }
+        public int? ClientId { get; set; }
+        public int? ContractorId { get; set; }
+        public int? UserAccountId { get; set; }
+        public string? TemplateName { get; set; }
+    }
 }

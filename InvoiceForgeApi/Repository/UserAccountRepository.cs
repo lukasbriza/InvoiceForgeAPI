@@ -1,4 +1,5 @@
-﻿using InvoiceForgeApi.Data;
+﻿using System.Linq.Expressions;
+using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
@@ -66,23 +67,16 @@ public class UserAccountRepository: IUserAccountRepository
         }
         return userAccount[0];
     }
-
-    public async Task<bool> Add(int userId, UserAccountAddRequest userAccount)
+    public async Task<bool> HasDuplicitIbanOrAccountNumber(int userId, UserAccountAddRequest userAccount)
     {
-        if(userAccount is null)
-        {
-            throw new ValidationError("User account is not provided");
-        }
-
         var isDuplicitIBANOrAccountNumber = await _dbContext.UserAccount
             .Where(u => u.Owner == userId && (u.IBAN == userAccount.IBAN || u.AccountNumber == userAccount.AccountNumber))
             .ToListAsync();
-
-        if(isDuplicitIBANOrAccountNumber.Count > 0)
-        {
-            throw new ValidationError("Canot add account with duplicit number or IBAN");
-        }
-
+        if (isDuplicitIBANOrAccountNumber is null || isDuplicitIBANOrAccountNumber.Count() == 0) return false;
+        return true;
+    }
+    public async Task<bool> Add(int userId, UserAccountAddRequest userAccount)
+    {
         var newUserAccount = new UserAccount
         {
             Owner = userId,
@@ -96,26 +90,11 @@ public class UserAccountRepository: IUserAccountRepository
     }
     public async Task<bool> Update(int userAccountId, UserAccountUpdateRequest userAccount)
     {
-        if (userAccount is null)
-        {
-            throw new ValidationError("User acccoun is not provided.");
-        }
-
         var localUserAccount = await Get(userAccountId);
 
         if (localUserAccount is null)
         {
             throw new DatabaseCallError("User account is not in database.");
-        }
-
-        if (userAccount.BankId is not null)
-        {
-            var bankControl = await _dbContext.Bank.FindAsync(userAccount.BankId);
-
-            if (bankControl is null)
-            {
-                throw new ValidationError("Provided bank is not in our database");
-            }
         }
 
         localUserAccount.BankId = userAccount.BankId ?? localUserAccount.BankId;
@@ -138,5 +117,10 @@ public class UserAccountRepository: IUserAccountRepository
     private async Task<UserAccount?> Get(int id)
     {
         return await _dbContext.UserAccount.FindAsync(id);
+    }
+    public async Task<List<UserAccount>?> GetByCondition(Expression<Func<UserAccount, bool>> condition)
+    {
+        var result = await _dbContext.UserAccount.Where(condition).ToListAsync();
+        return result;
     }
 }

@@ -1,4 +1,5 @@
-﻿using InvoiceForgeApi.Data;
+﻿using System.Linq.Expressions;
+using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -96,17 +97,13 @@ namespace InvoiceForgeApi.Repository
 
             return client[0];
         }
-        public async Task<bool> Add(int userId ,ClientAddRequest client, ClientType? clientType)
+        public async Task<bool> Add(int userId ,ClientAddRequest client, ClientType clientType)
         {
-            if (clientType is null)
-            {
-                throw new ValidationError("ClientType is not provided.");
-            }
             var newClient = new Client
             {
                 AddressId = client.AddressId,
                 Owner = userId,
-                Type = (ClientType)clientType,
+                Type = clientType,
                 ClientName = client.ClientName,
                 IN = client.IN,
                 TIN = client.TIN,
@@ -119,16 +116,11 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType? clientType)
         {
-            if (client is null)
-            {
-                throw new ValidationError("Client is not provided.");
-            }
-
             var localClient = await Get(clientId);
 
             if(localClient is null)
             {
-                return false;
+                throw new DatabaseCallError("Client is not in database.");
             }
 
             localClient.AddressId = client.AddressId ?? localClient.AddressId;
@@ -156,6 +148,11 @@ namespace InvoiceForgeApi.Repository
         private async Task<Client?> Get(int id)
         {
             return await _dbContext.Client.FindAsync(id);
+        }
+        public async Task<List<Client>?> GetByCondition(Expression<Func<Client,bool>> condition)
+        {
+            var result = await _dbContext.Client.Where(condition).ToListAsync();
+            return result;
         }
     }
 }

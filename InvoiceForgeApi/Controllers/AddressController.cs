@@ -1,3 +1,4 @@
+using System.Diagnostics.Tracing;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
@@ -11,12 +12,16 @@ namespace InvoiceForgeApi.Controllers
     {
         private readonly IAddressRepository _addressRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IContractorRepository _contractorRepository;
+        private readonly IClientRepository _clientRepository;
         private readonly ICodeListsRepository _codeListRepository;
         private readonly IRepositoryWrapper _repository;
         public AddressController(IRepositoryWrapper repository)
         {
             _addressRepository = repository.Address;
             _userRepository = repository.User;
+            _contractorRepository = repository.Contractor;
+            _clientRepository = repository.Client;
             _codeListRepository = repository.CodeLists;
             _repository = repository;
         }
@@ -71,8 +76,11 @@ namespace InvoiceForgeApi.Controllers
         [Route("{addressId}")]
         public async Task<bool> DeleteAddress(int addressId)
         {
-            var hasReferences = await _addressRepository.HasDependentReferences(addressId);
-            if (hasReferences) throw new ValidationError("Cannot delete. Address has references.");
+            var hasContractReference = await _contractorRepository.GetByCondition((contractor) => contractor.AddressId == addressId);
+            if (hasContractReference is not null && hasContractReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+            var hasClientReference = await _clientRepository.GetByCondition((client) => client.AddressId == addressId);
+            if (hasClientReference is not null && hasClientReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+
             var deleteAddress = await _addressRepository.Delete(addressId);
             if (deleteAddress) await _repository.Save();
             return deleteAddress;

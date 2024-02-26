@@ -27,9 +27,9 @@ namespace InvoiceForgeApi.Repository
                 }
             );
         }
-        public async Task<CountryGetRequest> GetCountryById(int id)
+        public async Task<CountryGetRequest?> GetCountryById(int id)
         {
-            var countries = await _dbContext.Country.Select(c => new CountryGetRequest
+            var country = await _dbContext.Country.Select(c => new CountryGetRequest
                 {
                     Id = c.Id,
                     Value = c.Value,
@@ -37,8 +37,9 @@ namespace InvoiceForgeApi.Repository
                 }
             ).Where(c => c.Id == id).ToListAsync();
 
-            if (countries is null || countries.Count() != 1) throw new ValidationError("Something unexpected happened. There is more than one country with that id.");
-            return countries[0];
+            if (country.Count > 1) throw new ValidationError("Something unexpected happened. There is more than one country with that id.");
+            if (country is null || country.Count == 0) return null;
+            return country[0];
         }
         public async Task<List<BankGetRequest>?> GetBanks()
         {
@@ -52,6 +53,20 @@ namespace InvoiceForgeApi.Repository
                         SWIFT = b.SWIFT,
                     }
                 );
+        }
+        public async Task<BankGetRequest?> GetBankById(int id)
+        {
+            var bank = await _dbContext.Bank.Select(b => new BankGetRequest
+                {
+                    Id = b.Id,
+                    Value = b.Value,
+                    Shortcut = b.Shortcut,
+                    SWIFT = b.SWIFT
+                }
+            ).ToListAsync();
+            if (bank.Count > 1) throw new ValidationError("Something unexpected happened. There is more than one bank with that id.");
+            if (bank is null || bank.Count == 0) return null;
+            return bank[0];
         }
         public List<ClientTypeGetRequest> GetClientTypes()
         {

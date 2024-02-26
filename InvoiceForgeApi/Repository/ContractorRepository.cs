@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO;
@@ -91,22 +92,13 @@ namespace InvoiceForgeApi.Repository
 
             return contractor[0];
         }
-        public async Task<bool> Add(int userId, ContractorAddRequest contractor, ClientType? clientType)
+        public async Task<bool> Add(int userId, ContractorAddRequest contractor, ClientType clientType)
         {
-            if(clientType is null)
-            {
-                throw new ValidationError("Client type is not defined.");
-            }
-            if(contractor is null)
-            {
-                throw new ValidationError("Contractor is not provided");
-            }
-
             var newContractor = new Contractor
             {
                 AddressId = contractor.AddressId,
                 Owner = userId,
-                ClientType = (ClientType)clientType,
+                ClientType = clientType,
                 ContractorName = contractor.ContractorName,
                 IN = contractor.IN,
                 TIN = contractor.TIN,
@@ -120,29 +112,11 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType? clientType)
         {
-            if (contractor is null)
-            {
-                throw new ValidationError("Contractor is not provided.");
-            }
-
             var localContractor = await Get(contractorId);
 
             if(localContractor is null)
             {
                 throw new DatabaseCallError("Contractor is not in database.");
-            }
-
-            if (contractor.AddressId is not null){
-                var addressControl = await _dbContext.Address.FindAsync(contractor.AddressId);
-
-                if (addressControl is null)
-                {
-                    throw new ValidationError("Provided address is not in database.");
-                }
-                if(addressControl.Owner != localContractor.Owner)
-                {
-                    throw new ValidationError("Provided address is not in your possession.");
-                }
             }
 
             localContractor.AddressId = contractor.AddressId ?? localContractor.AddressId;
@@ -171,6 +145,11 @@ namespace InvoiceForgeApi.Repository
         private async Task<Contractor?> Get(int id)
         {
             return await _dbContext.Contractor.FindAsync(id);
+        }
+        public async Task<List<Contractor>?> GetByCondition(Expression<Func<Contractor,bool>> condition)
+        {
+            var result = await _dbContext.Contractor.Where(condition).ToListAsync();
+            return result;
         }
 
     }

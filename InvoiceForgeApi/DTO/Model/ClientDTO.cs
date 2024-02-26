@@ -1,5 +1,4 @@
 ﻿using InvoiceForgeApi.Data.Enum;
-using Microsoft.Net.Http.Headers;
 
 namespace InvoiceForgeApi.DTO.Model
 {

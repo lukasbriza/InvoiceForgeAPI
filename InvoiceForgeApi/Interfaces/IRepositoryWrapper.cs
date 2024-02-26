@@ -7,6 +7,8 @@ namespace InvoiceForgeApi.Interfaces
         IClientRepository Client { get; }
         ICodeListsRepository CodeLists { get; }
         IAddressRepository Address { get; }
+        IInvoiceTemplateRepository InvoiceTemplate { get; }
+        IContractorRepository Contractor { get; }
         Task Save();
     }
 }

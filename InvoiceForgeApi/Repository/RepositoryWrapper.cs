@@ -13,6 +13,7 @@ namespace InvoiceForgeApi.Repository
         private IAddressRepository _address = null!;
         private ICodeListsRepository _codeLists = null!;
         private IContractorRepository _contractor = null!;
+        private IInvoiceTemplateRepository _invoiceTemplates = null!;
 
         public RepositoryWrapper(InvoiceForgeDatabaseContext context)
         {
@@ -65,6 +66,16 @@ namespace InvoiceForgeApi.Repository
                     _contractor = new ContractorRepository(_context);
                 }
                 return _contractor;
+            }
+        }
+        public IInvoiceTemplateRepository InvoiceTemplate
+        {
+            get{
+                if(_invoiceTemplates == null)
+                {
+                    _invoiceTemplates = new InvoiceTemplateRepository(_context);
+                }
+                return _invoiceTemplates;
             }
         }
         public ICodeListsRepository CodeLists
