@@ -15,10 +15,15 @@ public class UserAccountRepository: IUserAccountRepository
     {
         _dbContext = dbContext;
     }
-    public async Task<List<UserAccountGetRequest>?> GetAll(int userId)
+    public async Task<List<UserAccountGetRequest>?> GetAll(int userId, bool? plain)
     {
-        var userAccounts = await _dbContext.UserAccount
-            .Include(u => u.Bank)
+        DbSet<UserAccount> userAccounts = _dbContext.UserAccount;
+        if (plain == false)
+        {
+            userAccounts.Include(u => u.Bank);
+        }
+        
+        var userAccountsList = await userAccounts
             .Select( u => new UserAccountGetRequest
                 {
                     Id = u.Id,
@@ -26,23 +31,28 @@ public class UserAccountRepository: IUserAccountRepository
                     BankId = u.BankId,
                     IBAN = u.IBAN,
                     AccountNumber = u.AccountNumber,
-                    Bank = new BankGetRequest
+                    Bank = plain == false ? new BankGetRequest
                     {
                         Id = u.Bank!.Id,
                         Value = u.Bank.Value,
                         Shortcut = u.Bank.Shortcut,
                         SWIFT = u.Bank.SWIFT
-                    }
+                    } : null
                 }
             )
             .Where(u => u.Owner == userId).ToListAsync();
 
-        return userAccounts;
+        return userAccountsList;
     }
-    public async Task<UserAccountGetRequest?> GetById(int userAccountId)
+    public async Task<UserAccountGetRequest?> GetById(int userAccountId, bool? plain)
     {
-        var userAccount = await _dbContext.UserAccount
-            .Include(u => u.Bank)
+        DbSet<UserAccount> userAccount = _dbContext.UserAccount;
+        if (plain == false)
+        {
+            userAccount.Include(u => u.Bank);
+        }
+        
+        var userAccountList = await userAccount
             .Select( u => new UserAccountGetRequest
                 {
                     Id = u.Id,
@@ -61,11 +71,11 @@ public class UserAccountRepository: IUserAccountRepository
             )
             .Where(u => u.Id == userAccountId).ToListAsync();
         
-        if(userAccount.Count > 1)
+        if(userAccountList.Count > 1)
         {
             throw new ValidationError("Something unexpected happened. There are more than one user account with this ID.");
         }
-        return userAccount[0];
+        return userAccountList[0];
     }
     public async Task<bool> HasDuplicitIbanOrAccountNumber(int userId, UserAccountAddRequest userAccount)
     {

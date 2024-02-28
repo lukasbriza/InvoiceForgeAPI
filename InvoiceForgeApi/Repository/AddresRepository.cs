@@ -15,33 +15,38 @@ namespace InvoiceForgeApi.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<List<AddressGetRequest>?> GetAll(int userId)
+        public async Task<List<AddressGetRequest>?> GetAll(int userId, bool? plain = false)
         {
-            var addresses = await _dbContext.Address
-                .Include(a => a.Country)
-                .Select( a => new AddressGetRequest
+            DbSet<Address> addresses = _dbContext.Address;
+            if (plain == false){
+                addresses.Include(a => a.Country);
+            }
+            var addressList = await addresses.Select( a => new AddressGetRequest
+                {
+                    Id = a.Id,
+                    Owner = a.Owner,
+                    Street = a.Street,
+                    StreetNumber = a.StreetNumber,
+                    City = a.City,
+                    PostalCode = a.PostalCode,
+                    CountryId = a.CountryId,
+                    Country = plain == false ? new CountryGetRequest
                     {
-                        Id = a.Id,
-                        Owner = a.Owner,
-                        Street = a.Street,
-                        StreetNumber = a.StreetNumber,
-                        City = a.City,
-                        PostalCode = a.PostalCode,
-                        Country = new CountryGetRequest
-                        {
-                            Id = a.Country!.Id,
-                            Value = a.Country.Value,
-                            Shortcut = a.Country.Shortcut
-                        }
-                    }
-                )
-                .Where(a => a.Owner == userId).ToListAsync();
-            return addresses;
+                        Id = a.Country!.Id,
+                        Value = a.Country.Value,
+                        Shortcut = a.Country.Shortcut
+                    } : null 
+                }
+            ).Where(a => a.Owner == userId).ToListAsync();
+            return addressList;
         }
-        public async Task<AddressGetRequest?> GetById(int addressId)
+        public async Task<AddressGetRequest?> GetById(int addressId, bool? plain = false)
         {
-                var address = await _dbContext.Address
-                    .Include(a => a.Country)
+                DbSet<Address> address = _dbContext.Address;
+                if (plain == false){
+                    address.Include(a => a.Country);
+                }
+                var addressList = await address
                     .Select( a => new AddressGetRequest
                         {
                             Id = a.Id,
@@ -50,21 +55,22 @@ namespace InvoiceForgeApi.Repository
                             StreetNumber = a.StreetNumber,
                             City = a.City,
                             PostalCode = a.PostalCode,
-                            Country = new CountryGetRequest
+                            CountryId = a.CountryId,
+                            Country = plain == false ? new CountryGetRequest
                             {
                                 Id = a.Country!.Id,
                                 Value = a.Country.Value,
                                 Shortcut = a.Country.Shortcut
-                            }
+                            } : null
                         }
                     )
                     .Where(a => a.Id == addressId).ToListAsync();
                 
-                if (address.Count > 1)
+                if (addressList.Count > 1)
                 {
                     throw new DatabaseCallError("Something unexpected happended. There are more than one address with this ID.");
                 }
-                return address[0];
+                return addressList[0];
         }
         public async Task<bool> Add(int userId, AddressAddRequest address)
         {

@@ -34,10 +34,22 @@ namespace InvoiceForgeApi.Controllers
             return await _contractorRepository.GetAll(userId);
         }
         [HttpGet]
+        [Route("plain/all/{userId}")]
+        public async Task<List<ContractorGetRequest>?> GetPlainAllContractors(int userId)
+        {
+            return await _contractorRepository.GetAll(userId, true);
+        }
+        [HttpGet]
         [Route("{contractorId}")]
         public async Task<ContractorGetRequest?> GetByContractorId(int contractorId)
         {
             return await _contractorRepository.GetById(contractorId);
+        }
+        [HttpGet]
+        [Route("plain/{contractorId}")]
+        public async Task<ContractorGetRequest?> GetPlainByContractorId(int contractorId)
+        {
+            return await _contractorRepository.GetById(contractorId, true);
         }
         [HttpPost]
         [Route("{userId}")]

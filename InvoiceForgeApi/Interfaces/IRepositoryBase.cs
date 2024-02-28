@@ -5,11 +5,11 @@ namespace InvoiceForgeApi.Interfaces
 {
     public interface IRepositoryBaseExtended<GET,ADD,UPDATE, TEntity>: IRepositoryBase<GET,ADD,UPDATE, TEntity>
     {
-        Task<List<GET>?> GetAll(int userId);
+        Task<List<GET>?> GetAll(int userId, bool? plain = false);
     }
     public interface IRepositoryBaseWithClientExtended<GET,ADD,UPDATE, TEntity>: IRepositoryBaseWithClient<GET,ADD,UPDATE, TEntity>
     {
-        Task<List<GET>?> GetAll(int userId);
+        Task<List<GET>?> GetAll(int userId, bool? plain = false);
     }
 
     public interface IRepositoryBase<GET,ADD,UPDATE, TEntity>: IBaseMethods<GET, TEntity>
@@ -26,7 +26,7 @@ namespace InvoiceForgeApi.Interfaces
     public interface IBaseMethods<GET, TEntity>
     {
         public Task<List<TEntity>?> GetByCondition(Expression<Func<TEntity,bool>> condition);
-        Task<GET?> GetById(int entityId);
+        Task<GET?> GetById(int entityId, bool? plain = false);
         Task<bool> Delete(int entityId);
     }
 }

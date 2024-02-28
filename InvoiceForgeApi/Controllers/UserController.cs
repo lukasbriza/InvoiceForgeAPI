@@ -23,7 +23,12 @@ namespace InvoiceForgeApi.Controllers
         {   
             return await _userRepository.GetById(id);
         }
-
+        [HttpGet]
+        [Route("plain/{id}")]
+        public async Task<UserGetRequest?> GetPlain(int id)
+        {   
+            return await _userRepository.GetById(id, true);
+        }
         [HttpPost]
         public async Task<bool> Add(UserAddRequest user)
         {
@@ -31,7 +36,6 @@ namespace InvoiceForgeApi.Controllers
             if (userAdd)  await _repository.Save();
             return userAdd;
         }
-
         [HttpPut]
         public async Task<bool> Update(UserUpdateRequest user)
         { 
@@ -39,7 +43,6 @@ namespace InvoiceForgeApi.Controllers
             if(userUpdate) await _repository.Save();
             return userUpdate;
         }
-
         [HttpDelete]
         public async Task<bool> Delete(int id)
         {

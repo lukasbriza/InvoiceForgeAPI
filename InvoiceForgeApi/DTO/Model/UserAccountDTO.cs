@@ -8,7 +8,7 @@
         public string AccountNumber { get; set; } = null!;
         public string? IBAN { get; set; }
 
-        public BankGetRequest Bank { get; set; } = null!;
+        public BankGetRequest? Bank { get; set; } = null!;
     }
     public class UserAccountAddRequest
     {

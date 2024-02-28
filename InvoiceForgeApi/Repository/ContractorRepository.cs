@@ -17,10 +17,14 @@ namespace InvoiceForgeApi.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<List<ContractorGetRequest>?> GetAll(int userId)
+        public async Task<List<ContractorGetRequest>?> GetAll(int userId, bool? plain)
         {
-            var contractors = await _dbContext.Contractor
-                .Include(c => c.Address)
+            var contractors = _dbContext.Contractor;
+            if (plain == false)
+            {
+                contractors.Include(c => c.Address);
+            }
+            var contractorsList = await contractors
                 .Select(c => new ContractorGetRequest
                     {
                         Id = c.Id,
@@ -33,7 +37,7 @@ namespace InvoiceForgeApi.Repository
                         Mobil = c.Mobil,
                         Tel = c.Tel,
                         Www = c.Www,
-                        Address = new AddressGetRequest
+                        Address = plain == false ? new AddressGetRequest
                         {
                             Id = c.Address!.Id,
                             Owner = c.Address.Owner,
@@ -47,20 +51,26 @@ namespace InvoiceForgeApi.Repository
                                 Value = c.Address.Country.Value,
                                 Shortcut = c.Address.Country.Shortcut
                             }
-                        }
+                        } : null
                     }
                 ).Where(c => c.Owner == userId).ToListAsync();
-            return contractors;
+            return contractorsList;
         }
-        public async Task<ContractorGetRequest?> GetById(int contractorId)
+        public async Task<ContractorGetRequest?> GetById(int contractorId, bool? plain)
         {
-            var contractor = await _dbContext.Contractor
-                .Include(c => c.Address)
+            DbSet<Contractor> contractor = _dbContext.Contractor;
+            if (plain == true)
+            {
+                contractor.Include(c => c.Address);
+            }
+            
+            var contractorList = await contractor
                 .Select(c => new ContractorGetRequest
                     {
                         Id = c.Id,
                         Owner = c.Owner,
                         ClientType = c.ClientType,
+                        AddressId = (int)c.AddressId!,
                         ContractorName = c.ContractorName,
                         IN = c.IN,
                         TIN = c.TIN,
@@ -68,7 +78,7 @@ namespace InvoiceForgeApi.Repository
                         Mobil = c.Mobil,
                         Tel = c.Tel,
                         Www = c.Www,
-                        Address = new AddressGetRequest
+                        Address = plain == false ? new AddressGetRequest
                         {
                             Id = c.Address!.Id,
                             Owner = c.Address.Owner,
@@ -82,15 +92,15 @@ namespace InvoiceForgeApi.Repository
                                 Value = c.Address.Country.Value,
                                 Shortcut = c.Address.Country.Shortcut
                             }
-                        }
+                        } : null
                     }
                 ).Where(c => c.Id == contractorId).ToListAsync();
-            if (contractor.Count > 1)
+            if (contractorList.Count > 1)
             {
                 throw new DatabaseCallError("Something unexpected happened. There are more than one contractor with this ID.");
             }
 
-            return contractor[0];
+            return contractorList[0];
         }
         public async Task<bool> Add(int userId, ContractorAddRequest contractor, ClientType clientType)
         {

@@ -8,6 +8,7 @@ namespace InvoiceForgeApi.DTO.Model
         public int Id { get; set; }
         public int Owner { get; set; }
         public ClientType ClientType { get; set; }
+        public int AddressId { get; set; }
         public string ContractorName { get; set; } = null!;
         public long IN { get; set; }
         public string TIN { get; set; } = null!;
@@ -15,7 +16,7 @@ namespace InvoiceForgeApi.DTO.Model
         public string? Mobil { get; set; }
         public string? Tel { get; set; }
         public string? Www { get; set; }
-        public AddressGetRequest Address { get; set; } = null!;
+        public AddressGetRequest? Address { get; set; } = null!;
     }
     public class ContractorAddRequest
     {
