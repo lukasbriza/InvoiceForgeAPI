@@ -8,7 +8,8 @@
         public int StreetNumber { get; set; }
         public string City { get; set; } = null!;
         public int PostalCode { get; set; }
-        public CountryGetRequest Country { get; set; } = null!;
+        public int CountryId { get; set; }
+        public CountryGetRequest? Country { get; set; } = null!;
     }
     public class AddressAddRequest
     {

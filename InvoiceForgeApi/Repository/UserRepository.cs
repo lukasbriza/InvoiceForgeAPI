@@ -4,6 +4,7 @@ using InvoiceForgeApi.Model;
 using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using InvoiceForgeApi.DTO.Model;
+using System.Linq.Expressions;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -15,14 +16,18 @@ namespace InvoiceForgeApi.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<UserGetRequest?> GetById(int id)
+        public async Task<UserGetRequest?> GetById(int id, bool? plain)
         {
-            var user = await _dbContext.User
-                .Include(u => u.Clients)
+            DbSet<User> user = _dbContext.User;
+            if (plain == false)
+            {
+                user.Include(u => u.Clients)
                 .Include(u => u.Addresses)
                 .Include(u => u.Contractors)
-                .Include(u => u.UserAccounts)
-                .Select(u => new UserGetRequest
+                .Include(u => u.UserAccounts);
+            }
+            
+            var userList = await user.Select(u => new UserGetRequest
                     {
                         Id =  u.Id,
                         Contractors = u.Contractors.Select(c => new ContractorGetRequest
@@ -37,7 +42,7 @@ namespace InvoiceForgeApi.Repository
                                 Mobil = c.Mobil,
                                 Tel = c.Tel,
                                 Www = c.Www,
-                                Address = new AddressGetRequest
+                                Address = plain == false ? new AddressGetRequest
                                 {
                                     Id = c.Address!.Id,
                                     Owner = c.Address.Owner,
@@ -51,7 +56,7 @@ namespace InvoiceForgeApi.Repository
                                         Value = c.Address.Country.Value,
                                         Shortcut = c.Address.Country.Shortcut,
                                     }
-                                }
+                                } : null
                             }
                         ),
                         Clients =  u.Clients.Select(c => new ClientGetRequest
@@ -66,7 +71,7 @@ namespace InvoiceForgeApi.Repository
                                 Mobil = c.Mobil,
                                 Tel = c.Tel,
                                 Email = c.Email,
-                                Address = new AddressGetRequest
+                                Address = plain == false ? new AddressGetRequest
                                 {
                                     Id = c.Address!.Id,
                                     Owner = c.Address.Owner,
@@ -81,7 +86,7 @@ namespace InvoiceForgeApi.Repository
                                         Shortcut = c.Address.Country.Shortcut,
                                     }
 
-                                }
+                                } : null
                             }
                         ),
                         UserAccounts = u.UserAccounts.Select(u => new UserAccountGetRequest
@@ -91,13 +96,13 @@ namespace InvoiceForgeApi.Repository
                                 BankId = u.BankId,
                                 AccountNumber = u.AccountNumber,
                                 IBAN = u.IBAN,
-                                Bank = new BankGetRequest
+                                Bank = plain == false ? new BankGetRequest
                                 {
                                     Id = u.Bank!.Id,
                                     Value = u.Bank.Value,
                                     Shortcut = u.Bank.Shortcut,
                                     SWIFT = u.Bank.SWIFT
-                                }
+                                } : null
                             }
                         ),
                         Addresses = u.Addresses.Select(u => new AddressGetRequest
@@ -108,24 +113,24 @@ namespace InvoiceForgeApi.Repository
                                 PostalCode = u.PostalCode,
                                 Street = u.Street,
                                 StreetNumber = u.StreetNumber,
-                                Country = new CountryGetRequest
+                                Country = plain == false ? new CountryGetRequest
                                 {
                                     Id = u.Country!.Id,
                                     Value = u.Country!.Value,
                                     Shortcut = u.Country.Shortcut
-                                }
+                                } : null
                             }
                         )
                     }
                 )
                 .Where(u => u.Id == id).ToListAsync();
 
-            if (user.Count == 0)
+            if (userList.Count == 0)
             {
                 throw new DatabaseCallError("User is not in database.");
             }
 
-            return user[0];
+            return userList[0];
         }
         public async Task<bool> Delete(int id)
         {
@@ -139,7 +144,6 @@ namespace InvoiceForgeApi.Repository
             _dbContext.User.Remove(user);
             return true;
         }
-
         public async Task<bool> Update(int userId, UserUpdateRequest user)
         {
             if (user is null)
@@ -166,7 +170,6 @@ namespace InvoiceForgeApi.Repository
             localUser.AuthenticationId = user.AuthenticationId;
             return true;
         }
-
         public async Task<bool> Add(int userId, UserAddRequest user)
         {
 
@@ -182,6 +185,11 @@ namespace InvoiceForgeApi.Repository
         private async Task<User?> Get(int id)
         {
             return await _dbContext.User.FindAsync(id);
+        }
+        public async Task<List<User>?> GetByCondition(Expression<Func<User, bool>> condition)
+        {
+            var result = await _dbContext.User.Where(condition).ToListAsync();
+            return result;
         }
 
     }

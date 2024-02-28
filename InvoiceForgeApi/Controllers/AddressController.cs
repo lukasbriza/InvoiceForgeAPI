@@ -32,10 +32,22 @@ namespace InvoiceForgeApi.Controllers
             return await _addressRepository.GetAll(userId);
         }
         [HttpGet]
+        [Route("plain/all/{userId}")]
+        public async Task<List<AddressGetRequest>?> GetPlainAllAddresses(int userId)
+        {
+            return await _addressRepository.GetAll(userId, true);
+        }
+        [HttpGet]
         [Route("{addressId}")]
         public async Task<AddressGetRequest?> GetByAddressId(int addressId)
         {
             return await _addressRepository.GetById(addressId);
+        }
+        [HttpGet]
+        [Route("plain/{addressId}")]
+        public async Task<AddressGetRequest?> GetPlainByAddressId(int addressId)
+        {
+            return await _addressRepository.GetById(addressId, true);
         }
         [HttpPost]
         [Route("{userId}")]

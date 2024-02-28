@@ -15,7 +15,7 @@ namespace InvoiceForgeApi.DTO.Model
         public string? Mobil { get; set; } = null!;
         public string? Tel { get; set; } = null!;
         public string? Email { get; set; } = null!;
-        public AddressGetRequest Address { get; set; } = null!;
+        public AddressGetRequest? Address { get; set; } = null!;
     }
 
     public class ClientAddRequest

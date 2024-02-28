@@ -3,7 +3,7 @@ using InvoiceForgeApi.Model;
 
 namespace InvoiceForgeApi.Interfaces
 {
-    public interface IInvoiceTemplateRepository: IRepositoryBaseExtended<InvoiceTemplateGetRequest,IvoiceTemplateAddRequest,InvoiceTemplateUpdateRequest, InvoiceTemplate>
+    public interface IInvoiceTemplateRepository: IRepositoryBaseExtended<InvoiceTemplateGetRequest,InvoiceTemplateAddRequest,InvoiceTemplateUpdateRequest, InvoiceTemplate>
     {
         private static Task<InvoiceTemplate> Get(int id) => null!;
     }

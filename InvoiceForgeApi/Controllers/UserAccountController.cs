@@ -31,14 +31,24 @@ namespace InvoiceForgeApi.Controllers
         {
             return await _userAccountRepository.GetAll(userId);
         }
-
+        [HttpGet]
+        [Route("plain/all/{userId}")]
+        public async Task<List<UserAccountGetRequest>?> GetPlainAllUserAccounts(int userId)
+        {
+            return await _userAccountRepository.GetAll(userId, true);
+        }
         [HttpGet]
         [Route("{userAccountId}")]
         public async Task<UserAccountGetRequest?> GetByUserAccountId(int userAccountId)
         {
             return await _userAccountRepository.GetById(userAccountId);
         }
-
+        [HttpGet]
+        [Route("plain/{userAccountId}")]
+        public async Task<UserAccountGetRequest?> GetPlainByUserAccountId(int userAccountId)
+        {
+            return await _userAccountRepository.GetById(userAccountId);
+        }
         [HttpPost]
         [Route("{userId}")]
         public async Task<bool> AddUserAccount(int userId, UserAccountAddRequest userAccount)

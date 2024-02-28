@@ -15,12 +15,15 @@ namespace InvoiceForgeApi.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<List<ClientGetRequest>?> GetAll(int userId)
+        public async Task<List<ClientGetRequest>?> GetAll(int userId, bool? plain)
         {
-            var clients = await _dbContext.Client
-                .Include(c => c.Address)
-                .Include(c => c.Address!.Country)
-                .Select(c => new ClientGetRequest
+            DbSet<Client> clients = _dbContext.Client;
+            if (plain == true)
+            {
+                clients.Include(c => c.Address).Include(c => c.Address!.Country);
+            }
+              
+              var clientsList = await clients.Select(c => new ClientGetRequest
                     {
                         Id = c.Id,
                         AddressId = (int)c.AddressId!,
@@ -32,7 +35,7 @@ namespace InvoiceForgeApi.Repository
                         Mobil = c.Mobil,
                         Tel = c.Tel,
                         Email = c.Email,
-                        Address = new AddressGetRequest
+                        Address = plain == false ? new AddressGetRequest
                         {
                             Id = c.Address!.Id,
                             Owner = c.Address.Owner,
@@ -40,26 +43,30 @@ namespace InvoiceForgeApi.Repository
                             StreetNumber = c.Address.StreetNumber,
                             City = c.Address.City,
                             PostalCode = c.Address.PostalCode,
-                            Country = new CountryGetRequest
+                            Country = plain == false ? new CountryGetRequest
                             {
                                 Id = c.Address.Country!.Id,
                                 Value = c.Address.Country.Value,
                                 Shortcut = c.Address.Country.Shortcut
-                            }
-                        }
+                            } : null
+                        } : null
                     }
                 )
                 .Where(c => c.Owner == userId).ToListAsync();
                 
-            return clients;
+            return clientsList;
 
 
         }
-        public async Task<ClientGetRequest?> GetById(int clientId)
+        public async Task<ClientGetRequest?> GetById(int clientId, bool? plain)
         {
-            var client = await _dbContext.Client
-                .Include(c => c.Address)
-                .Include(c => c.Address!.Country)
+            DbSet<Client> client = _dbContext.Client;
+            if (plain == false)
+            {
+                client.Include(c => c.Address).Include(c => c.Address!.Country);
+            }
+
+            var clientList = await client
                 .Select(c => new ClientGetRequest
                     {
                         Id = c.Id,
@@ -72,7 +79,7 @@ namespace InvoiceForgeApi.Repository
                         Mobil = c.Mobil,
                         Tel = c.Tel,
                         Email = c.Email,
-                        Address = new AddressGetRequest
+                        Address = plain == false ? new AddressGetRequest
                         {
                             Id = c.Address!.Id,
                             Owner = c.Address.Owner,
@@ -80,22 +87,23 @@ namespace InvoiceForgeApi.Repository
                             StreetNumber = c.Address.StreetNumber,
                             City = c.Address.City,
                             PostalCode = c.Address.PostalCode,
-                            Country = new CountryGetRequest
+                            CountryId = c.Address.CountryId,
+                            Country = plain == false ?new CountryGetRequest
                             {
                                 Id = c.Address.Country!.Id,
                                 Value = c.Address.Country.Value,
                                 Shortcut = c.Address.Country.Shortcut
-                            }
-                        }
+                            } : null
+                        } : null
                     }
                 ).Where(c => c.Id == clientId).ToListAsync();
 
-            if (client.Count > 1)
+            if (clientList.Count > 1)
             {
                 throw new DatabaseCallError("Something unexpected happened. There are more than one client with this ID.");
             }
 
-            return client[0];
+            return clientList[0];
         }
         public async Task<bool> Add(int userId ,ClientAddRequest client, ClientType clientType)
         {
@@ -118,11 +126,8 @@ namespace InvoiceForgeApi.Repository
         {
             var localClient = await Get(clientId);
 
-            if(localClient is null)
-            {
-                throw new DatabaseCallError("Client is not in database.");
-            }
-
+            if (localClient is null) throw new DatabaseCallError("Client is not in database.");
+            
             localClient.AddressId = client.AddressId ?? localClient.AddressId;
             localClient.Type = clientType ?? localClient.Type;
             localClient.ClientName = client.ClientName ?? localClient.ClientName;
@@ -136,11 +141,7 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Delete(int id)
         {
             var client = await Get(id);
-
-            if (client is null) 
-            {
-                throw new DatabaseCallError("Client is not in database.");    
-            }
+            if (client is null) throw new DatabaseCallError("Client is not in database.");    
 
             _dbContext.Client.Remove(client);
             return true;
