@@ -5,12 +5,17 @@ namespace InvoiceForgeApi.Interfaces
 {
     public interface ICodeListsRepository
     {
-        Task<List<CountryGetRequest>?> GetCountries();
-        Task<CountryGetRequest?> GetCountryById(int id);
-        Task<List<BankGetRequest>?> GetBanks();
-        Task<BankGetRequest?> GetBankById(int id);
-        Task<CodeListsAllGetRequest> GetCodeListsAll();
+        public Task<List<CountryGetRequest>> GetCountries();
+        public Task<CountryGetRequest?> GetCountryById(int id);
+        public Task<List<BankGetRequest>> GetBanks();
+        public Task<BankGetRequest?> GetBankById(int id);
+        public Task<CodeListsAllGetRequest> GetCodeListsAll();
         public ClientType? GetClientTypeById(int clientTypeId);
-        List<ClientTypeGetRequest>? GetClientTypes();
+        public List<ClientTypeGetRequest> GetClientTypes();
+        public List<NumberingVariableGetRequest> GetNumberingVariables();
+        public Task<List<TariffGetRequest>> GetTariffs();
+        public Task<TariffGetRequest?> GetTariffById(int id);
+        public Task<List<CurrencyGetRequest>> GetCurrencies();
+        public Task<CurrencyGetRequest?> GetCurrencyById(int id);
     }
 }

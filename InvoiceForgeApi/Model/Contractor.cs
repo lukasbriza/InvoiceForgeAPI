@@ -24,5 +24,6 @@ namespace InvoiceForgeApi.Model
         //Reference
         public virtual Address? Address { get; set; }
         public virtual User User { get; set; } = null!;
+        public virtual ICollection<InvoiceTemplate>? InvoiceTemplates { get; set; } = new List<InvoiceTemplate>();
     }
 }

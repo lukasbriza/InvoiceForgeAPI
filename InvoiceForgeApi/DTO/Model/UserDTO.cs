@@ -17,10 +17,11 @@ namespace InvoiceForgeApi.DTO.Model
     public class UserGetRequest
     {
         [Required] public int Id { get; set; }
-        public IEnumerable<ClientGetRequest> Clients { get; set; } = new List<ClientGetRequest>();
-        public IEnumerable<ContractorGetRequest> Contractors { get; set; } = new List<ContractorGetRequest>();
-        public IEnumerable<UserAccountGetRequest> UserAccounts { get; set; } = new List<UserAccountGetRequest>();
-        public IEnumerable<InvoiceTemplateGetRequest> InvoiceTemplates { get; set; } = new List<InvoiceTemplateGetRequest>();
-        public IEnumerable<AddressGetRequest> Addresses { get; set; } = new List<AddressGetRequest>();
+        public IEnumerable<ClientGetRequest>? Clients { get; set; } = new List<ClientGetRequest>();
+        public IEnumerable<ContractorGetRequest>? Contractors { get; set; } = new List<ContractorGetRequest>();
+        public IEnumerable<UserAccountGetRequest>? UserAccounts { get; set; } = new List<UserAccountGetRequest>();
+        public IEnumerable<InvoiceTemplateGetRequest>? InvoiceTemplates { get; set; } = new List<InvoiceTemplateGetRequest>();
+        public IEnumerable<AddressGetRequest>? Addresses { get; set; } = new List<AddressGetRequest>();
+        public IEnumerable<InvoiceItemGetRequest>? InvoiceItems { get; set; } = new List<InvoiceItemGetRequest>();
     }
 }

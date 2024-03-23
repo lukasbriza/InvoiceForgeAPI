@@ -23,16 +23,34 @@ namespace InvoiceForgeApi.Data
                     context.Country.AddRange(new CountrySeed().Populate());
                     context.SaveChanges();
                 }
+                //Currency
+                if(!context.Currency.Any())
+                {
+                    context.Currency.AddRange(new CurrencySeed().Populate());
+                    context.SaveChanges();
+                }
+                //Tariff
+                if(!context.Tariff.Any())
+                {
+                    context.Tariff.AddRange(new TariffSeed().Populate());
+                    context.SaveChanges();
+                }
                 //User
                 if (!context.User.Any())
                 {
                     context.User.AddRange(new UserSeed().Populate());
                     context.SaveChanges();
                 }
-                //InvoiceTemplate
-                if (!context.InvoiceTemplate.Any()) 
+                //Numbering
+                if(!context.Numbering.Any())
                 {
-                    context.InvoiceTemplate.AddRange(new InvoiceTemplateSeed().Populate());
+                    context.Numbering.AddRange(new NumberingSeed().Populate());
+                    context.SaveChanges();
+                }
+                //InvoiceItem
+                if(!context.InvoiceItem.Any())
+                {
+                    context.InvoiceItem.AddRange(new InvoiceItemSeed().Populate());
                     context.SaveChanges();
                 }
                 //Address
@@ -59,6 +77,13 @@ namespace InvoiceForgeApi.Data
                     context.UserAccount.AddRange(new UserAccountSeed().Populate());
                     context.SaveChanges();
                 }
+                //InvoiceTemplate
+                if (!context.InvoiceTemplate.Any()) 
+                {
+                    context.InvoiceTemplate.AddRange(new InvoiceTemplateSeed().Populate());
+                    context.SaveChanges();
+                }
+                context.SaveChanges();
             }
         }
     }

@@ -16,5 +16,7 @@ namespace InvoiceForgeApi.Model
         public virtual ICollection<Address> Addresses { get; set; } = new List<Address>();
         public virtual ICollection<InvoiceTemplate> InvoiceTemplates { get; set; } = new List<InvoiceTemplate>();
         public virtual ICollection<UserAccount> UserAccounts { get; set; } = new List<UserAccount>();
+        public virtual ICollection<InvoiceItem> InvoiceItems { get; set; } = new List<InvoiceItem>();
+        public virtual ICollection<Numbering> Numberings { get; set;} = new List<Numbering>();
     }
 }

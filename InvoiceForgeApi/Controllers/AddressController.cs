@@ -1,4 +1,3 @@
-using System.Diagnostics.Tracing;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
@@ -15,6 +14,7 @@ namespace InvoiceForgeApi.Controllers
         private readonly IContractorRepository _contractorRepository;
         private readonly IClientRepository _clientRepository;
         private readonly ICodeListsRepository _codeListRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
         private readonly IRepositoryWrapper _repository;
         public AddressController(IRepositoryWrapper repository)
         {
@@ -23,6 +23,7 @@ namespace InvoiceForgeApi.Controllers
             _contractorRepository = repository.Contractor;
             _clientRepository = repository.Client;
             _codeListRepository = repository.CodeLists;
+            _invoiceRepository = repository.Invoice;
             _repository = repository;
         }
         [HttpGet]
@@ -61,27 +62,72 @@ namespace InvoiceForgeApi.Controllers
             var isValidOwner = await _userRepository.GetById(userId);
             if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
 
+            var isAddressUnique = await _addressRepository.GetByCondition(a => 
+                a.Owner == userId && 
+                a.City == address.City && 
+                a.Street == address.Street && 
+                a.StreetNumber == address.StreetNumber && 
+                a.CountryId == address.CountryId && 
+                a.PostalCode == address.PostalCode
+            ); 
+            if (isAddressUnique is not null && isAddressUnique.Count > 0) throw new ValidationError("Address must be unique.");
+
             var addAddress = await _addressRepository.Add(userId, address);
-            if (addAddress) await _repository.Save();
-            return addAddress;
+
+            var addAddressResult = addAddress is not null;
+            if (addAddressResult) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
+            return addAddressResult;
         }
         [HttpPut]
         [Route("{addressId}")]
         public async Task<bool> UpdateAddress(int addressId, AddressUpdateRequest address)
         {
+            if (address is null) throw new ValidationError("Address is not provided.");
+            
             var user = await _userRepository.GetById(address.Owner);
             if (user is null) return false;
 
-            var isOwnerOfAddress = user.Addresses.Where(a => a.Id == addressId);
+            var isOwnerOfAddress = user.Addresses?.Where(a => a.Id == addressId);
             if (isOwnerOfAddress is null || isOwnerOfAddress.Count() != 1) throw new ValidationError("Provided address is not in your possession.");
 
             if (address.CountryId is not null)
             {
-                var isCountryIdValid = _codeListRepository;
+                var isCountryIdValid = await _codeListRepository.GetCountryById((int)address.CountryId);
+                if (isCountryIdValid is null) throw new ValidationError("Provided countryId is invalid.");
             }
+
+            var isAddressUnique = await _addressRepository.GetByCondition(a => 
+                a.Owner == user.Id && 
+                a.City == address.City && 
+                a.Street == address.Street && 
+                a.StreetNumber == address.StreetNumber && 
+                a.CountryId == address.CountryId && 
+                a.PostalCode == address.PostalCode
+            ); 
+            if (isAddressUnique is not null && isAddressUnique.Count > 0) throw new ValidationError("Address must be unique.");
             
             var addressUpdate = await _addressRepository.Update(addressId, address);
-            if (addressUpdate) await _repository.Save();
+            
+            if (addressUpdate) 
+            {
+                //OUTDATE LINKED INVOICES WITH CLIENT
+                //OUTDATE LINKED INVOICES WITH CONTRACTOR
+                var invoices = await _invoiceRepository.GetByCondition(i => (i.ClientLocal.AddressId == addressId || i.ContractorLocal.AddressId == addressId) && i.Outdated == false);
+                if (invoices is not null && invoices.Count > 0)
+                {
+                    invoices.ConvertAll(c => {
+                        c.Outdated = true;
+                        return c;
+                    });
+                }
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return addressUpdate;
         }
         [HttpDelete]
@@ -94,7 +140,11 @@ namespace InvoiceForgeApi.Controllers
             if (hasClientReference is not null && hasClientReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
 
             var deleteAddress = await _addressRepository.Delete(addressId);
-            if (deleteAddress) await _repository.Save();
+            if (deleteAddress) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return deleteAddress;
         }
 

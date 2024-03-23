@@ -17,6 +17,7 @@ namespace InvoiceForgeApi.Model
 
         //Reference
         public virtual Bank? Bank { get; set; }
+        public virtual ICollection<InvoiceTemplate>? InvoiceTemplates { get; set; } = new List<InvoiceTemplate>();
         public virtual User User { get; set; } = null!;
     }
 }

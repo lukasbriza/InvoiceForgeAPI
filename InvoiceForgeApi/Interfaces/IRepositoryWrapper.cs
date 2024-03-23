@@ -9,6 +9,11 @@ namespace InvoiceForgeApi.Interfaces
         IAddressRepository Address { get; }
         IInvoiceTemplateRepository InvoiceTemplate { get; }
         IContractorRepository Contractor { get; }
+        IInvoiceItemRepository InvoiceItem { get; }
+        IInvoiceServiceRepository InvoiceService { get; }
+        IInvoiceRepository Invoice { get; }
+        INumberingRepository Numbering { get; }
         Task Save();
+        void DetachChanges();
     }
 }
