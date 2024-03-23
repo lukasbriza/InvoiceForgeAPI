@@ -6,26 +6,28 @@ using Microsoft.AspNetCore.Mvc;
 namespace InvoiceForgeApi.Controllers
 {
     [ApiController]
-    [Route("api/contractor")]
+    [Route("api/invoice-template")]
     public class InvoiceTemplateController : ControllerBase
     {
         private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
-        private readonly IAddressRepository _addressRepository;
         private readonly IUserAccountRepository _userAccountRepository;
         private readonly IContractorRepository _contractorRepository;
         private readonly IClientRepository _clientRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
+        private readonly ICodeListsRepository _codeListRepository;
         private readonly IRepositoryWrapper _repository;
 
         public InvoiceTemplateController(IRepositoryWrapper repository)
         {
             _repository = repository;
             _invoiceTemplateRepository = repository.InvoiceTemplate;
-            _addressRepository = repository.Address;
             _contractorRepository = repository.Contractor;
             _userAccountRepository = repository.UserAccount;
+            _invoiceRepository = repository.Invoice;
             _userRepository = repository.User;
             _clientRepository = repository.Client;
+            _codeListRepository = repository.CodeLists;
 
         }
         [HttpGet]
@@ -70,26 +72,29 @@ namespace InvoiceForgeApi.Controllers
             if (userAccountValidation is null) throw new ValidationError("Provided UserAccountId is invalid.");
             if (userAccountValidation.Owner != userId) throw new ValidationError("Provided user account is not in your possession.");
 
-            var isValidOwner = await _userAccountRepository.GetById(userId, true);
-            if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
+            var uniqueTemplateNameValidation = await _invoiceTemplateRepository.GetByCondition(t => t.TemplateName == template.TemplateName && t.Owner == userId);
+            if (uniqueTemplateNameValidation is not null && uniqueTemplateNameValidation.Count > 0) throw new ValidationError("Template name must be unique.");
 
             var addTemplate = await _invoiceTemplateRepository.Add(userId, template);
-            if (addTemplate) await _repository.Save();
-            return addTemplate;
+            var addTemplateResult = addTemplate is not null;
+
+            if (addTemplateResult) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
+            return addTemplateResult;
         }
         [HttpPut]
         [Route("{templateId}")]
         public async Task<bool> UpdateTemplate(int templateId, InvoiceTemplateUpdateRequest template)
         {
             if (template is null) throw new ValidationError("Template is not provided.");
-            
-            var isUniqueName = await _invoiceTemplateRepository.GetByCondition(t => t.TemplateName == template.TemplateName);
-            if (isUniqueName is not null || isUniqueName?.Count > 0) throw new ValidationError("Teplate name must be unique.");
 
             var user = await _userRepository.GetById(template.Owner);
             if (user is null) return false;
 
-            var isOwnerOfTemplate = user.InvoiceTemplates.Where(t => t.Id == templateId);
+            var isOwnerOfTemplate = user.InvoiceTemplates?.Where(t => t.Id == templateId);
             if (isOwnerOfTemplate is null || isOwnerOfTemplate.Count() != 1) throw new ValidationError("Template is not in your possession.");
 
             if (template.ClientId is not null) {
@@ -112,16 +117,50 @@ namespace InvoiceForgeApi.Controllers
                 if (userAccountValidation.Owner != template.Owner) throw new ValidationError("Provided user account is not in your possession."); 
             }
 
+            if (template.CurrencyId is not null)
+            {
+                var currencyValidation = await _codeListRepository.GetCurrencyById((int)template.CurrencyId);
+                if (currencyValidation is null) throw new ValidationError("Provided CurrencyId is invalid.");
+            }
+
+            if (template.TemplateName is not null)
+            {
+                var templateNameValidation = await _invoiceTemplateRepository.GetByCondition(t => t.TemplateName == template.TemplateName && t.Owner == user.Id);
+                if (templateNameValidation is not null && templateNameValidation.Count > 0) throw new ValidationError("Template name must be unique.");
+            }
+
             var templateUpdate = await _invoiceTemplateRepository.Update(templateId, template);
-            if (templateUpdate) await _repository.Save();
+
+            if (templateUpdate) {
+                //OUTDATE LINKED INVOICES
+                var invoices = await _invoiceRepository.GetByCondition(i => i.TemplateId == templateId && i.Owner == user.Id && i.Outdated == false);
+                if(invoices is not null && invoices.Count > 0)
+                {
+                    invoices.ConvertAll(i => {
+                        i.Outdated = true;
+                        return i;
+                    });
+                }
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return templateUpdate;
         } 
         [HttpDelete]
         [Route("{templateId}")]
-        public async Task<bool> DeleteTemplate(int template)
+        public async Task<bool> DeleteTemplate(int templateId)
         {
-            var deleteTemplate = await _invoiceTemplateRepository.Delete(template);
-            if (deleteTemplate) await _repository.Save();
+            var hasInvoiceReference = await _invoiceRepository.GetByCondition(i => i.TemplateId == templateId);
+            if (hasInvoiceReference is not null && hasInvoiceReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+
+            var deleteTemplate = await _invoiceTemplateRepository.Delete(templateId);
+
+            if (deleteTemplate) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return deleteTemplate;
         }
     }

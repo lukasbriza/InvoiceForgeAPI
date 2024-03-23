@@ -33,21 +33,37 @@ namespace InvoiceForgeApi.Controllers
         public async Task<bool> Add(UserAddRequest user)
         {
             var userAdd = await _userRepository.Add(1,user);
-            if (userAdd)  await _repository.Save();
-            return userAdd;
+            var userAddResult = userAdd is not null;
+
+            if (userAddResult) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
+            return userAddResult;
         }
         [HttpPut]
         public async Task<bool> Update(UserUpdateRequest user)
         { 
             var userUpdate = await _userRepository.Update(user.Id, user);
-            if(userUpdate) await _repository.Save();
+
+            if (userUpdate) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return userUpdate;
         }
         [HttpDelete]
         public async Task<bool> Delete(int id)
         {
             var userDelete = await _userRepository.Delete(id);
-            if(userDelete) await _repository.Save();
+
+            if (userDelete) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return userDelete;
         }
     }

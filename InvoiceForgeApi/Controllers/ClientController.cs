@@ -14,7 +14,8 @@ namespace InvoiceForgeApi.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IAddressRepository _addressRepository;
         private readonly ICodeListsRepository _codeListsRepository;
-        private readonly IInvoiceTemplateRepository _invoiceTemplate;
+        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
         private readonly IRepositoryWrapper _repository;
         public ClientController(IRepositoryWrapper repository)
         {
@@ -22,7 +23,8 @@ namespace InvoiceForgeApi.Controllers
             _addressRepository = repository.Address;
             _userRepository = repository.User;
             _codeListsRepository = repository.CodeLists;
-            _invoiceTemplate = repository.InvoiceTemplate;
+            _invoiceTemplateRepository = repository.InvoiceTemplate;
+            _invoiceRepository = repository.Invoice;
             _repository = repository;
         }
 
@@ -58,6 +60,9 @@ namespace InvoiceForgeApi.Controllers
         {
             if (client is null) throw new ValidationError("Client is not provided.");
             
+            var isValidOwner = await _userRepository.GetById(userId, true);
+            if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
+
             var addressValidation = await _addressRepository.GetById(client.AddressId, true);
             if (addressValidation is null) throw new ValidationError("Provided AddressId is invalid.");
             if (addressValidation.Owner != userId) throw new ValidationError("Provided address is not in your possession.");
@@ -65,12 +70,14 @@ namespace InvoiceForgeApi.Controllers
             var clientTypeValidation = _codeListsRepository.GetClientTypeById(client.TypeId);
             if (clientTypeValidation is null) throw new ValidationError("Provided wrong TypeId.");
             
-            var isValidOwner = await _userRepository.GetById(userId, true);
-            if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
-            
-            var addClient = await _clientRepository.Add(userId, client, (ClientType)clientTypeValidation);
-            if (addClient) await _repository.Save();
-            return addClient;
+            var addClientId = await _clientRepository.Add(userId, client, (ClientType)clientTypeValidation);
+            var addClientResult = addClientId is not null;
+            if (addClientResult) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
+            return addClientResult;
         }
         [HttpPut]
         [Route("{clientId}")]
@@ -81,7 +88,7 @@ namespace InvoiceForgeApi.Controllers
             var user = await _userRepository.GetById(client.Owner);
             if (user is null) return false;
 
-            var isOwnerOfClient = user.Clients.Where(c => c.Id == clientId);
+            var isOwnerOfClient = user.Clients?.Where(c => c.Id == clientId);
             if (isOwnerOfClient is null || isOwnerOfClient.Count() != 1) throw new ValidationError("Client is not in your possession.");
             
             var clientValidation = await _clientRepository.GetById(clientId);
@@ -96,19 +103,38 @@ namespace InvoiceForgeApi.Controllers
 
             var clientType = client.TypeId is not null ? _codeListsRepository.GetClientTypeById((int)client.TypeId) : null;
             if (clientType is null && client.TypeId is not null) throw new ValidationError("Provided client type does not exist in database.");
+            
             var clientUpdate = await _clientRepository.Update(clientId, client, clientType);
-            if (clientUpdate) await _repository.Save();
+            
+            if (clientUpdate) {
+                //OUTDATE LINKED INVOICES
+                var invoices = await _invoiceRepository.GetByCondition(i => i.ClientLocal.Id == clientId && i.Owner == user.Id && i.Outdated == false);
+                if (invoices is not null && invoices.Count > 0){
+                    invoices.ConvertAll(i => {
+                        i.Outdated = true;
+                        return i;
+                    });
+                }
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return clientUpdate;
         }
         [HttpDelete]
         [Route("{clientId}")]
         public async Task<bool> DeleteClient(int clientId)
         {
-            var hasInvoiceTemplatesReference = await _invoiceTemplate.GetByCondition((template) => template.ClientId == clientId);
+            var hasInvoiceTemplatesReference = await _invoiceTemplateRepository.GetByCondition((template) => template.ClientId == clientId);
             if (hasInvoiceTemplatesReference is not null && hasInvoiceTemplatesReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
 
             var deleteClient = await _clientRepository.Delete(clientId);
-            if (deleteClient) await _repository.Save();
+
+            if (deleteClient) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return deleteClient;
         }
     }

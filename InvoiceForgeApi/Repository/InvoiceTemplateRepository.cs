@@ -15,37 +15,21 @@ namespace InvoiceForgeApi.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<List<InvoiceTemplateGetRequest>?> GetAll(int userId, bool? plain)
+        public async Task<List<InvoiceTemplateGetRequest>?> GetAll(int userId, bool? plain = false)
         {
             var templates = await _dbContext.InvoiceTemplate
-                .Select(i => new InvoiceTemplateGetRequest
-                    {
-                        Id = i.Id,
-                        Owner = i.Owner,
-                        ClientId = i.ClientId,
-                        ContractorId = i.ContractorId,
-                        UserAccountId = i.UserAccountId,
-                        TemplateName = i.TemplateName,
-                        Created = i.Created
-                    }
-                ).Where(i => i.Owner == userId).ToListAsync();
+                .Select(i => new InvoiceTemplateGetRequest(i, plain))
+                .Where(i => i.Owner == userId)
+                .ToListAsync();
 
             return templates;
         }
-        public async Task<InvoiceTemplateGetRequest?> GetById(int templateId, bool? plain)
+        public async Task<InvoiceTemplateGetRequest?> GetById(int templateId, bool? plain = false)
         {
             var template = await _dbContext.InvoiceTemplate
-                .Select(i => new InvoiceTemplateGetRequest
-                    {
-                        Id = i.Id,
-                        Owner = i.Owner,
-                        ClientId = i.ClientId,
-                        ContractorId = i.ContractorId,
-                        UserAccountId = i.UserAccountId,
-                        TemplateName = i.TemplateName,
-                        Created = i.Created
-                    }
-                ).Where(i => i.Id == templateId).ToListAsync();
+                .Select(i => new InvoiceTemplateGetRequest(i, plain))
+                .Where(i => i.Id == templateId)
+                .ToListAsync();
             
             if (template.Count > 1)
             {
@@ -54,7 +38,7 @@ namespace InvoiceForgeApi.Repository
 
             return template[0];
         }
-        public async Task<bool> Add(int userId, InvoiceTemplateAddRequest template)
+        public async Task<int?> Add(int userId, InvoiceTemplateAddRequest template)
         {
             var newInvoiceTemplate = new InvoiceTemplate
             {
@@ -63,30 +47,32 @@ namespace InvoiceForgeApi.Repository
                 ContractorId = template.ContractorId,
                 UserAccountId = template.UserAccountId,
                 TemplateName = template.TemplateName,
-                Created = new DateTime().ToUniversalTime()
+                Created = new DateTime().ToUniversalTime(),
+                NumberingId = template.NumberingId
             };
-            await _dbContext.InvoiceTemplate.AddAsync(newInvoiceTemplate);
-            return true;
+            var entity = await _dbContext.InvoiceTemplate.AddAsync(newInvoiceTemplate);
+            return entity.State == EntityState.Added ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int templateId, InvoiceTemplateUpdateRequest template)
         {
             var localTemplate = await Get(templateId);
-
             if (localTemplate is null) throw new DatabaseCallError("Invoice template is not provided.");
 
             localTemplate.ClientId = template.ClientId ?? localTemplate.ClientId;
             localTemplate.ContractorId = template.ContractorId ?? localTemplate.ContractorId;
             localTemplate.UserAccountId = template.UserAccountId ?? localTemplate.UserAccountId;
             localTemplate.TemplateName = template.TemplateName ?? localTemplate.TemplateName;
-            return true;      
+            localTemplate.NumberingId = template.NumberingId ?? localTemplate.NumberingId;
+           
+            return _dbContext.Entry(localTemplate).State == EntityState.Modified;      
         }
         public async Task<bool> Delete(int id)
         {
             var template = await Get(id);
             if (template is null) throw new DatabaseCallError("Template is not in database.");
 
-            _dbContext.InvoiceTemplate.Remove(template);
-            return true;
+            var entity = _dbContext.InvoiceTemplate.Remove(template);
+            return entity.State == EntityState.Deleted;
         }
         private async Task<InvoiceTemplate?> Get(int id)
         {

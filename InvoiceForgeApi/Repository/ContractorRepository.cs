@@ -17,46 +17,20 @@ namespace InvoiceForgeApi.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<List<ContractorGetRequest>?> GetAll(int userId, bool? plain)
+        public async Task<List<ContractorGetRequest>?> GetAll(int userId, bool? plain = false)
         {
-            var contractors = _dbContext.Contractor;
+            DbSet<Contractor> contractors = _dbContext.Contractor;
             if (plain == false)
             {
                 contractors.Include(c => c.Address);
             }
             var contractorsList = await contractors
-                .Select(c => new ContractorGetRequest
-                    {
-                        Id = c.Id,
-                        Owner = c.Owner,
-                        ClientType = c.ClientType,
-                        ContractorName = c.ContractorName,
-                        IN = c.IN,
-                        TIN = c.TIN,
-                        Email = c.Email,
-                        Mobil = c.Mobil,
-                        Tel = c.Tel,
-                        Www = c.Www,
-                        Address = plain == false ? new AddressGetRequest
-                        {
-                            Id = c.Address!.Id,
-                            Owner = c.Address.Owner,
-                            Street = c.Address.Street,
-                            StreetNumber = c.Address.StreetNumber,
-                            City = c.Address.City,
-                            PostalCode = c.Address.PostalCode,
-                            Country = new CountryGetRequest
-                            {
-                                Id = c.Address.Country!.Id,
-                                Value = c.Address.Country.Value,
-                                Shortcut = c.Address.Country.Shortcut
-                            }
-                        } : null
-                    }
-                ).Where(c => c.Owner == userId).ToListAsync();
+                .Select(c => new ContractorGetRequest(c, plain))
+                .Where(c => c.Owner == userId)
+                .ToListAsync();
             return contractorsList;
         }
-        public async Task<ContractorGetRequest?> GetById(int contractorId, bool? plain)
+        public async Task<ContractorGetRequest?> GetById(int contractorId, bool? plain = false)
         {
             DbSet<Contractor> contractor = _dbContext.Contractor;
             if (plain == true)
@@ -65,36 +39,9 @@ namespace InvoiceForgeApi.Repository
             }
             
             var contractorList = await contractor
-                .Select(c => new ContractorGetRequest
-                    {
-                        Id = c.Id,
-                        Owner = c.Owner,
-                        ClientType = c.ClientType,
-                        AddressId = (int)c.AddressId!,
-                        ContractorName = c.ContractorName,
-                        IN = c.IN,
-                        TIN = c.TIN,
-                        Email = c.Email,
-                        Mobil = c.Mobil,
-                        Tel = c.Tel,
-                        Www = c.Www,
-                        Address = plain == false ? new AddressGetRequest
-                        {
-                            Id = c.Address!.Id,
-                            Owner = c.Address.Owner,
-                            Street = c.Address.Street,
-                            StreetNumber = c.Address.StreetNumber,
-                            City = c.Address.City,
-                            PostalCode = c.Address.PostalCode,
-                            Country = new CountryGetRequest
-                            {
-                                Id = c.Address.Country!.Id,
-                                Value = c.Address.Country.Value,
-                                Shortcut = c.Address.Country.Shortcut
-                            }
-                        } : null
-                    }
-                ).Where(c => c.Id == contractorId).ToListAsync();
+                .Select(c => new ContractorGetRequest(c, plain))
+                .Where(c => c.Id == contractorId)
+                .ToListAsync();
             if (contractorList.Count > 1)
             {
                 throw new DatabaseCallError("Something unexpected happened. There are more than one contractor with this ID.");
@@ -102,7 +49,7 @@ namespace InvoiceForgeApi.Repository
 
             return contractorList[0];
         }
-        public async Task<bool> Add(int userId, ContractorAddRequest contractor, ClientType clientType)
+        public async Task<int?> Add(int userId, ContractorAddRequest contractor, ClientType clientType)
         {
             var newContractor = new Contractor
             {
@@ -117,8 +64,8 @@ namespace InvoiceForgeApi.Repository
                 Tel = contractor.Email,
                 Www = contractor.Www
             };
-            await _dbContext.Contractor.AddAsync(newContractor);
-            return true;
+            var entity = await _dbContext.Contractor.AddAsync(newContractor);
+            return entity.State == EntityState.Added ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType? clientType)
         {
@@ -138,7 +85,8 @@ namespace InvoiceForgeApi.Repository
             localContractor.Mobil = contractor.Mobil ?? localContractor.Mobil;
             localContractor.Tel = contractor.Tel ?? localContractor.Tel;
             localContractor.Www = contractor.Www ?? localContractor.Www;
-            return true;
+            
+            return _dbContext.Entry(localContractor).State == EntityState.Modified;
         }
         public async Task<bool> Delete(int id)
         {
@@ -149,8 +97,8 @@ namespace InvoiceForgeApi.Repository
                 throw new DatabaseCallError("Contractor is not in database.");
             }
 
-            _dbContext.Contractor.Remove(contractor);
-            return true;
+            var entity = _dbContext.Contractor.Remove(contractor);
+            return entity.State == EntityState.Deleted;
         }
         private async Task<Contractor?> Get(int id)
         {

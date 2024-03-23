@@ -1,6 +1,7 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -13,7 +14,11 @@ namespace InvoiceForgeApi.Repository
         private IAddressRepository _address = null!;
         private ICodeListsRepository _codeLists = null!;
         private IContractorRepository _contractor = null!;
-        private IInvoiceTemplateRepository _invoiceTemplates = null!;
+        private IInvoiceTemplateRepository _invoiceTemplate = null!;
+        private IInvoiceItemRepository _invoiceItem = null!;
+        private IInvoiceServiceRepository _invoiceService = null!;
+        private IInvoiceRepository _invoice = null!;
+        private INumberingRepository _numbering = null!;
 
         public RepositoryWrapper(InvoiceForgeDatabaseContext context)
         {
@@ -51,7 +56,7 @@ namespace InvoiceForgeApi.Repository
         public IAddressRepository Address
         {
             get {
-                if(_address == null)
+                if (_address == null)
                 {
                     _address = new AddressRepository(_context);
                 }
@@ -61,7 +66,7 @@ namespace InvoiceForgeApi.Repository
         public IContractorRepository Contractor
         {
             get{
-                if(_contractor == null)
+                if (_contractor == null)
                 {
                     _contractor = new ContractorRepository(_context);
                 }
@@ -71,11 +76,51 @@ namespace InvoiceForgeApi.Repository
         public IInvoiceTemplateRepository InvoiceTemplate
         {
             get{
-                if(_invoiceTemplates == null)
+                if (_invoiceTemplate == null)
                 {
-                    _invoiceTemplates = new InvoiceTemplateRepository(_context);
+                    _invoiceTemplate = new InvoiceTemplateRepository(_context);
                 }
-                return _invoiceTemplates;
+                return _invoiceTemplate;
+            }
+        }
+        public IInvoiceItemRepository InvoiceItem
+        {
+            get{
+                if (_invoiceItem == null)
+                {
+                    _invoiceItem = new InvoiceItemRepository(_context);
+                }
+                return _invoiceItem;
+            }
+        }
+        public IInvoiceServiceRepository InvoiceService
+        {
+            get{
+                if (_invoiceService == null)
+                {
+                    _invoiceService = new InvoiceServiceRepository(_context);
+                }
+                return _invoiceService;
+            }
+        }
+        public INumberingRepository Numbering
+        {
+            get{
+                if (_numbering == null)
+                {
+                    _numbering = new NumberingRepository(_context);
+                }
+                return _numbering;
+            }
+        }
+        public IInvoiceRepository Invoice
+        {
+            get{
+                if (_invoice == null)
+                {
+                    _invoice = new InvoiceRepository(_context);
+                }
+                return _invoice;
             }
         }
         public ICodeListsRepository CodeLists
@@ -91,10 +136,14 @@ namespace InvoiceForgeApi.Repository
         public async Task Save()
         {
             int save = await _context.SaveChangesAsync();
-            if(!(save > 0))
+            if (!(save > 0))
             {
                 throw new DatabaseCallError("Saving failed. Modifications was not applied.");
             }
+        }
+        public void DetachChanges()
+        {
+            _context.ChangeTracker.Entries().ToList().ForEach(e => e.State = EntityState.Unchanged);
         }
     }
 }

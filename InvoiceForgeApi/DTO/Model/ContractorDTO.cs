@@ -5,6 +5,24 @@ namespace InvoiceForgeApi.DTO.Model
 {
     public class ContractorGetRequest
     {
+        public ContractorGetRequest(){}
+        public ContractorGetRequest(Contractor contractor, bool? plain = false)
+        {
+            if (contractor is not null)
+            {
+                Id = contractor.Id;
+                Owner = contractor.Owner;
+                ClientType = contractor.ClientType;
+                ContractorName = contractor.ContractorName;
+                IN = contractor.IN;
+                TIN = contractor.TIN;
+                Email = contractor.Email;
+                Mobil = contractor.Mobil;
+                Tel = contractor.Tel;
+                Www = contractor.Www;
+                Address = plain == false ? new AddressGetRequest(contractor.Address) : null;
+            }
+        }
         public int Id { get; set; }
         public int Owner { get; set; }
         public ClientType ClientType { get; set; }

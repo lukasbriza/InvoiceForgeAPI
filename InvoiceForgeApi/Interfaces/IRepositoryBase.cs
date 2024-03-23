@@ -14,12 +14,12 @@ namespace InvoiceForgeApi.Interfaces
 
     public interface IRepositoryBase<GET,ADD,UPDATE, TEntity>: IBaseMethods<GET, TEntity>
     {
-        Task<bool> Add(int userId, ADD entity);
+        Task<int?> Add(int userId, ADD entity);
         Task<bool> Update(int entityId, UPDATE entity);
     }
     public interface IRepositoryBaseWithClient<GET,ADD,UPDATE, TEntity>: IBaseMethods<GET, TEntity>
     {
-        Task<bool> Add(int userId, ADD entity, ClientType type);
+        Task<int?> Add(int userId, ADD entity, ClientType type);
         Task<bool> Update(int entityId, UPDATE entity, ClientType? typy);
     }
 

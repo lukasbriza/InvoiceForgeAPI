@@ -16,111 +16,27 @@ namespace InvoiceForgeApi.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<UserGetRequest?> GetById(int id, bool? plain)
+        public async Task<UserGetRequest?> GetById(int id, bool? plain = false)
         {
             DbSet<User> user = _dbContext.User;
             if (plain == false)
             {
-                user.Include(u => u.Clients)
-                .Include(u => u.Addresses)
-                .Include(u => u.Contractors)
-                .Include(u => u.UserAccounts);
+                user
+                .Include(u => u.Clients).ThenInclude(c => c.Address).ThenInclude(a => a!.Country)
+                .Include(u => u.Addresses).ThenInclude(a => a.Country)
+                .Include(u => u.Contractors).ThenInclude(c => c.Address).ThenInclude(a => a!.Country)
+                .Include(u => u.UserAccounts).ThenInclude(u => u.Bank)
+                .Include(u => u.InvoiceItems).ThenInclude(i => i.Tariff);
             }
             
             var userList = await user.Select(u => new UserGetRequest
                     {
                         Id =  u.Id,
-                        Contractors = u.Contractors.Select(c => new ContractorGetRequest
-                            {
-                                Id = c.Id,
-                                Owner = c.Owner,
-                                ClientType = c.ClientType,
-                                ContractorName = c.ContractorName,
-                                IN = c.IN,
-                                TIN = c.TIN,
-                                Email = c.Email,
-                                Mobil = c.Mobil,
-                                Tel = c.Tel,
-                                Www = c.Www,
-                                Address = plain == false ? new AddressGetRequest
-                                {
-                                    Id = c.Address!.Id,
-                                    Owner = c.Address.Owner,
-                                    Street = c.Address.Street,
-                                    StreetNumber = c.Address.StreetNumber,
-                                    City = c.Address.City,
-                                    PostalCode = c.Address.PostalCode,
-                                    Country = new CountryGetRequest
-                                    {
-                                        Id = c.Address.Country!.Id,
-                                        Value = c.Address.Country.Value,
-                                        Shortcut = c.Address.Country.Shortcut,
-                                    }
-                                } : null
-                            }
-                        ),
-                        Clients =  u.Clients.Select(c => new ClientGetRequest
-                            {
-                                Id = c.Id,
-                                AddressId = (int)c.AddressId!,
-                                Owner = c.Owner,
-                                Type = c.Type,
-                                ClientName = c.ClientName,
-                                IN = c.IN,
-                                TIN = c.TIN,
-                                Mobil = c.Mobil,
-                                Tel = c.Tel,
-                                Email = c.Email,
-                                Address = plain == false ? new AddressGetRequest
-                                {
-                                    Id = c.Address!.Id,
-                                    Owner = c.Address.Owner,
-                                    Street = c.Address.Street,
-                                    StreetNumber = c.Address.StreetNumber,
-                                    City = c.Address.City,
-                                    PostalCode = c.Address.PostalCode,
-                                    Country = new CountryGetRequest
-                                    {
-                                        Id = c.Address.Country!.Id,
-                                        Value = c.Address.Country.Value,
-                                        Shortcut = c.Address.Country.Shortcut,
-                                    }
-
-                                } : null
-                            }
-                        ),
-                        UserAccounts = u.UserAccounts.Select(u => new UserAccountGetRequest
-                            {
-                                Id = u.Id,
-                                Owner = u.Owner,
-                                BankId = u.BankId,
-                                AccountNumber = u.AccountNumber,
-                                IBAN = u.IBAN,
-                                Bank = plain == false ? new BankGetRequest
-                                {
-                                    Id = u.Bank!.Id,
-                                    Value = u.Bank.Value,
-                                    Shortcut = u.Bank.Shortcut,
-                                    SWIFT = u.Bank.SWIFT
-                                } : null
-                            }
-                        ),
-                        Addresses = u.Addresses.Select(u => new AddressGetRequest
-                            {
-                                Id = u.Id,
-                                Owner = u.Owner,
-                                City = u.City,
-                                PostalCode = u.PostalCode,
-                                Street = u.Street,
-                                StreetNumber = u.StreetNumber,
-                                Country = plain == false ? new CountryGetRequest
-                                {
-                                    Id = u.Country!.Id,
-                                    Value = u.Country!.Value,
-                                    Shortcut = u.Country.Shortcut
-                                } : null
-                            }
-                        )
+                        Contractors = plain == false ? u.Contractors.Select(c => new ContractorGetRequest(c, plain)) : null,
+                        Clients = plain == false ? u.Clients.Select(c => new ClientGetRequest(c, plain)) : null,
+                        UserAccounts = plain == false ? u.UserAccounts.Select(u => new UserAccountGetRequest(u, plain)) : null,
+                        Addresses = plain == false ? u.Addresses.Select(a => new AddressGetRequest(a, plain)) : null,
+                        InvoiceItems = plain == false ? u.InvoiceItems.Select(i => new InvoiceItemGetRequest(i, plain)) : null
                     }
                 )
                 .Where(u => u.Id == id).ToListAsync();
@@ -129,7 +45,6 @@ namespace InvoiceForgeApi.Repository
             {
                 throw new DatabaseCallError("User is not in database.");
             }
-
             return userList[0];
         }
         public async Task<bool> Delete(int id)
@@ -141,36 +56,25 @@ namespace InvoiceForgeApi.Repository
                 throw new DatabaseCallError("User is not in database.");
             }
 
-            _dbContext.User.Remove(user);
-            return true;
+            var entity = _dbContext.User.Remove(user);
+            return entity.State == EntityState.Deleted;
         }
         public async Task<bool> Update(int userId, UserUpdateRequest user)
         {
-            if (user is null)
-            {
-                throw new ValidationError("User is not provided.");
-            }
-
+            if (user is null) throw new ValidationError("User is not provided.");
             var localUser = await Get(userId);
 
-            if (localUser == null)
-            {
-                throw new DatabaseCallError("User is not in database.");
-            }
-
+            if (localUser == null) throw new DatabaseCallError("User is not in database.");
             var userWithNewAuthIdExists = await _dbContext.User
                 .Where(u => u.AuthenticationId == user.AuthenticationId)
                 .ToListAsync();
 
-            if (userWithNewAuthIdExists.Count > 0)
-            {
-                throw new ValidationError("Provided values are incorrect.");
-            }
-
+            if (userWithNewAuthIdExists.Count > 0) throw new ValidationError("Provided values are incorrect.");
             localUser.AuthenticationId = user.AuthenticationId;
-            return true;
+            
+            return _dbContext.Entry(localUser).State == EntityState.Modified;
         }
-        public async Task<bool> Add(int userId, UserAddRequest user)
+        public async Task<int?> Add(int userId, UserAddRequest user)
         {
 
             if(user is null)
@@ -179,8 +83,8 @@ namespace InvoiceForgeApi.Repository
             }
 
             var newUser = new User {AuthenticationId = user.AuthenticationId};
-            await _dbContext.User.AddAsync(newUser);
-            return true;
+            var entity = await _dbContext.User.AddAsync(newUser);
+            return entity.State == EntityState.Added ? entity.Entity.Id : null;
         }
         private async Task<User?> Get(int id)
         {

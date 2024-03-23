@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvoiceForgeApi.Migrations
 {
     [DbContext(typeof(InvoiceForgeDatabaseContext))]
-    [Migration("20240216184932_InitialCreate")]
+    [Migration("20240322230812_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -152,6 +152,39 @@ namespace InvoiceForgeApi.Migrations
                     b.ToTable("Country");
                 });
 
+            modelBuilder.Entity("InvoiceForgeApi.Model.CodeLists.Currency", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Currency");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.CodeLists.Tariff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tariff");
+                });
+
             modelBuilder.Entity("InvoiceForgeApi.Model.Contractor", b =>
                 {
                     b.Property<int>("Id")
@@ -190,7 +223,7 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<string>("Tel")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("www")
+                    b.Property<string>("Www")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -200,6 +233,144 @@ namespace InvoiceForgeApi.Migrations
                     b.HasIndex("Owner");
 
                     b.ToTable("Contractor");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<long>("BasePriceTotal")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ClientLocal")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContractorLocal")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Exposure")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Maturity")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("NumberingId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("OrderNumber")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Outdated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Owner")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TaxableTransaction")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TotalAll")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("UserAccountLocal")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("VATTotal")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Owner");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("Invoice");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Owner")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TariffId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Owner");
+
+                    b.HasIndex("TariffId");
+
+                    b.ToTable("InvoiceItem");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceService", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<long>("BasePrice")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InvoiceItemId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("PricePerUnit")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Total")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("Units")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("VAT")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("InvoiceItemId");
+
+                    b.ToTable("InvoiceService");
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceTemplate", b =>
@@ -219,6 +390,12 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberingId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Owner")
                         .HasColumnType("int");
 
@@ -231,9 +408,44 @@ namespace InvoiceForgeApi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClientId");
+
+                    b.HasIndex("ContractorId");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("NumberingId");
+
                     b.HasIndex("Owner");
 
+                    b.HasIndex("UserAccountId");
+
                     b.ToTable("InvoiceTemplate");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Numbering", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("NumberingPrefix")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NumberingTemplate")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Owner")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Owner");
+
+                    b.ToTable("Numbering");
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Model.User", b =>
@@ -337,10 +549,118 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceTemplate", b =>
+            modelBuilder.Entity("InvoiceForgeApi.Model.Invoice", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Model.User", "User")
+                        .WithMany()
+                        .HasForeignKey("Owner")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.InvoiceTemplate", "InvoiceTemplate")
+                        .WithMany("Invoices")
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.Navigation("InvoiceTemplate");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceItem", b =>
+                {
+                    b.HasOne("InvoiceForgeApi.Model.User", "User")
+                        .WithMany("InvoiceItems")
+                        .HasForeignKey("Owner")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.CodeLists.Tariff", "Tariff")
+                        .WithMany("InvoiceItems")
+                        .HasForeignKey("TariffId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.Navigation("Tariff");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceService", b =>
+                {
+                    b.HasOne("InvoiceForgeApi.Model.Invoice", "Invoice")
+                        .WithMany("InvoiceServices")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.InvoiceItem", "InvoiceItem")
+                        .WithMany("InvoiceServices")
+                        .HasForeignKey("InvoiceItemId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("InvoiceItem");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceTemplate", b =>
+                {
+                    b.HasOne("InvoiceForgeApi.Client", "Client")
                         .WithMany("InvoiceTemplates")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.Contractor", "Contractor")
+                        .WithMany("InvoiceTemplates")
+                        .HasForeignKey("ContractorId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.CodeLists.Currency", "Currency")
+                        .WithMany("InvoiceTemplates")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.Numbering", "Numbering")
+                        .WithMany("InvoiceTemplates")
+                        .HasForeignKey("NumberingId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.User", "User")
+                        .WithMany("InvoiceTemplates")
+                        .HasForeignKey("Owner")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Model.UserAccount", "UserAccount")
+                        .WithMany("InvoiceTemplates")
+                        .HasForeignKey("UserAccountId")
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+
+                    b.Navigation("Contractor");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("Numbering");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserAccount");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Numbering", b =>
+                {
+                    b.HasOne("InvoiceForgeApi.Model.User", "User")
+                        .WithMany("Numberings")
                         .HasForeignKey("Owner")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -366,6 +686,11 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("InvoiceForgeApi.Client", b =>
+                {
+                    b.Navigation("InvoiceTemplates");
+                });
+
             modelBuilder.Entity("InvoiceForgeApi.Model.Address", b =>
                 {
                     b.Navigation("Clients");
@@ -383,6 +708,41 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("Addresses");
                 });
 
+            modelBuilder.Entity("InvoiceForgeApi.Model.CodeLists.Currency", b =>
+                {
+                    b.Navigation("InvoiceTemplates");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.CodeLists.Tariff", b =>
+                {
+                    b.Navigation("InvoiceItems");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Contractor", b =>
+                {
+                    b.Navigation("InvoiceTemplates");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Invoice", b =>
+                {
+                    b.Navigation("InvoiceServices");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceItem", b =>
+                {
+                    b.Navigation("InvoiceServices");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.InvoiceTemplate", b =>
+                {
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.Numbering", b =>
+                {
+                    b.Navigation("InvoiceTemplates");
+                });
+
             modelBuilder.Entity("InvoiceForgeApi.Model.User", b =>
                 {
                     b.Navigation("Addresses");
@@ -391,9 +751,18 @@ namespace InvoiceForgeApi.Migrations
 
                     b.Navigation("Contractors");
 
+                    b.Navigation("InvoiceItems");
+
                     b.Navigation("InvoiceTemplates");
 
+                    b.Navigation("Numberings");
+
                     b.Navigation("UserAccounts");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Model.UserAccount", b =>
+                {
+                    b.Navigation("InvoiceTemplates");
                 });
 #pragma warning restore 612, 618
         }

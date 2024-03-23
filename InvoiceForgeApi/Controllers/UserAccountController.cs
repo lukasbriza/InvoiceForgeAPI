@@ -1,4 +1,5 @@
 ﻿
+using System.Diagnostics.Tracing;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
@@ -13,7 +14,8 @@ namespace InvoiceForgeApi.Controllers
         private readonly IUserAccountRepository _userAccountRepository;
         private readonly IUserRepository _userRepository;
         private readonly ICodeListsRepository _codeLists;
-        private readonly IInvoiceTemplateRepository _invoiceTemplate;
+        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
+        private readonly IInvoiceRepository _inboiceRepository;
         private readonly IRepositoryWrapper _repository;
 
         public UserAccountController(IRepositoryWrapper repository)
@@ -21,7 +23,8 @@ namespace InvoiceForgeApi.Controllers
             _userAccountRepository = repository.UserAccount;
             _userRepository = repository.User;
             _codeLists = repository.CodeLists;
-            _invoiceTemplate = repository.InvoiceTemplate;
+            _invoiceTemplateRepository = repository.InvoiceTemplate;
+            _inboiceRepository = repository.Invoice;
             _repository = repository;
         }
 
@@ -61,8 +64,14 @@ namespace InvoiceForgeApi.Controllers
             if (isDuplicitIbanOrAccountNumber) throw new ValidationError("There is already account with that IBAN or account number.");
 
             var addUserAccount = await _userAccountRepository.Add(userId, userAccount);
-            if (addUserAccount) await _repository.Save();
-            return addUserAccount;
+            var addUserAccountResult = addUserAccount is not null;
+
+            if (addUserAccountResult) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
+            return addUserAccountResult;
         }
 
         [HttpPut]
@@ -74,8 +83,20 @@ namespace InvoiceForgeApi.Controllers
             var user = await _userRepository.GetById(userAccount.Owner);
             if (user is null) throw new ValidationError("Provided user does not exist.");
 
-            var isOwnerOfUserAccount = user.UserAccounts.Where(a => a.Id == userAccountId);
-            if(isOwnerOfUserAccount is null || isOwnerOfUserAccount.Count() != 1) throw new ValidationError("Provided values are wrong.");
+            var isOwnerOfUserAccount = user.UserAccounts?.Where(a => a.Id == userAccountId);
+            if (isOwnerOfUserAccount is null || isOwnerOfUserAccount.Count() != 1) throw new ValidationError("Provided values are wrong.");
+
+            if (userAccount.AccountNumber is not null)
+            {
+                var accountNumberValidation = await _userAccountRepository.GetByCondition(a => a.AccountNumber == userAccount.AccountNumber && a.Owner == userAccountId);
+                if (accountNumberValidation is not null && accountNumberValidation.Count > 0) throw new ValidationError("Account number must be unique.");
+            }
+
+            if (userAccount.IBAN is not null)
+            {
+                var ibanValidation = await _userAccountRepository.GetByCondition(a => a.IBAN == userAccount.IBAN && a.Owner == userAccount.Owner);
+                if (ibanValidation is not null && ibanValidation.Count > 0) throw new ValidationError("IBAN must be unique.");
+            }
 
             if (userAccount.BankId is not null)
             {
@@ -84,7 +105,21 @@ namespace InvoiceForgeApi.Controllers
             }
 
             var userAccountUpdate = await _userAccountRepository.Update(userAccountId, userAccount);
-            if (userAccountUpdate) await _repository.Save();
+
+            if (userAccountUpdate) {
+                //OUTDATE LINKED INVOICES
+                var invoices = await _inboiceRepository.GetByCondition(i => i.UserAccountLocal.Id == userAccountId && i.Owner == user.Id && i.Outdated == false);
+                if (invoices is not null && invoices.Count > 0)
+                {
+                    invoices.ConvertAll(i => {
+                        i.Outdated = true;
+                        return i;
+                    });
+                }
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return userAccountUpdate;
         }
 
@@ -92,11 +127,16 @@ namespace InvoiceForgeApi.Controllers
         [Route("{userAccountId}")]
         public async Task<bool> DeleteUserAccount(int userAccountId)
         {
-            var hasInvoiceTemplatesReference = await _invoiceTemplate.GetByCondition((template) => template.UserAccountId == userAccountId);
+            var hasInvoiceTemplatesReference = await _invoiceTemplateRepository.GetByCondition((template) => template.UserAccountId == userAccountId);
             if (hasInvoiceTemplatesReference is not null && hasInvoiceTemplatesReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
 
             var deleteUserAccount = await _userAccountRepository.Delete(userAccountId);
-            if (deleteUserAccount) await _repository.Save();
+
+            if (deleteUserAccount) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return deleteUserAccount;
         }
     }

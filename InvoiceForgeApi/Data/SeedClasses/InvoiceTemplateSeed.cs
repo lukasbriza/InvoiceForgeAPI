@@ -15,7 +15,9 @@ namespace InvoiceForgeApi.Data.SeedClasses
                     ContractorId = 1,
                     UserAccountId = 1,
                     TemplateName = "Template1",
-                    Created = DateTime.UtcNow
+                    Created = DateTime.UtcNow,
+                    NumberingId = 1,
+                    CurrencyId = 1
                 },
                 new InvoiceTemplate()
                 {
@@ -24,7 +26,9 @@ namespace InvoiceForgeApi.Data.SeedClasses
                     ContractorId = 1,
                     UserAccountId = 1,
                     TemplateName = "Template2",
-                    Created = DateTime.UtcNow
+                    Created = DateTime.UtcNow,
+                    NumberingId = 1,
+                    CurrencyId = 2
                 }
             };
         }

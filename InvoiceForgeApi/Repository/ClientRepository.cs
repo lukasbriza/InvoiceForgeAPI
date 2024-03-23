@@ -20,39 +20,13 @@ namespace InvoiceForgeApi.Repository
             DbSet<Client> clients = _dbContext.Client;
             if (plain == true)
             {
-                clients.Include(c => c.Address).Include(c => c.Address!.Country);
+                clients.Include(c => c.Address).ThenInclude(a => a!.Country);
             }
               
-              var clientsList = await clients.Select(c => new ClientGetRequest
-                    {
-                        Id = c.Id,
-                        AddressId = (int)c.AddressId!,
-                        Owner = c.Owner,
-                        Type = c.Type,
-                        ClientName = c.ClientName,
-                        IN = c.IN,
-                        TIN = c.TIN,
-                        Mobil = c.Mobil,
-                        Tel = c.Tel,
-                        Email = c.Email,
-                        Address = plain == false ? new AddressGetRequest
-                        {
-                            Id = c.Address!.Id,
-                            Owner = c.Address.Owner,
-                            Street = c.Address.Street,
-                            StreetNumber = c.Address.StreetNumber,
-                            City = c.Address.City,
-                            PostalCode = c.Address.PostalCode,
-                            Country = plain == false ? new CountryGetRequest
-                            {
-                                Id = c.Address.Country!.Id,
-                                Value = c.Address.Country.Value,
-                                Shortcut = c.Address.Country.Shortcut
-                            } : null
-                        } : null
-                    }
-                )
-                .Where(c => c.Owner == userId).ToListAsync();
+              var clientsList = await clients
+                .Select(c => new ClientGetRequest(c, plain))
+                .Where(c => c.Owner == userId)
+                .ToListAsync();
                 
             return clientsList;
 
@@ -63,40 +37,13 @@ namespace InvoiceForgeApi.Repository
             DbSet<Client> client = _dbContext.Client;
             if (plain == false)
             {
-                client.Include(c => c.Address).Include(c => c.Address!.Country);
+                client.Include(c => c.Address).ThenInclude(a => a!.Country);
             }
 
             var clientList = await client
-                .Select(c => new ClientGetRequest
-                    {
-                        Id = c.Id,
-                        AddressId = (int)c.AddressId!,
-                        Owner = c.Owner,
-                        Type = c.Type,
-                        ClientName = c.ClientName,
-                        IN = c.IN,
-                        TIN = c.TIN,
-                        Mobil = c.Mobil,
-                        Tel = c.Tel,
-                        Email = c.Email,
-                        Address = plain == false ? new AddressGetRequest
-                        {
-                            Id = c.Address!.Id,
-                            Owner = c.Address.Owner,
-                            Street = c.Address.Street,
-                            StreetNumber = c.Address.StreetNumber,
-                            City = c.Address.City,
-                            PostalCode = c.Address.PostalCode,
-                            CountryId = c.Address.CountryId,
-                            Country = plain == false ?new CountryGetRequest
-                            {
-                                Id = c.Address.Country!.Id,
-                                Value = c.Address.Country.Value,
-                                Shortcut = c.Address.Country.Shortcut
-                            } : null
-                        } : null
-                    }
-                ).Where(c => c.Id == clientId).ToListAsync();
+                .Select(c => new ClientGetRequest(c, plain))
+                .Where(c => c.Id == clientId)
+                .ToListAsync();
 
             if (clientList.Count > 1)
             {
@@ -105,7 +52,7 @@ namespace InvoiceForgeApi.Repository
 
             return clientList[0];
         }
-        public async Task<bool> Add(int userId ,ClientAddRequest client, ClientType clientType)
+        public async Task<int?> Add(int userId ,ClientAddRequest client, ClientType clientType)
         {
             var newClient = new Client
             {
@@ -119,8 +66,8 @@ namespace InvoiceForgeApi.Repository
                 Tel = client.Tel,
                 Email = client.Email
             };
-            await _dbContext.Client.AddAsync(newClient);
-            return true;
+            var entity = await _dbContext.Client.AddAsync(newClient);
+            return entity.State == EntityState.Added ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType? clientType)
         {
@@ -135,16 +82,17 @@ namespace InvoiceForgeApi.Repository
             localClient.TIN = client.TIN ?? localClient.TIN;
             localClient.Mobil = client.Mobil ?? localClient.Mobil;
             localClient.Tel = client.Tel ?? localClient.Tel;
-            localClient.Email = client.Email ?? localClient.Email;
-            return true;
+            localClient.Email = client.Email ?? localClient.Email;  
+
+            return _dbContext.Entry(localClient).State == EntityState.Modified;
         }
         public async Task<bool> Delete(int id)
         {
             var client = await Get(id);
             if (client is null) throw new DatabaseCallError("Client is not in database.");    
 
-            _dbContext.Client.Remove(client);
-            return true;
+            var entity = _dbContext.Client.Remove(client);
+            return entity.State == EntityState.Deleted;
         }
         private async Task<Client?> Get(int id)
         {

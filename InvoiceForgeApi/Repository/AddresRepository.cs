@@ -21,23 +21,10 @@ namespace InvoiceForgeApi.Repository
             if (plain == false){
                 addresses.Include(a => a.Country);
             }
-            var addressList = await addresses.Select( a => new AddressGetRequest
-                {
-                    Id = a.Id,
-                    Owner = a.Owner,
-                    Street = a.Street,
-                    StreetNumber = a.StreetNumber,
-                    City = a.City,
-                    PostalCode = a.PostalCode,
-                    CountryId = a.CountryId,
-                    Country = plain == false ? new CountryGetRequest
-                    {
-                        Id = a.Country!.Id,
-                        Value = a.Country.Value,
-                        Shortcut = a.Country.Shortcut
-                    } : null 
-                }
-            ).Where(a => a.Owner == userId).ToListAsync();
+            var addressList = await addresses
+                .Select(a => new AddressGetRequest(a, plain))
+                .Where(a => a.Owner == userId)
+                .ToListAsync();
             return addressList;
         }
         public async Task<AddressGetRequest?> GetById(int addressId, bool? plain = false)
@@ -47,24 +34,9 @@ namespace InvoiceForgeApi.Repository
                     address.Include(a => a.Country);
                 }
                 var addressList = await address
-                    .Select( a => new AddressGetRequest
-                        {
-                            Id = a.Id,
-                            Owner = a.Owner,
-                            Street = a.Street,
-                            StreetNumber = a.StreetNumber,
-                            City = a.City,
-                            PostalCode = a.PostalCode,
-                            CountryId = a.CountryId,
-                            Country = plain == false ? new CountryGetRequest
-                            {
-                                Id = a.Country!.Id,
-                                Value = a.Country.Value,
-                                Shortcut = a.Country.Shortcut
-                            } : null
-                        }
-                    )
-                    .Where(a => a.Id == addressId).ToListAsync();
+                    .Select(a => new AddressGetRequest(a, plain))
+                    .Where(a => a.Id == addressId)
+                    .ToListAsync();
                 
                 if (addressList.Count > 1)
                 {
@@ -72,7 +44,7 @@ namespace InvoiceForgeApi.Repository
                 }
                 return addressList[0];
         }
-        public async Task<bool> Add(int userId, AddressAddRequest address)
+        public async Task<int?> Add(int userId, AddressAddRequest address)
         {
             var newAddress = new Address
             {
@@ -83,25 +55,11 @@ namespace InvoiceForgeApi.Repository
                 City = address.City,
                 PostalCode = address.PostalCode
             };
-            await _dbContext.Address.AddAsync(newAddress);
-            return true;
+            var entity = await _dbContext.Address.AddAsync(newAddress);
+            return entity.State == EntityState.Added ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int addressId, AddressUpdateRequest address)
         {
-            if (address is null)
-            {
-                throw new ValidationError("Address is not provided");
-            }
-
-            if (address.CountryId is not null)
-            {
-                var country = await _dbContext.Country.FindAsync(address.CountryId);
-                if (country is null)
-                {
-                    throw new ValidationError("Provided countryId is invalid.");
-                }
-            }
-
             var localAddress = await Get(addressId);
             if (localAddress is null)
             {
@@ -113,7 +71,8 @@ namespace InvoiceForgeApi.Repository
             localAddress.Street = address.Street ?? localAddress.Street;
             localAddress.StreetNumber = address.StreetNumber ?? localAddress.StreetNumber;
             localAddress.PostalCode = address.PostalCode ?? localAddress.PostalCode;
-            return true;
+            
+            return _dbContext.Entry(localAddress).State == EntityState.Modified;
         }
         public async Task<bool> Delete(int addressId)
         {
@@ -124,8 +83,8 @@ namespace InvoiceForgeApi.Repository
                 throw new DatabaseCallError("Address is not in database.");
             }
 
-            _dbContext.Address.Remove(address);
-            return true;
+            var entity = _dbContext.Address.Remove(address);
+            return entity.State == EntityState.Deleted;
         }
         private async Task<Address?> Get(int id)
         {

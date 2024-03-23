@@ -15,6 +15,7 @@ namespace InvoiceForgeApi.Controllers
         private readonly ICodeListsRepository _codeListsRepository;
         private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IInvoiceRepository _invoiceRepository;
         private readonly IRepositoryWrapper _repository;
 
         public ContractorController(IRepositoryWrapper repository)
@@ -24,6 +25,7 @@ namespace InvoiceForgeApi.Controllers
             _userRepository = repository.User;
             _codeListsRepository = repository.CodeLists;
             _invoiceTemplateRepository = repository.InvoiceTemplate;
+            _invoiceRepository = repository.Invoice;
             _repository = repository;
         }
 
@@ -31,7 +33,7 @@ namespace InvoiceForgeApi.Controllers
         [Route("all/{userId}")]
         public async Task<List<ContractorGetRequest>?> GetAllContractors(int userId)
         {
-            return await _contractorRepository.GetAll(userId);
+            return await _contractorRepository.GetAll(userId, false);
         }
         [HttpGet]
         [Route("plain/all/{userId}")]
@@ -68,8 +70,14 @@ namespace InvoiceForgeApi.Controllers
             if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
 
             var addContractor = await _contractorRepository.Add(userId, contractor, (ClientType)clientTypeValidation);
-            if (addContractor) await _repository.Save();
-            return addContractor; 
+            var addContractorResult = addContractor is not null;
+
+            if (addContractorResult) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
+            return addContractorResult;
         }
         [HttpPut]
         [Route("{contractorId}")]
@@ -80,7 +88,7 @@ namespace InvoiceForgeApi.Controllers
             var user = await _userRepository.GetById(contractor.Owner);
             if (user is null) return false;
 
-            var isOwnerOfContractor = user.Contractors.Where(c => c.Id == contractorId);
+            var isOwnerOfContractor = user.Contractors?.Where(c => c.Id == contractorId);
             if (isOwnerOfContractor is null || isOwnerOfContractor.Count() != 1) throw new ValidationError("Contractor is not in your possession.");
 
             var contractorValidation = await _contractorRepository.GetById(contractorId);
@@ -95,8 +103,22 @@ namespace InvoiceForgeApi.Controllers
 
             var clientType = contractor.TypeId is not null ? _codeListsRepository.GetClientTypeById((int)contractor.TypeId) : null;
             if (clientType is null && contractor.TypeId is not null) throw new ValidationError("Provided client type does not exist in database.");
-            var contractorUpdate = await _contractorRepository.Update(contractorId,contractor,clientType);
-            if (contractorUpdate) await _repository.Save();
+            var contractorUpdate = await _contractorRepository.Update(contractorId, contractor,clientType);
+           
+            if (contractorUpdate) {
+                //OUTDATE LINKED INVOICES
+                var invoices = await _invoiceRepository.GetByCondition(i => i.ContractorLocal.Id == contractorId && i.Owner == user.Id && i.Outdated == false);
+                if (invoices is not null && invoices.Count > 0)
+                {
+                    invoices.ConvertAll(i => {
+                        i.Outdated = true;
+                        return i;
+                    });
+                }
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return contractorUpdate;
         }
         [HttpDelete]
@@ -107,7 +129,12 @@ namespace InvoiceForgeApi.Controllers
             if (hasInvoiceTemplatesReference is not null && hasInvoiceTemplatesReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
 
             var deleteContractor = await _contractorRepository.Delete(contractorId);
-            if (deleteContractor) await _repository.Save();
+            
+            if (deleteContractor) {
+                await _repository.Save();
+            } else {
+                _repository.DetachChanges();
+            };
             return deleteContractor;
         }
     }
