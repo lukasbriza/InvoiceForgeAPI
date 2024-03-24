@@ -9,7 +9,11 @@ namespace InvoiceForgeApi.Data
             using (var serviceScope = applicationBuilder.ApplicationServices.CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetService<InvoiceForgeDatabaseContext>();
-
+                PopulateDatabase(context);
+            }
+        }
+        public static void PopulateDatabase(InvoiceForgeDatabaseContext? context)
+        {
                 context!.Database.EnsureCreated();
                 //Bank
                 if(!context.Bank.Any())
@@ -84,7 +88,7 @@ namespace InvoiceForgeApi.Data
                     context.SaveChanges();
                 }
                 context.SaveChanges();
-            }
         }
+        
     }
 }

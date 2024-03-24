@@ -51,7 +51,9 @@ namespace InvoiceForgeApi.Repository
                 NumberingId = template.NumberingId
             };
             var entity = await _dbContext.InvoiceTemplate.AddAsync(newInvoiceTemplate);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int templateId, InvoiceTemplateUpdateRequest template)
         {
@@ -64,7 +66,8 @@ namespace InvoiceForgeApi.Repository
             localTemplate.TemplateName = template.TemplateName ?? localTemplate.TemplateName;
             localTemplate.NumberingId = template.NumberingId ?? localTemplate.NumberingId;
            
-            return _dbContext.Entry(localTemplate).State == EntityState.Modified;      
+            var update = _dbContext.Update(localTemplate);
+            return update.State == EntityState.Modified;     
         }
         public async Task<bool> Delete(int id)
         {

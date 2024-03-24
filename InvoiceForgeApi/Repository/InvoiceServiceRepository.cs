@@ -96,7 +96,8 @@ namespace InvoiceForgeApi.Repository
             localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit ?? localInvoiceservice.PricePerUnit;
             localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit ?? localInvoiceservice.PricePerUnit;
             
-            return _dbContext.Entry(localInvoiceservice).State == EntityState.Modified;
+            var update = _dbContext.Update(localInvoiceservice);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int id)
         {

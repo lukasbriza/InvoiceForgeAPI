@@ -55,7 +55,9 @@ namespace InvoiceForgeApi.Repository
                 TariffId = invoiceItem.TariffId
             };
             var entity = await _dbContext.InvoiceItem.AddAsync(newInvoiceItem);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int invoiceItemId, InvoiceItemUpdateRequest invoiceItem)
         {
@@ -68,7 +70,8 @@ namespace InvoiceForgeApi.Repository
             localInvoiceItem.ItemName = invoiceItem.ItemName ?? localInvoiceItem.ItemName;
             localInvoiceItem.TariffId = invoiceItem.TariffId ?? localInvoiceItem.TariffId;
             
-            return _dbContext.Entry(localInvoiceItem).State == EntityState.Modified;
+            var update = _dbContext.Update(localInvoiceItem);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int invoiceItemId)
         {

@@ -72,7 +72,9 @@ namespace InvoiceForgeApi.Repository
                 Created = invoice.Created
             };
             var entity = await _dbContext.Invoice.AddAsync(newInvoice);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
 
         }
         public async Task<bool> Update(int invoiceId, InvoiceUpdateRequest invoice)
@@ -88,7 +90,8 @@ namespace InvoiceForgeApi.Repository
             localInvoice.Exposure = invoice.Exposure ?? localInvoice.Exposure;
             localInvoice.TaxableTransaction = invoice.TaxableTransaction ?? localInvoice.TaxableTransaction;
 
-            return _dbContext.Entry(localInvoice).State == EntityState.Modified;
+            var update = _dbContext.Update(localInvoice);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int entityId)
         {

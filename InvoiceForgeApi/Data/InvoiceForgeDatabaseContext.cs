@@ -83,7 +83,6 @@ namespace InvoiceForgeApi.Data
             //UserAccount on delete behavior
             builder.Entity<UserAccount>().HasOne(a => a.Bank).WithMany(b => b.UserAccounts).OnDelete(DeleteBehavior.ClientNoAction);
 
-
             //Invoice on delete behavior
             builder.Entity<Invoice>().HasOne(a => a.InvoiceTemplate).WithMany(b => b.Invoices).OnDelete(DeleteBehavior.ClientNoAction);
 

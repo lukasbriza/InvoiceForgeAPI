@@ -7,14 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+//Add services to the container.
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+//Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -32,7 +32,7 @@ if (args.Length == 1 && args[0].ToLower() == "seed")
     Seed.SeedData(app);
 }
 
-// Configure the HTTP request pipeline.
+//Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -45,3 +45,6 @@ app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+//Acess app from outside
+public partial class InvoiceForgeApiProgram { }

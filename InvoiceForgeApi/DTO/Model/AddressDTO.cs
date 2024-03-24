@@ -40,7 +40,7 @@ namespace InvoiceForgeApi.DTO.Model
     public class AddressUpdateRequest
     {
         public int Owner {  get; set; }
-         public int? CountryId { get; set; }
+        public int? CountryId { get; set; }
         public string? Street { get; set; }
         public int? StreetNumber { get; set; }
         public string? City { get; set; }

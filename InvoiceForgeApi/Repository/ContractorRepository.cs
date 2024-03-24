@@ -65,7 +65,9 @@ namespace InvoiceForgeApi.Repository
                 Www = contractor.Www
             };
             var entity = await _dbContext.Contractor.AddAsync(newContractor);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType? clientType)
         {
@@ -86,7 +88,8 @@ namespace InvoiceForgeApi.Repository
             localContractor.Tel = contractor.Tel ?? localContractor.Tel;
             localContractor.Www = contractor.Www ?? localContractor.Www;
             
-            return _dbContext.Entry(localContractor).State == EntityState.Modified;
+            var update = _dbContext.Update(localContractor);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int id)
         {
