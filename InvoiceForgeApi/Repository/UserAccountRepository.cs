@@ -38,16 +38,9 @@ public class UserAccountRepository: IUserAccountRepository
             userAccount.Include(u => u.Bank);
         }
         
-        var userAccountList = await userAccount
-            .Select( u => new UserAccountGetRequest(u, plain))
-            .Where(u => u.Id == userAccountId)
-            .ToListAsync();
-        
-        if(userAccountList.Count > 1)
-        {
-            throw new ValidationError("Something unexpected happened. There are more than one user account with this ID.");
-        }
-        return userAccountList[0];
+        var userAccountCall = await userAccount.FindAsync(userAccountId);
+        var userAccountResult = new UserAccountGetRequest(userAccountCall, plain);
+        return userAccountCall is not null ? userAccountResult : null;
     }
     public async Task<bool> HasDuplicitIbanOrAccountNumber(int userId, UserAccountAddRequest userAccount)
     {

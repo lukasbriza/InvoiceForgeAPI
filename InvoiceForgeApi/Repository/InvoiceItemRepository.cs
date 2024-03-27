@@ -36,15 +36,9 @@ namespace InvoiceForgeApi.Repository
             {
                 invoiceItem.Include(i => i.Tariff);
             }
-            var invoiceItemList = await invoiceItem
-                .Select(i => new InvoiceItemGetRequest(i, plain))
-                .Where(i => i.Id == invoiceItemId)
-                .ToListAsync();
-            if (invoiceItemList.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happended. There are more than one invoice item with this ID.");
-            }
-            return invoiceItemList[0];
+            var invoiceItemCall = await invoiceItem.FindAsync(invoiceItemId);
+            var invoiceItemResult = new InvoiceItemGetRequest(invoiceItemCall, plain);
+            return invoiceItemCall is not null ? invoiceItemResult : null;
         }
         public async Task<int?> Add(int userId, InvoiceItemAddRequest invoiceItem)
         {
@@ -64,7 +58,7 @@ namespace InvoiceForgeApi.Repository
             var localInvoiceItem = await Get(invoiceItemId);
             if (localInvoiceItem is null)
             {
-                throw new ValidationError("InvoiceItem is not in database.");
+                throw new DatabaseCallError("InvoiceItem is not in database.");
             }
 
             localInvoiceItem.ItemName = invoiceItem.ItemName ?? localInvoiceItem.ItemName;

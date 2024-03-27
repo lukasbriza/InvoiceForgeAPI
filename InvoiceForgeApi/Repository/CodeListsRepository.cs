@@ -1,6 +1,5 @@
 ﻿using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
-using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +23,7 @@ namespace InvoiceForgeApi.Repository
         {
             var country = await _dbContext.Country.FindAsync(id);
             var countryResult = new CountryGetRequest(country);
-            return countryResult;
+            return country is not null ? countryResult : null;
         }
         public async Task<List<BankGetRequest>> GetBanks()
         {
@@ -35,7 +34,7 @@ namespace InvoiceForgeApi.Repository
         {
             var bank = await _dbContext.Bank.FindAsync(id);
             var bankresult = new BankGetRequest(bank);
-            return bankresult;
+            return bank is not null ? bankresult : null;
         }
         public List<ClientTypeGetRequest> GetClientTypes()
         {
@@ -127,7 +126,7 @@ namespace InvoiceForgeApi.Repository
         {
             var tariff = await _dbContext.Tariff.FindAsync(id);
             var tariffResult = new TariffGetRequest(tariff);
-            return tariffResult;
+            return tariff is not null ? tariffResult : null;
         }
         public async Task<List<CurrencyGetRequest>> GetCurrencies()
         {
@@ -138,7 +137,7 @@ namespace InvoiceForgeApi.Repository
         {
             var currency = await _dbContext.Currency.FindAsync(id);
             var currencyResult = new CurrencyGetRequest(currency);
-            return currencyResult;
+            return currency is not null ? currencyResult : null;
         }
     }
 }

@@ -39,16 +39,9 @@ namespace InvoiceForgeApi.Repository
                     .Include(i => i.InvoiceItem)
                     .ThenInclude(i => i!.Tariff);
             }
-            var invoiceServiceList = await invoiceService
-                .Select(i => new InvoiceServiceGetRequest(i, plain))
-                .Where(i => i.Id == itemServiceId)
-                .ToListAsync();
-            
-            if (invoiceServiceList.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happened. There are more than one invoice template with this ID.");
-            }
-            return invoiceServiceList[0];
+            var invoiceServiceCall = await invoiceService.FindAsync(itemServiceId);
+            var invoiceServiceResult = new InvoiceServiceGetRequest(invoiceServiceCall, plain);
+            return invoiceServiceCall is not null ? invoiceServiceResult : null;
         }
         public async Task<int?> Add(int InvoiceId, InvoiceServiceExtendedAddRequest invoiceService)
         {

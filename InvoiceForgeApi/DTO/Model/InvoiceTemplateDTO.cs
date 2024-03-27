@@ -6,18 +6,21 @@ namespace InvoiceForgeApi.DTO.Model
     public class InvoiceTemplateGetRequest
     {
         public InvoiceTemplateGetRequest() {}
-        public InvoiceTemplateGetRequest(InvoiceTemplate template, bool? plain = false) 
+        public InvoiceTemplateGetRequest(InvoiceTemplate? template, bool? plain = false) 
         {
-            Id = template.Id;
-            Owner = template.Owner;
-            ClientId = template.ClientId;
-            ContractorId = template.ContractorId;
-            UserAccountId = template.UserAccountId;
-            TemplateName = template.TemplateName;
-            NumberingId = template.NumberingId;
-            CurrencyId = template.CurrencyId;
-            Created = template.Created;
-            Numbering = plain == false ? new NumberingGetRequest(template.Numbering) : null;
+            if (template is not null)
+            {
+                Id = template.Id;
+                Owner = template.Owner;
+                ClientId = template.ClientId;
+                ContractorId = template.ContractorId;
+                UserAccountId = template.UserAccountId;
+                TemplateName = template.TemplateName;
+                NumberingId = template.NumberingId;
+                CurrencyId = template.CurrencyId;
+                Created = template.Created;
+                Numbering = plain == false ? new NumberingGetRequest(template.Numbering) : null;
+            }
         }
         public int Id { get; set; }
         public int Owner { get; set; }

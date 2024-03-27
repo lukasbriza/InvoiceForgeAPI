@@ -6,7 +6,7 @@ namespace InvoiceForgeApi.DTO.Model
     public class ContractorGetRequest
     {
         public ContractorGetRequest(){}
-        public ContractorGetRequest(Contractor contractor, bool? plain = false)
+        public ContractorGetRequest(Contractor? contractor, bool? plain = false)
         {
             if (contractor is not null)
             {

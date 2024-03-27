@@ -1,10 +1,11 @@
 
 
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO.Model;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Client.Repository
+namespace ClientRepository
 {
     [Collection("Sequential")]
     public class UpdateClient: WebApplicationFactory

@@ -17,6 +17,7 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<List<AddressGetRequest>?> GetAll(int userId, bool? plain = false)
         {
+            await _dbContext.Database.BeginTransactionAsync();
             DbSet<Address> addresses = _dbContext.Address;
             if (plain == false){
                 addresses.Include(a => a.Country);
@@ -35,6 +36,7 @@ namespace InvoiceForgeApi.Repository
                     address.Include(a => a.Country);
                 }
                 var addressCall = await address.FindAsync(addressId);
+                if (addressCall is null) throw new DatabaseCallError("Adress is not in database.");
                 var addressResult  = new AddressGetRequest(addressCall, plain);
                 return addressResult;
         }

@@ -1,11 +1,11 @@
-
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.DTO.Model;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Client.Repository
+namespace ClientRepository
 {
     [Collection("Sequential")]
     public class GetClient: WebApplicationFactory

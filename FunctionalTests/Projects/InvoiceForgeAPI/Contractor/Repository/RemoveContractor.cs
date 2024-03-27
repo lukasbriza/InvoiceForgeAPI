@@ -1,14 +1,15 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Contractor.Repository
+namespace ContractorRepository
 {
     [Collection("Sequential")]
     public class RemoveContractor: WebApplicationFactory
     {
         [Fact]
-        public Task CanUpdateContractorById()
+        public Task CanRemoveContractorById()
         {
             return RunTest(async (client) => {
                 //SETUP

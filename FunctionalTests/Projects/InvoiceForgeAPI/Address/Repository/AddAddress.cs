@@ -1,8 +1,9 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO.Model;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Address.Repository
+namespace AddressRepository
 {
     [Collection("Sequential")]
     public class AddAddress: WebApplicationFactory
@@ -11,7 +12,6 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI.Address.Repository
         public Task CanAddAddress()
         {
             return RunTest(async (client) => {
-
                 //SETUP
                 var db = new DatabaseHelper();
                 db.InitializeDbForTest();

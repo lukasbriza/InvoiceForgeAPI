@@ -41,6 +41,7 @@ namespace InvoiceForgeApi.Repository
             }
 
             var clientCall = await client.FindAsync(clientId);
+            if (clientCall is null) throw new DatabaseCallError("Client is not in database.");
             var clientResult = new ClientGetRequest(clientCall, plain);
             return clientResult;
         }

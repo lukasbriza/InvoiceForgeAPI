@@ -1,11 +1,13 @@
 
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Repository;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Address.Repository
+namespace AddressRepository
 {
     [Collection("Sequential")]
     public class GetAddress: WebApplicationFactory
@@ -13,12 +15,12 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI.Address.Repository
         [Fact]
         public Task ReturnSeededCountAndTypeOfAddressesForUser()
         {
-            return RunTest(async (clientm) => {
+            return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
                 db.InitializeDbForTest();
                 var users = await db._context.User.Select(u => u.Id).ToListAsync();
-
+                
                 //ASSERT
                 Assert.NotNull(users);
                 Assert.IsType<List<int>>(users);

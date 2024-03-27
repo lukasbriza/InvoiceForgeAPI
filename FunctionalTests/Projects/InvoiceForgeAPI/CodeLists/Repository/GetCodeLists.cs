@@ -1,11 +1,12 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Model.CodeLists;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.CodeLists.Repository
+namespace CodeListsRepository
 {
     [Collection("Sequential")]
     public class GetCodeLists: WebApplicationFactory

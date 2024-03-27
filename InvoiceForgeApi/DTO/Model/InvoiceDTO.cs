@@ -5,7 +5,7 @@ namespace InvoiceForgeApi.DTO.Model
     public class InvoiceGetRequest
     {
         public InvoiceGetRequest() {}
-        public InvoiceGetRequest(Invoice? invoice)
+        public InvoiceGetRequest(Invoice? invoice, bool? plain = false)
         {
             if (invoice is not null)
             {
@@ -20,7 +20,7 @@ namespace InvoiceForgeApi.DTO.Model
                 VATTotal = invoice.VATTotal;
                 TotalAll = invoice.TotalAll;
                 Currency = invoice.Currency;
-                InvoiceServices = invoice.InvoiceServices.Select(s => new InvoiceServiceGetRequest(s)).ToList();
+                InvoiceServices = plain == false ? invoice.InvoiceServices.Select(s => new InvoiceServiceGetRequest(s)).ToList() : null;
 
                 Created = invoice.Created;
                 Maturity = invoice.Maturity;
@@ -42,7 +42,7 @@ namespace InvoiceForgeApi.DTO.Model
         public long BasePriceTotal { get; set; }
         public long VATTotal { get; set; }
         public long TotalAll { get; set; }
-        public ICollection<InvoiceServiceGetRequest> InvoiceServices { get; set; } = new List<InvoiceServiceGetRequest>();
+        public ICollection<InvoiceServiceGetRequest>? InvoiceServices { get; set; } = new List<InvoiceServiceGetRequest>();
 
         public DateTime Created { get; set; }
         public DateTime Maturity { get; set; }

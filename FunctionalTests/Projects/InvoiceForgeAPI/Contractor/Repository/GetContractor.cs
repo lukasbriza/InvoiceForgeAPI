@@ -1,11 +1,12 @@
 
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.DTO.Model;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Contractor.Repository
+namespace ContractorRepository
 {
     [Collection("Sequential")]
     public class GetContractor: WebApplicationFactory

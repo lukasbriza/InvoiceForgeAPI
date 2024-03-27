@@ -1,8 +1,9 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
+using FunctionalTests.Projects.InvoiceForgeAPI;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI.Address.Repository
+namespace AddressRepository
 {
     [Collection("Sequential")]
     public class RemoveAddress: WebApplicationFactory

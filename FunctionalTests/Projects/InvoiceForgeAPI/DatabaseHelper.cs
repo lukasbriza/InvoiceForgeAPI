@@ -2,7 +2,6 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.Repository;
-using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.EntityFrameworkCore;
 
 namespace FunctionalTests.Projects.InvoiceForgeAPI
@@ -122,10 +121,10 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI
                 _context.SaveChanges();
             }
         }
-        public void Dispose()
+        public async void  Dispose()
         {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
+            await _context.Database.EnsureDeletedAsync();
+            await  _context.DisposeAsync();
         }
     }
 }

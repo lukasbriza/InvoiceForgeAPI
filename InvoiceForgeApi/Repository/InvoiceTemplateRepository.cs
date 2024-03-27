@@ -26,17 +26,9 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<InvoiceTemplateGetRequest?> GetById(int templateId, bool? plain = false)
         {
-            var template = await _dbContext.InvoiceTemplate
-                .Select(i => new InvoiceTemplateGetRequest(i, plain))
-                .Where(i => i.Id == templateId)
-                .ToListAsync();
-            
-            if (template.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happened. There are more than one invoice template with this ID.");
-            }
-
-            return template[0];
+            var templateCall = await _dbContext.InvoiceTemplate.FindAsync(templateId);
+            var templateResult = new InvoiceTemplateGetRequest(templateCall, plain);
+            return templateCall is not null ? templateResult : null;
         }
         public async Task<int?> Add(int userId, InvoiceTemplateAddRequest template)
         {

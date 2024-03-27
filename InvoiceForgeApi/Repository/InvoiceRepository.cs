@@ -18,34 +18,31 @@ namespace InvoiceForgeApi.Repository
         public async Task<List<InvoiceGetRequest>?> GetAll(int userId, bool? plain = false)
         {
             DbSet<Invoice> invoices = _dbContext.Invoice;
-            invoices
-                .Include(i => i.InvoiceServices)
-                .ThenInclude(i => i.InvoiceItem);
+            if (plain == true)
+            {
+                invoices
+                    .Include(i => i.InvoiceServices)
+                    .ThenInclude(i => i.InvoiceItem);
+            }
 
             var invoicesList = await invoices
-                .Select(i => new InvoiceGetRequest(i))
                 .Where(i => i.Owner == userId)
+                .Select(i => new InvoiceGetRequest(i, plain))
                 .ToListAsync();
             return invoicesList;
         }
         public async Task<InvoiceGetRequest?> GetById(int invoiceId, bool? plain = false)
         {
             DbSet<Invoice> invoice = _dbContext.Invoice;
-            invoice
-                .Include(i => i.InvoiceServices)
-                .ThenInclude(i => i.InvoiceItem);
-
-            var invoiceList = await invoice
-                .Select(i => new InvoiceGetRequest(i))
-                .Where(i => i.Id == invoiceId)
-                .ToListAsync();
-
-            if (invoiceList.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happened. There are more than one invoice with this ID.");
+            if (plain == false){
+                invoice
+                    .Include(i => i.InvoiceServices)
+                    .ThenInclude(i => i.InvoiceItem);
             }
 
-            return invoiceList[0];
+            var invoiceCall = await invoice.FindAsync(invoiceId);
+            var invoiceResult = new InvoiceGetRequest(invoiceCall);
+            return invoiceCall is not null ? invoiceResult : null;
         }
         public async Task<int?> Add(int userId, InvoiceAddRequestRepository invoice)
         {

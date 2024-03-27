@@ -29,23 +29,9 @@ namespace InvoiceForgeApi.Repository
                 .Include(u => u.InvoiceItems).ThenInclude(i => i.Tariff);
             }
             
-            var userList = await user.Select(u => new UserGetRequest
-                    {
-                        Id =  u.Id,
-                        Contractors = plain == false ? u.Contractors.Select(c => new ContractorGetRequest(c, plain)) : null,
-                        Clients = plain == false ? u.Clients.Select(c => new ClientGetRequest(c, plain)) : null,
-                        UserAccounts = plain == false ? u.UserAccounts.Select(u => new UserAccountGetRequest(u, plain)) : null,
-                        Addresses = plain == false ? u.Addresses.Select(a => new AddressGetRequest(a, plain)) : null,
-                        InvoiceItems = plain == false ? u.InvoiceItems.Select(i => new InvoiceItemGetRequest(i, plain)) : null
-                    }
-                )
-                .Where(u => u.Id == id).ToListAsync();
-
-            if (userList.Count == 0)
-            {
-                throw new DatabaseCallError("User is not in database.");
-            }
-            return userList[0];
+            var userCall = await user.FindAsync(id);
+            var userResult = new UserGetRequest(userCall, plain);
+            return userCall is not null ? userResult : null;
         }
         public async Task<bool> Delete(int id)
         {
