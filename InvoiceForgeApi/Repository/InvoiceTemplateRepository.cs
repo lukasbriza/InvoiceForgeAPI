@@ -38,6 +38,7 @@ namespace InvoiceForgeApi.Repository
                 ClientId = template.ClientId,
                 ContractorId = template.ContractorId,
                 UserAccountId = template.UserAccountId,
+                CurrencyId = template.CurrencyId,
                 TemplateName = template.TemplateName,
                 Created = new DateTime().ToUniversalTime(),
                 NumberingId = template.NumberingId

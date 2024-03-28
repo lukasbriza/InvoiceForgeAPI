@@ -39,6 +39,7 @@ namespace InvoiceForgeApi.DTO.Model
         public  int ClientId { get; set; }
         public int ContractorId { get; set; }
         public int UserAccountId { get; set; }
+        public int CurrencyId { get; set; }
         public string TemplateName { get; set; } = null!;
         public int NumberingId { get; set; }
     }

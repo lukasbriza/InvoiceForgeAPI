@@ -4,34 +4,41 @@ using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace InvoiceItemRepository
+namespace InvoiceTemplateRepository
 {
     [Collection("Sequential")]
-    public class DeleteInvoiceItem: WebApplicationFactory
+    public class RemoveInvoiceTemplate: WebApplicationFactory  
     {
         [Fact]
-        public Task CanDeleteInvoiceItem()
+        public Task CanRemoveInvoiceTemplateById()
         {
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
                 db.InitializeDbForTest();
-                var invoiceItemIds = await db._context.InvoiceItem.Select(i => i.Id).ToListAsync();
+
+                var dbTemplateIds = await db._context.InvoiceTemplate.Select(t => t.Id).ToListAsync();
 
                 //ASSERT
-                invoiceItemIds.ForEach(async invoiceItemId => {
-                    var invoiceItemRemove = await db._repository.InvoiceItem.Delete(invoiceItemId);
-                    Assert.True(invoiceItemRemove);
+                dbTemplateIds.ForEach(async templateId => {
+                    var deleteResult = await db._repository.InvoiceTemplate.Delete(templateId);
+                    Assert.True(deleteResult);
                 });
+
                 await db._repository.Save();
-                
+
+                dbTemplateIds.ForEach(async templateId => {
+                    var deletedInvoiceTemplate = await  db._context.InvoiceTemplate.FindAsync(templateId);
+                    Assert.Null(deletedInvoiceTemplate);
+                });
+
                 //CLEAN
                 db.Dispose();
             });
         }
 
         [Fact]
-        public Task ThrowErrorThanDeleteNonexistentInvoiceItem()
+        public Task ThrowErrorOnRemoveNonExistentInvoiceTemplate()
         {
             return RunTest(async (client) => {
                 //SETUP
@@ -41,14 +48,14 @@ namespace InvoiceItemRepository
                 //ASSERT
                 try
                 {
-                    var removeResult = await db._repository.InvoiceItem.Delete(100);
+                    var removeResult = await db._repository.InvoiceTemplate.Delete(100);
                     await db._repository.Save();
                 }
                 catch (Exception error)
                 {
                     Assert.IsType<DatabaseCallError>(error);
                 }
-                
+
                 //CLEAN
                 db.Dispose();
             });

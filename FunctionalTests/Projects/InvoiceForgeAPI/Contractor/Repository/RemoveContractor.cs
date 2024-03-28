@@ -1,5 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -35,6 +36,33 @@ namespace ContractorRepository
                     var deletedContractor = db._context.Contractor.Find(contractorId);
                     Assert.Null(deletedContractor);
                 });
+
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorOnRemoveNonExistentContractor()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                db.InitCountries();
+                db.InitUsers();
+                db.InitAddresses();
+                db.InitContractors();
+
+                //ASSERT
+                try
+                {
+                    var removeResult = await db._repository.Contractor.Delete(100);
+                    await db._repository.Save();
+                }
+                catch (Exception error)
+                {
+                    Assert.IsType<DatabaseCallError>(error);
+                }
 
                 //CLEAN
                 db.Dispose();
