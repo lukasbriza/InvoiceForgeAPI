@@ -17,6 +17,7 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<List<AddressGetRequest>?> GetAll(int userId, bool? plain = false)
         {
+            await _dbContext.Database.BeginTransactionAsync();
             DbSet<Address> addresses = _dbContext.Address;
             if (plain == false){
                 addresses.Include(a => a.Country);
@@ -29,20 +30,15 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<AddressGetRequest?> GetById(int addressId, bool? plain = false)
         {
-                DbSet<Address> address = _dbContext.Address;
-                if (plain == false){
+                var address = _dbContext.Address;
+                if (plain == false)
+                {
                     address.Include(a => a.Country);
                 }
-                var addressList = await address
-                    .Select(a => new AddressGetRequest(a, plain))
-                    .Where(a => a.Id == addressId)
-                    .ToListAsync();
-                
-                if (addressList.Count > 1)
-                {
-                    throw new DatabaseCallError("Something unexpected happended. There are more than one address with this ID.");
-                }
-                return addressList[0];
+                var addressCall = await address.FindAsync(addressId);
+                if (addressCall is null) throw new DatabaseCallError("Adress is not in database.");
+                var addressResult  = new AddressGetRequest(addressCall, plain);
+                return addressResult;
         }
         public async Task<int?> Add(int userId, AddressAddRequest address)
         {
@@ -56,7 +52,9 @@ namespace InvoiceForgeApi.Repository
                 PostalCode = address.PostalCode
             };
             var entity = await _dbContext.Address.AddAsync(newAddress);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int addressId, AddressUpdateRequest address)
         {
@@ -72,7 +70,8 @@ namespace InvoiceForgeApi.Repository
             localAddress.StreetNumber = address.StreetNumber ?? localAddress.StreetNumber;
             localAddress.PostalCode = address.PostalCode ?? localAddress.PostalCode;
             
-            return _dbContext.Entry(localAddress).State == EntityState.Modified;
+            var update = _dbContext.Update(localAddress);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int addressId)
         {

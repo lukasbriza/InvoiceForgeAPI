@@ -38,16 +38,9 @@ public class UserAccountRepository: IUserAccountRepository
             userAccount.Include(u => u.Bank);
         }
         
-        var userAccountList = await userAccount
-            .Select( u => new UserAccountGetRequest(u, plain))
-            .Where(u => u.Id == userAccountId)
-            .ToListAsync();
-        
-        if(userAccountList.Count > 1)
-        {
-            throw new ValidationError("Something unexpected happened. There are more than one user account with this ID.");
-        }
-        return userAccountList[0];
+        var userAccountCall = await userAccount.FindAsync(userAccountId);
+        var userAccountResult = new UserAccountGetRequest(userAccountCall, plain);
+        return userAccountCall is not null ? userAccountResult : null;
     }
     public async Task<bool> HasDuplicitIbanOrAccountNumber(int userId, UserAccountAddRequest userAccount)
     {
@@ -68,7 +61,9 @@ public class UserAccountRepository: IUserAccountRepository
         };
 
         var entity = await _dbContext.UserAccount.AddAsync(newUserAccount);
-        return entity.State == EntityState.Added ? entity.Entity.Id : null;
+       
+        if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+        return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
     }
     public async Task<bool> Update(int userAccountId, UserAccountUpdateRequest userAccount)
     {
@@ -83,7 +78,8 @@ public class UserAccountRepository: IUserAccountRepository
         localUserAccount.AccountNumber = userAccount.AccountNumber ?? localUserAccount.AccountNumber;
         localUserAccount.IBAN = userAccount.IBAN ?? localUserAccount.IBAN;
         
-        return _dbContext.Entry(localUserAccount).State == EntityState.Modified;
+        var update = _dbContext.Update(localUserAccount);
+        return update.State == EntityState.Modified; 
     }
     public async Task<bool> Delete(int userAccountId)
     {

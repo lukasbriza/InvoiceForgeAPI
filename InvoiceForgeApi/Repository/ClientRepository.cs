@@ -34,23 +34,16 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<ClientGetRequest?> GetById(int clientId, bool? plain)
         {
-            DbSet<Client> client = _dbContext.Client;
+            var client = _dbContext.Client;
             if (plain == false)
             {
                 client.Include(c => c.Address).ThenInclude(a => a!.Country);
             }
 
-            var clientList = await client
-                .Select(c => new ClientGetRequest(c, plain))
-                .Where(c => c.Id == clientId)
-                .ToListAsync();
-
-            if (clientList.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happened. There are more than one client with this ID.");
-            }
-
-            return clientList[0];
+            var clientCall = await client.FindAsync(clientId);
+            if (clientCall is null) throw new DatabaseCallError("Client is not in database.");
+            var clientResult = new ClientGetRequest(clientCall, plain);
+            return clientResult;
         }
         public async Task<int?> Add(int userId ,ClientAddRequest client, ClientType clientType)
         {
@@ -67,7 +60,9 @@ namespace InvoiceForgeApi.Repository
                 Email = client.Email
             };
             var entity = await _dbContext.Client.AddAsync(newClient);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType? clientType)
         {
@@ -84,7 +79,8 @@ namespace InvoiceForgeApi.Repository
             localClient.Tel = client.Tel ?? localClient.Tel;
             localClient.Email = client.Email ?? localClient.Email;  
 
-            return _dbContext.Entry(localClient).State == EntityState.Modified;
+            var update = _dbContext.Update(localClient);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int id)
         {

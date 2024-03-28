@@ -26,17 +26,9 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<InvoiceTemplateGetRequest?> GetById(int templateId, bool? plain = false)
         {
-            var template = await _dbContext.InvoiceTemplate
-                .Select(i => new InvoiceTemplateGetRequest(i, plain))
-                .Where(i => i.Id == templateId)
-                .ToListAsync();
-            
-            if (template.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happened. There are more than one invoice template with this ID.");
-            }
-
-            return template[0];
+            var templateCall = await _dbContext.InvoiceTemplate.FindAsync(templateId);
+            var templateResult = new InvoiceTemplateGetRequest(templateCall, plain);
+            return templateCall is not null ? templateResult : null;
         }
         public async Task<int?> Add(int userId, InvoiceTemplateAddRequest template)
         {
@@ -46,12 +38,15 @@ namespace InvoiceForgeApi.Repository
                 ClientId = template.ClientId,
                 ContractorId = template.ContractorId,
                 UserAccountId = template.UserAccountId,
+                CurrencyId = template.CurrencyId,
                 TemplateName = template.TemplateName,
                 Created = new DateTime().ToUniversalTime(),
                 NumberingId = template.NumberingId
             };
             var entity = await _dbContext.InvoiceTemplate.AddAsync(newInvoiceTemplate);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int templateId, InvoiceTemplateUpdateRequest template)
         {
@@ -64,7 +59,8 @@ namespace InvoiceForgeApi.Repository
             localTemplate.TemplateName = template.TemplateName ?? localTemplate.TemplateName;
             localTemplate.NumberingId = template.NumberingId ?? localTemplate.NumberingId;
            
-            return _dbContext.Entry(localTemplate).State == EntityState.Modified;      
+            var update = _dbContext.Update(localTemplate);
+            return update.State == EntityState.Modified;     
         }
         public async Task<bool> Delete(int id)
         {

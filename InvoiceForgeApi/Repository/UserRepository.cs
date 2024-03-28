@@ -29,23 +29,9 @@ namespace InvoiceForgeApi.Repository
                 .Include(u => u.InvoiceItems).ThenInclude(i => i.Tariff);
             }
             
-            var userList = await user.Select(u => new UserGetRequest
-                    {
-                        Id =  u.Id,
-                        Contractors = plain == false ? u.Contractors.Select(c => new ContractorGetRequest(c, plain)) : null,
-                        Clients = plain == false ? u.Clients.Select(c => new ClientGetRequest(c, plain)) : null,
-                        UserAccounts = plain == false ? u.UserAccounts.Select(u => new UserAccountGetRequest(u, plain)) : null,
-                        Addresses = plain == false ? u.Addresses.Select(a => new AddressGetRequest(a, plain)) : null,
-                        InvoiceItems = plain == false ? u.InvoiceItems.Select(i => new InvoiceItemGetRequest(i, plain)) : null
-                    }
-                )
-                .Where(u => u.Id == id).ToListAsync();
-
-            if (userList.Count == 0)
-            {
-                throw new DatabaseCallError("User is not in database.");
-            }
-            return userList[0];
+            var userCall = await user.FindAsync(id);
+            var userResult = new UserGetRequest(userCall, plain);
+            return userCall is not null ? userResult : null;
         }
         public async Task<bool> Delete(int id)
         {
@@ -72,7 +58,8 @@ namespace InvoiceForgeApi.Repository
             if (userWithNewAuthIdExists.Count > 0) throw new ValidationError("Provided values are incorrect.");
             localUser.AuthenticationId = user.AuthenticationId;
             
-            return _dbContext.Entry(localUser).State == EntityState.Modified;
+            var update = _dbContext.Update(localUser);
+            return update.State == EntityState.Modified; 
         }
         public async Task<int?> Add(int userId, UserAddRequest user)
         {
@@ -84,7 +71,9 @@ namespace InvoiceForgeApi.Repository
 
             var newUser = new User {AuthenticationId = user.AuthenticationId};
             var entity = await _dbContext.User.AddAsync(newUser);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         private async Task<User?> Get(int id)
         {

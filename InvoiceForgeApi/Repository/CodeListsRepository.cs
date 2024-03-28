@@ -1,6 +1,5 @@
 ﻿using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
-using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,31 +21,20 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<CountryGetRequest?> GetCountryById(int id)
         {
-            var country = await _dbContext.Country
-                .Select(c => new CountryGetRequest(c))
-                .Where(c => c.Id == id)
-                .ToListAsync();
-
-            if (country.Count > 1) throw new ValidationError("Something unexpected happened. There is more than one country with that id.");
-            if (country is null || country.Count == 0) return null;
-            return country[0];
+            var country = await _dbContext.Country.FindAsync(id);
+            var countryResult = new CountryGetRequest(country);
+            return country is not null ? countryResult : null;
         }
         public async Task<List<BankGetRequest>> GetBanks()
         {
             var bankList = await _dbContext.Bank.ToListAsync();
-            return bankList
-                .ConvertAll(b => new BankGetRequest(b));
+            return bankList.ConvertAll(b => new BankGetRequest(b));
         }
         public async Task<BankGetRequest?> GetBankById(int id)
         {
-            var bank = await _dbContext.Bank
-                .Select(b => new BankGetRequest(b))
-                .Where(b => b.Id == id)
-                .ToListAsync();
-
-            if (bank is null || bank.Count == 0) return null;
-            if (bank.Count > 1) throw new ValidationError("Something unexpected happened. There is more than one bank with that id.");
-            return bank[0];
+            var bank = await _dbContext.Bank.FindAsync(id);
+            var bankresult = new BankGetRequest(bank);
+            return bank is not null ? bankresult : null;
         }
         public List<ClientTypeGetRequest> GetClientTypes()
         {
@@ -136,13 +124,9 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<TariffGetRequest?> GetTariffById(int id)
         {
-            var tariff = await _dbContext.Tariff
-                .Select(t => new TariffGetRequest(t))
-                .Where(t => t.Id == id)
-                .ToListAsync();
-            if (tariff is null || tariff.Count == 0) return null;
-            if (tariff.Count > 1) throw new ValidationError("Something unexpected happened. There is more than one tariff with that id.");
-            return tariff[0];
+            var tariff = await _dbContext.Tariff.FindAsync(id);
+            var tariffResult = new TariffGetRequest(tariff);
+            return tariff is not null ? tariffResult : null;
         }
         public async Task<List<CurrencyGetRequest>> GetCurrencies()
         {
@@ -151,13 +135,9 @@ namespace InvoiceForgeApi.Repository
         }
         public async Task<CurrencyGetRequest?> GetCurrencyById(int id)
         {
-            var currency = await _dbContext.Currency
-                .Select(c => new CurrencyGetRequest(c))
-                .Where(c => c.Id == id)
-                .ToListAsync();
-            if (currency is null || currency.Count == 0) return null;
-            if (currency.Count > 1) throw new ValidationError("Something unexpected happened. There is more than one currency with that id.");
-            return currency[0];
+            var currency = await _dbContext.Currency.FindAsync(id);
+            var currencyResult = new CurrencyGetRequest(currency);
+            return currency is not null ? currencyResult : null;
         }
     }
 }

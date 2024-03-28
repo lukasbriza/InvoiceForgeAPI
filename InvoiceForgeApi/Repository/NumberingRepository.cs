@@ -7,7 +7,6 @@ using InvoiceForgeApi.Helpers;
 using InvoiceForgeApi.Interfaces;
 using InvoiceForgeApi.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -64,7 +63,9 @@ namespace InvoiceForgeApi.Repository
             };
 
             var entity = await _dbContext.Numbering.AddAsync(newNumbering);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> UpdateNumbering(int numberingId, NumberingUpdateRequest numbering)
         {
@@ -75,7 +76,8 @@ namespace InvoiceForgeApi.Repository
             localNumbering.NumberingTemplate = numbering.NumberingTemplate ?? localNumbering.NumberingTemplate;
             localNumbering.NumberingPrefix = numbering.NumberingPrefix ?? localNumbering.NumberingPrefix;
 
-            return _dbContext.Entry(localNumbering).State == EntityState.Modified; 
+            var update = _dbContext.Update(localNumbering);
+            return update.State == EntityState.Modified;    
         }
         public async Task<bool> DeleteNumbering(int numberingId)
         {

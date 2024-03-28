@@ -38,16 +38,9 @@ namespace InvoiceForgeApi.Repository
                 contractor.Include(c => c.Address);
             }
             
-            var contractorList = await contractor
-                .Select(c => new ContractorGetRequest(c, plain))
-                .Where(c => c.Id == contractorId)
-                .ToListAsync();
-            if (contractorList.Count > 1)
-            {
-                throw new DatabaseCallError("Something unexpected happened. There are more than one contractor with this ID.");
-            }
-
-            return contractorList[0];
+            var contractorCall = await contractor.FindAsync(contractorId);
+            var contractorResult = new ContractorGetRequest(contractorCall, plain);
+            return contractorResult;
         }
         public async Task<int?> Add(int userId, ContractorAddRequest contractor, ClientType clientType)
         {
@@ -61,11 +54,13 @@ namespace InvoiceForgeApi.Repository
                 TIN = contractor.TIN,
                 Email = contractor.Email,
                 Mobil = contractor.Mobil,
-                Tel = contractor.Email,
+                Tel = contractor.Tel,
                 Www = contractor.Www
             };
             var entity = await _dbContext.Contractor.AddAsync(newContractor);
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
+            
+            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
+            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
         public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType? clientType)
         {
@@ -86,7 +81,8 @@ namespace InvoiceForgeApi.Repository
             localContractor.Tel = contractor.Tel ?? localContractor.Tel;
             localContractor.Www = contractor.Www ?? localContractor.Www;
             
-            return _dbContext.Entry(localContractor).State == EntityState.Modified;
+            var update = _dbContext.Update(localContractor);
+            return update.State == EntityState.Modified;
         }
         public async Task<bool> Delete(int id)
         {
