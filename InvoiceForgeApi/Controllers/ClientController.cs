@@ -6,27 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/client")]
-    public class ClientController : ControllerBase
+    public class ClientController : BaseController
     {
-        private readonly IClientRepository _clientRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IAddressRepository _addressRepository;
-        private readonly ICodeListsRepository _codeListsRepository;
-        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
-        private readonly IInvoiceRepository _invoiceRepository;
-        private readonly IRepositoryWrapper _repository;
-        public ClientController(IRepositoryWrapper repository)
-        {
-            _clientRepository = repository.Client;
-            _addressRepository = repository.Address;
-            _userRepository = repository.User;
-            _codeListsRepository = repository.CodeLists;
-            _invoiceTemplateRepository = repository.InvoiceTemplate;
-            _invoiceRepository = repository.Invoice;
-            _repository = repository;
-        }
+        public ClientController(IRepositoryWrapper repository): base(repository) {}
 
         [HttpGet]
         [Route("all/{userId}")]
@@ -67,7 +50,7 @@ namespace InvoiceForgeApi.Controllers
             if (addressValidation is null) throw new ValidationError("Provided AddressId is invalid.");
             if (addressValidation.Owner != userId) throw new ValidationError("Provided address is not in your possession.");
             
-            var clientTypeValidation = _codeListsRepository.GetClientTypeById(client.TypeId);
+            var clientTypeValidation = _codeListRepository.GetClientTypeById(client.TypeId);
             if (clientTypeValidation is null) throw new ValidationError("Provided wrong TypeId.");
             
             var addClientId = await _clientRepository.Add(userId, client, (ClientType)clientTypeValidation);
@@ -101,7 +84,7 @@ namespace InvoiceForgeApi.Controllers
                 if (addressValidation.Owner != user.Id) throw new ValidationError("Provided address is not in your possession.");
             }
 
-            var clientType = client.TypeId is not null ? _codeListsRepository.GetClientTypeById((int)client.TypeId) : null;
+            var clientType = client.TypeId is not null ? _codeListRepository.GetClientTypeById((int)client.TypeId) : null;
             if (clientType is null && client.TypeId is not null) throw new ValidationError("Provided client type does not exist in database.");
             
             var clientUpdate = await _clientRepository.Update(clientId, client, clientType);

@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using InvoiceForgeApi.Data;
+﻿using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
@@ -8,13 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository;
 
-public class UserAccountRepository: IUserAccountRepository
+public class UserAccountRepository:RepositoryBase<UserAccount>, IUserAccountRepository
 {
-    private readonly InvoiceForgeDatabaseContext _dbContext;
-    public UserAccountRepository(InvoiceForgeDatabaseContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public UserAccountRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
     public async Task<List<UserAccountGetRequest>?> GetAll(int userId, bool? plain)
     {
         DbSet<UserAccount> userAccounts = _dbContext.UserAccount;
@@ -92,14 +87,5 @@ public class UserAccountRepository: IUserAccountRepository
 
         var entity = _dbContext.UserAccount.Remove(userAccount);
         return entity.State == EntityState.Deleted;
-    }
-    private async Task<UserAccount?> Get(int id)
-    {
-        return await _dbContext.UserAccount.FindAsync(id);
-    }
-    public async Task<List<UserAccount>?> GetByCondition(Expression<Func<UserAccount, bool>> condition)
-    {
-        var result = await _dbContext.UserAccount.Where(condition).ToListAsync();
-        return result;
     }
 }

@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -8,13 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceTemplateRepository: IInvoiceTemplateRepository
+    public class InvoiceTemplateRepository: RepositoryBase<InvoiceTemplate>, IInvoiceTemplateRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public InvoiceTemplateRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public InvoiceTemplateRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceTemplateGetRequest>?> GetAll(int userId, bool? plain = false)
         {
             var templates = await _dbContext.InvoiceTemplate
@@ -61,23 +56,6 @@ namespace InvoiceForgeApi.Repository
            
             var update = _dbContext.Update(localTemplate);
             return update.State == EntityState.Modified;     
-        }
-        public async Task<bool> Delete(int id)
-        {
-            var template = await Get(id);
-            if (template is null) throw new DatabaseCallError("Template is not in database.");
-
-            var entity = _dbContext.InvoiceTemplate.Remove(template);
-            return entity.State == EntityState.Deleted;
-        }
-        private async Task<InvoiceTemplate?> Get(int id)
-        {
-            return await _dbContext.InvoiceTemplate.FindAsync(id);
-        }
-        public async Task<List<InvoiceTemplate>?> GetByCondition(Expression<Func<InvoiceTemplate,bool>> condition)
-        {
-            var result = await _dbContext.InvoiceTemplate.Where(condition).ToListAsync();
-            return result;
         }
     }
 }

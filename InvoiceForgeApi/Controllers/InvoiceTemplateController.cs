@@ -5,31 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/invoice-template")]
-    public class InvoiceTemplateController : ControllerBase
+    public class InvoiceTemplateController : BaseController
     {
-        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
-        private readonly IUserAccountRepository _userAccountRepository;
-        private readonly IContractorRepository _contractorRepository;
-        private readonly IClientRepository _clientRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IInvoiceRepository _invoiceRepository;
-        private readonly ICodeListsRepository _codeListRepository;
-        private readonly IRepositoryWrapper _repository;
-
-        public InvoiceTemplateController(IRepositoryWrapper repository)
-        {
-            _repository = repository;
-            _invoiceTemplateRepository = repository.InvoiceTemplate;
-            _contractorRepository = repository.Contractor;
-            _userAccountRepository = repository.UserAccount;
-            _invoiceRepository = repository.Invoice;
-            _userRepository = repository.User;
-            _clientRepository = repository.Client;
-            _codeListRepository = repository.CodeLists;
-
-        }
+        public InvoiceTemplateController(IRepositoryWrapper repository): base(repository) {}
         [HttpGet]
         [Route("all/{userId}")]
         public async Task<List<InvoiceTemplateGetRequest>?> GetAllTemplates(int userId)

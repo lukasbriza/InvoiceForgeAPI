@@ -6,28 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/contractor")]
-    public class ContractorController : ControllerBase
+    public class ContractorController : BaseController
     {
-        private readonly IContractorRepository _contractorRepository;
-        private readonly IAddressRepository _addressRepository;
-        private readonly ICodeListsRepository _codeListsRepository;
-        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IInvoiceRepository _invoiceRepository;
-        private readonly IRepositoryWrapper _repository;
-
-        public ContractorController(IRepositoryWrapper repository)
-        {
-            _contractorRepository = repository.Contractor;
-            _addressRepository = repository.Address;
-            _userRepository = repository.User;
-            _codeListsRepository = repository.CodeLists;
-            _invoiceTemplateRepository = repository.InvoiceTemplate;
-            _invoiceRepository = repository.Invoice;
-            _repository = repository;
-        }
+        public ContractorController(IRepositoryWrapper repository): base(repository) {}
 
         [HttpGet]
         [Route("all/{userId}")]
@@ -63,7 +45,7 @@ namespace InvoiceForgeApi.Controllers
             if (addressValidation is null) throw new ValidationError("Provided AddressId is invalid.");
             if (addressValidation.Owner != userId) throw new ValidationError("Provided address is not in your possession.");
 
-            var clientTypeValidation = _codeListsRepository.GetClientTypeById(contractor.TypeId);
+            var clientTypeValidation = _codeListRepository.GetClientTypeById(contractor.TypeId);
             if (clientTypeValidation is null) throw new ValidationError("Provided wrong TypeId.");
 
             var isValidOwner = await _userRepository.GetById(userId);
@@ -101,7 +83,7 @@ namespace InvoiceForgeApi.Controllers
                 if (addressValidation.Owner != user.Id) throw new ValidationError("Provided address is not in your possession.");
             }
 
-            var clientType = contractor.TypeId is not null ? _codeListsRepository.GetClientTypeById((int)contractor.TypeId) : null;
+            var clientType = contractor.TypeId is not null ? _codeListRepository.GetClientTypeById((int)contractor.TypeId) : null;
             if (clientType is null && contractor.TypeId is not null) throw new ValidationError("Provided client type does not exist in database.");
             var contractorUpdate = await _contractorRepository.Update(contractorId, contractor,clientType);
            

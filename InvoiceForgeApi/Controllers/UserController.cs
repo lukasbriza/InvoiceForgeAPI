@@ -4,19 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/user")]
-    public class UserController: ControllerBase
+    public class UserController: BaseController
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IRepositoryWrapper _repository;
-
-        public UserController(IRepositoryWrapper repository)
-        {
-            _userRepository = repository.User;
-            _repository = repository;
-        }
-
+        public UserController(IRepositoryWrapper repository): base(repository) {}
         [HttpGet]
         [Route("{id}")]
         public async Task<UserGetRequest?> Get(int id)

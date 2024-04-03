@@ -5,34 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/invoice")]
-    public class InvoiceController : ControllerBase
+    public class InvoiceController : BaseController
     {
-        private readonly IInvoiceServiceRepository _invoiceServiceRepository;
-        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
-        private readonly IInvoiceRepository _invoiceRepository;
-        private readonly IClientRepository _clientRepository;
-        private readonly IContractorRepository _contractorRepository;
-        private readonly IUserAccountRepository _userAccountRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly INumberingRepository _numberingRepository;
-        private readonly IInvoiceItemRepository _invoiceItemRepository;
-        private readonly IRepositoryWrapper _repository;
 
-        public InvoiceController(IRepositoryWrapper repository)
-        {
-            _invoiceServiceRepository = repository.InvoiceService;
-            _invoiceRepository = repository.Invoice;
-            _userRepository = repository.User;
-            _invoiceTemplateRepository = repository.InvoiceTemplate;
-            _invoiceItemRepository = repository.InvoiceItem;
-            _numberingRepository = repository.Numbering;
-            _contractorRepository = repository.Contractor;
-            _clientRepository = repository.Client;
-            _userAccountRepository = repository.UserAccount;
-            _repository = repository;
-        }
+        public InvoiceController(IRepositoryWrapper repository): base(repository) {}
 
         [HttpGet]
         [Route("all/{userId}")]

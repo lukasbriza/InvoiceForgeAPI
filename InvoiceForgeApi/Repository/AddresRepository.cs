@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -8,13 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class AddressRepository: IAddressRepository
+    public class AddressRepository: RepositoryBase<Address>, IAddressRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public AddressRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public AddressRepository(InvoiceForgeDatabaseContext dbContext) : base(dbContext){}
+
         public async Task<List<AddressGetRequest>?> GetAll(int userId, bool? plain = false)
         {
             await _dbContext.Database.BeginTransactionAsync();
@@ -73,27 +69,5 @@ namespace InvoiceForgeApi.Repository
             var update = _dbContext.Update(localAddress);
             return update.State == EntityState.Modified;
         }
-        public async Task<bool> Delete(int addressId)
-        {
-            var address = await Get(addressId);
-
-            if (address is null)
-            {
-                throw new DatabaseCallError("Address is not in database.");
-            }
-
-            var entity = _dbContext.Address.Remove(address);
-            return entity.State == EntityState.Deleted;
-        }
-        private async Task<Address?> Get(int id)
-        {
-            return await _dbContext.Address.FindAsync(id);
-        }
-        public async Task<List<Address>?> GetByCondition(Expression<Func<Address,bool>> condition)
-        {
-            var result = await _dbContext.Address.Where(condition).ToListAsync();
-            return result;
-        }
-
     }
 }

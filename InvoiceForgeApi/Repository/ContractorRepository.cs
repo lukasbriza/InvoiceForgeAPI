@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO;
@@ -9,13 +8,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class ContractorRepository: IContractorRepository
+    public class ContractorRepository: RepositoryBase<Contractor>, IContractorRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public ContractorRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public ContractorRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
 
         public async Task<List<ContractorGetRequest>?> GetAll(int userId, bool? plain = false)
         {
@@ -84,27 +79,5 @@ namespace InvoiceForgeApi.Repository
             var update = _dbContext.Update(localContractor);
             return update.State == EntityState.Modified;
         }
-        public async Task<bool> Delete(int id)
-        {
-            var contractor = await Get(id);
-
-            if(contractor is null)
-            {
-                throw new DatabaseCallError("Contractor is not in database.");
-            }
-
-            var entity = _dbContext.Contractor.Remove(contractor);
-            return entity.State == EntityState.Deleted;
-        }
-        private async Task<Contractor?> Get(int id)
-        {
-            return await _dbContext.Contractor.FindAsync(id);
-        }
-        public async Task<List<Contractor>?> GetByCondition(Expression<Func<Contractor,bool>> condition)
-        {
-            var result = await _dbContext.Contractor.Where(condition).ToListAsync();
-            return result;
-        }
-
     }
 }

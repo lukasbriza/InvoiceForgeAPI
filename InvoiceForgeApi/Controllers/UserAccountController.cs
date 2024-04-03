@@ -1,33 +1,14 @@
-﻿
-using System.Diagnostics.Tracing;
-using InvoiceForgeApi.DTO;
+﻿using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/user-account")]
-    public class UserAccountController: ControllerBase
+    public class UserAccountController: BaseController
     {
-        private readonly IUserAccountRepository _userAccountRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly ICodeListsRepository _codeLists;
-        private readonly IInvoiceTemplateRepository _invoiceTemplateRepository;
-        private readonly IInvoiceRepository _inboiceRepository;
-        private readonly IRepositoryWrapper _repository;
-
-        public UserAccountController(IRepositoryWrapper repository)
-        {
-            _userAccountRepository = repository.UserAccount;
-            _userRepository = repository.User;
-            _codeLists = repository.CodeLists;
-            _invoiceTemplateRepository = repository.InvoiceTemplate;
-            _inboiceRepository = repository.Invoice;
-            _repository = repository;
-        }
-
+        public UserAccountController(IRepositoryWrapper repository): base(repository) {}
         [HttpGet]
         [Route("all/{userId}")]
         public async Task<List<UserAccountGetRequest>?> GetAllUserAccounts(int userId)
@@ -100,7 +81,7 @@ namespace InvoiceForgeApi.Controllers
 
             if (userAccount.BankId is not null)
             {
-                var bankControl = await _codeLists.GetBankById((int)userAccount.BankId);
+                var bankControl = await _codeListRepository.GetBankById((int)userAccount.BankId);
                 if (bankControl is null) throw new ValidationError("Provided bank is not in our database");   
             }
 
@@ -108,7 +89,7 @@ namespace InvoiceForgeApi.Controllers
 
             if (userAccountUpdate) {
                 //OUTDATE LINKED INVOICES
-                var invoices = await _inboiceRepository.GetByCondition(i => i.UserAccountLocal.Id == userAccountId && i.Owner == user.Id && i.Outdated == false);
+                var invoices = await _invoiceRepository.GetByCondition(i => i.UserAccountLocal.Id == userAccountId && i.Owner == user.Id && i.Outdated == false);
                 if (invoices is not null && invoices.Count > 0)
                 {
                     invoices.ConvertAll(i => {

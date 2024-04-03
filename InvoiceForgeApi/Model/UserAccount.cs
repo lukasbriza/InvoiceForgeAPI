@@ -4,12 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoiceForgeApi.Model
 {
-    public class UserAccount
+    public class UserAccount: ModelBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        [ForeignKey("User")] public int Owner { get; set; }
         [ForeignKey("Bank")] public int? BankId { get; set; }
 
         [Required] public string AccountNumber { get; set; } = null!;
@@ -18,6 +14,6 @@ namespace InvoiceForgeApi.Model
         //Reference
         public virtual Bank? Bank { get; set; }
         public virtual ICollection<InvoiceTemplate>? InvoiceTemplates { get; set; } = new List<InvoiceTemplate>();
-        public virtual User User { get; set; } = null!;
+
     }
 }

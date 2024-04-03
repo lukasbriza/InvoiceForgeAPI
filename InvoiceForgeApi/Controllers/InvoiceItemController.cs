@@ -5,23 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/invoice-item")]
-    public class InvoiceItemController : ControllerBase
+    public class InvoiceItemController : BaseController
     {
-            private readonly IUserRepository _userRepository;
-            private readonly ICodeListsRepository _codeListsRepository;
-            private readonly IInvoiceItemRepository _invoiceItemRepository;
-            private readonly IInvoiceServiceRepository _invoiceServiceRepository;
-            private readonly IRepositoryWrapper _repository;
-        public InvoiceItemController(IRepositoryWrapper repository)
-        {
-            _repository = repository;
-            _codeListsRepository = repository.CodeLists;
-            _invoiceItemRepository = repository.InvoiceItem;
-            _invoiceServiceRepository = repository.InvoiceService;
-            _userRepository = repository.User;
-        }
+        public InvoiceItemController(IRepositoryWrapper repository): base(repository) {}
         [HttpGet]
         [Route("all/{userId}")]
         public async Task<List<InvoiceItemGetRequest>?> GetAllInvoiceItems(int userId)
@@ -52,7 +39,7 @@ namespace InvoiceForgeApi.Controllers
         {
             if (invoiceItem is null) throw new ValidationError("Client is not provided.");
 
-            var tariffValidation = await _codeListsRepository.GetTariffById(invoiceItem.TariffId);
+            var tariffValidation = await _codeListRepository.GetTariffById(invoiceItem.TariffId);
             if(tariffValidation is null) throw new ValidationError("Provided tariff id is invalid.");
 
             var invoiceItemNameValidation = await _invoiceItemRepository.GetByCondition(i => i.ItemName == invoiceItem.ItemName && i.Owner == userId);
@@ -85,7 +72,7 @@ namespace InvoiceForgeApi.Controllers
 
             if (invoiceItem.TariffId is not null)
             {
-                var tariffValidation = _codeListsRepository.GetTariffById((int)invoiceItem.TariffId);
+                var tariffValidation = _codeListRepository.GetTariffById((int)invoiceItem.TariffId);
                 if (tariffValidation is null) throw new ValidationError("Provided TariffId is not in database.");
             }
 

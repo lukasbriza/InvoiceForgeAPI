@@ -4,12 +4,8 @@ using InvoiceForgeApi.Model.CodeLists;
 
 namespace InvoiceForgeApi.Model
 {
-    public class InvoiceTemplate
+    public class InvoiceTemplate: ModelBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-        [ForeignKey("User")] public int Owner { get; set; }
         [ForeignKey("Currency")] public int CurrencyId { get; set; } 
         [ForeignKey("Numbering")] public int NumberingId { get; set; }
         [ForeignKey("Client")] public int ClientId { get; set; }
@@ -19,7 +15,6 @@ namespace InvoiceForgeApi.Model
         [Required] public DateTime Created { get; set; }
 
         // Reference
-        public virtual User User { get; set; } = null!;
         public virtual ICollection<Invoice>? Invoices { get; set; }
         public virtual Currency? Currency { get; set; }
 

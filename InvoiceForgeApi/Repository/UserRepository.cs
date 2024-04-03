@@ -4,17 +4,12 @@ using InvoiceForgeApi.Model;
 using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using InvoiceForgeApi.DTO.Model;
-using System.Linq.Expressions;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class UserRepository: IUserRepository
+    public class UserRepository:RepositoryBase<User>, IUserRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public UserRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public UserRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
 
         public async Task<UserGetRequest?> GetById(int id, bool? plain = false)
         {
@@ -75,15 +70,5 @@ namespace InvoiceForgeApi.Repository
             if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
             return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
-        private async Task<User?> Get(int id)
-        {
-            return await _dbContext.User.FindAsync(id);
-        }
-        public async Task<List<User>?> GetByCondition(Expression<Func<User, bool>> condition)
-        {
-            var result = await _dbContext.User.Where(condition).ToListAsync();
-            return result;
-        }
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using InvoiceForgeApi.Data;
+﻿using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -8,13 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class ClientRepository: IClientRepository
+    public class ClientRepository: RepositoryBase<Client>, IClientRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public ClientRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public ClientRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
+
         public async Task<List<ClientGetRequest>?> GetAll(int userId, bool? plain)
         {
             DbSet<Client> clients = _dbContext.Client;
@@ -81,23 +77,6 @@ namespace InvoiceForgeApi.Repository
 
             var update = _dbContext.Update(localClient);
             return update.State == EntityState.Modified;
-        }
-        public async Task<bool> Delete(int id)
-        {
-            var client = await Get(id);
-            if (client is null) throw new DatabaseCallError("Client is not in database.");    
-
-            var entity = _dbContext.Client.Remove(client);
-            return entity.State == EntityState.Deleted;
-        }
-        private async Task<Client?> Get(int id)
-        {
-            return await _dbContext.Client.FindAsync(id);
-        }
-        public async Task<List<Client>?> GetByCondition(Expression<Func<Client,bool>> condition)
-        {
-            var result = await _dbContext.Client.Where(condition).ToListAsync();
-            return result;
         }
     }
 }

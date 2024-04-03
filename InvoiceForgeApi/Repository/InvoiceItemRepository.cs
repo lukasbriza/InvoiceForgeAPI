@@ -1,5 +1,3 @@
-
-using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -9,13 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceItemRepository: IInvoiceItemRepository
+    public class InvoiceItemRepository: RepositoryBase<InvoiceItem>, IInvoiceItemRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public InvoiceItemRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public InvoiceItemRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceItemGetRequest>?> GetAll(int userId, bool? plain = false)
         {
             DbSet<InvoiceItem> invoiceItems = _dbContext.InvoiceItem;
@@ -66,26 +60,6 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localInvoiceItem);
             return update.State == EntityState.Modified;
-        }
-        public async Task<bool> Delete(int invoiceItemId)
-        {
-            var invoiceItem = await Get(invoiceItemId);
-
-            if (invoiceItem is null)
-            {
-                throw new DatabaseCallError("InvoiceItem is not in databse.");
-            }
-            var entity = _dbContext.InvoiceItem.Remove(invoiceItem);
-            return entity.State == EntityState.Deleted;
-        }
-        private async Task<InvoiceItem?> Get(int id)
-        {
-            return await _dbContext.InvoiceItem.FindAsync(id);
-        }
-        public async Task<List<InvoiceItem>?> GetByCondition(Expression<Func<InvoiceItem,bool>> condition)
-        {
-            var result = await _dbContext.InvoiceItem.Where(condition).ToListAsync();
-            return result;
         }
     }
 }

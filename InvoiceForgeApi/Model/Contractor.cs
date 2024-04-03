@@ -4,14 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoiceForgeApi.Model
 {
-    public class Contractor
+    public class Contractor: ModelBase
     {
-        [Key] 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
-        public int Id { get; set; }
         [ForeignKey("Address")] public int? AddressId { get; set; }
-        [ForeignKey("User")] public int Owner { get; set; }
-
         [Required] public ClientType ClientType { get; set; }
         [Required] public string ContractorName { get; set; } = null!;
         [Required] public long IN { get; set; }
@@ -23,7 +18,6 @@ namespace InvoiceForgeApi.Model
 
         //Reference
         public virtual Address? Address { get; set; }
-        public virtual User User { get; set; } = null!;
         public virtual ICollection<InvoiceTemplate>? InvoiceTemplates { get; set; } = new List<InvoiceTemplate>();
     }
 }

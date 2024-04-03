@@ -5,27 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/address")]
-    public class AddressController: ControllerBase
+    public class AddressController: BaseController
     {
-        private readonly IAddressRepository _addressRepository;
-        private readonly IUserRepository _userRepository;
-        private readonly IContractorRepository _contractorRepository;
-        private readonly IClientRepository _clientRepository;
-        private readonly ICodeListsRepository _codeListRepository;
-        private readonly IInvoiceRepository _invoiceRepository;
-        private readonly IRepositoryWrapper _repository;
-        public AddressController(IRepositoryWrapper repository)
-        {
-            _addressRepository = repository.Address;
-            _userRepository = repository.User;
-            _contractorRepository = repository.Contractor;
-            _clientRepository = repository.Client;
-            _codeListRepository = repository.CodeLists;
-            _invoiceRepository = repository.Invoice;
-            _repository = repository;
-        }
+        public AddressController(IRepositoryWrapper repository): base(repository) {}
         [HttpGet]
         [Route("all/{userId}")]
         public async Task<List<AddressGetRequest>?> GetAllAddresses(int userId)

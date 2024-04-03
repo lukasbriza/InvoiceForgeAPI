@@ -4,40 +4,34 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
 {
-    [ApiController]
     [Route("api/code-lists")]
-    public class CodeListsController: ControllerBase
+    public class CodeListsController: BaseController
     {
-        private readonly ICodeListsRepository _codeListsRepository;
-
-        public CodeListsController(IRepositoryWrapper repository)
-        {
-            _codeListsRepository = repository.CodeLists;
-        }
+        public CodeListsController(IRepositoryWrapper repository): base(repository) {}
 
         [HttpGet]
         [Route("countries")]
         public async Task<List<CountryGetRequest>?> GetCountries()
         {
-            return await _codeListsRepository.GetCountries();
+            return await _codeListRepository.GetCountries();
         }
         [HttpGet]
         [Route("banks")]
         public async Task<List<BankGetRequest>?> GetBanks()
         {
-            return await _codeListsRepository.GetBanks();
+            return await _codeListRepository.GetBanks();
         }
         [HttpGet]
         [Route("client-type")]
         public List<ClientTypeGetRequest>? GetClientTypes()
         {
-            return _codeListsRepository.GetClientTypes();
+            return _codeListRepository.GetClientTypes();
         }
         [HttpGet]
         [Route("all")]
         public async Task<CodeListsAllGetRequest> GetCodeListsAll()
         {
-            return await _codeListsRepository.GetCodeListsAll();
+            return await _codeListRepository.GetCodeListsAll();
         }
     }
 }

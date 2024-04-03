@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.Enum;
 using InvoiceForgeApi.DTO;
@@ -10,13 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class NumberingRepository: INumberingRepository
+    public class NumberingRepository: RepositoryBase<Numbering>, INumberingRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public NumberingRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public NumberingRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
+
         public async Task<GenerateInvoiceNumber?> GenerateInvoiceNumber(int numberingId)
         {
             //GET NUMBERING
@@ -86,15 +82,6 @@ namespace InvoiceForgeApi.Repository
             if (numbering is null) throw new DatabaseCallError("Numbering is not in database.");
             var entity = _dbContext.Numbering.Remove(numbering);
             return entity.State == EntityState.Deleted;
-        }
-        public async Task<List<Numbering>?> GetByCondition(Expression<Func<Numbering,bool>> condition)
-        {
-            var result = await _dbContext.Numbering.Where(condition).ToListAsync();
-            return result;
-        }
-        private async Task<Numbering?> Get(int id)
-        {
-            return await _dbContext.Numbering.FindAsync(id);
         }
         private async Task<bool> ExtendNumberVariableForNumbering (int numberingId)
         {

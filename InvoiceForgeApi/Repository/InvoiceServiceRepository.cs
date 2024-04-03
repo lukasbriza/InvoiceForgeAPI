@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
@@ -8,13 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceServiceRepository: IInvoiceServiceRepository
+    public class InvoiceServiceRepository: RepositoryBase<InvoiceService>, IInvoiceServiceRepository
     {
-        private readonly InvoiceForgeDatabaseContext _dbContext;
-        public InvoiceServiceRepository(InvoiceForgeDatabaseContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public InvoiceServiceRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceServiceGetRequest>?> GetAll(int invoiceId, bool? plain = false)
         {
             var invoiceServices = _dbContext.InvoiceService;
@@ -91,23 +86,6 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localInvoiceservice);
             return update.State == EntityState.Modified;
-        }
-        public async Task<bool> Delete(int id)
-        {
-            var invoiceService = await Get(id);
-            if (invoiceService is null) throw new DatabaseCallError("Invoice service is not in database.");
-
-            var entity = _dbContext.InvoiceService.Remove(invoiceService);
-            return entity.State == EntityState.Deleted;
-        }
-        public async Task<InvoiceService?> Get(int invoiceServiceId)
-        {
-            return await _dbContext.InvoiceService.FindAsync(invoiceServiceId);
-        }
-        public async Task<List<InvoiceService>?> GetByCondition(Expression<Func<InvoiceService,bool>> condition)
-        {
-            var result = await _dbContext.InvoiceService.Where(condition).ToListAsync();
-            return result;
         }
     }
 }

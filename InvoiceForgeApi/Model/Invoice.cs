@@ -4,13 +4,9 @@ using InvoiceForgeApi.DTO.Model;
 
 namespace InvoiceForgeApi.Model
 {
-    public class Invoice
+    public class Invoice: ModelBase
     {
-        [Key] 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
-        public int Id { get; set; }
         public bool Outdated { get; set;} = false;
-        [ForeignKey("User")] public int Owner { get; set; }
         [ForeignKey("InvoiceTemplate")] public int TemplateId { get; set; }
         [Required] public int NumberingId { get; set; }
         [Required] public string InvoiceNumber { get; set; } = null!;
@@ -31,7 +27,6 @@ namespace InvoiceForgeApi.Model
         [Required] public DateTime Created { get; set; }
 
         //Reference 
-        public virtual User User { get; set; } = null!;
         public virtual ICollection<InvoiceService> InvoiceServices { get; set; } = null!;
         public virtual InvoiceTemplate? InvoiceTemplate { get; set; }
     }
