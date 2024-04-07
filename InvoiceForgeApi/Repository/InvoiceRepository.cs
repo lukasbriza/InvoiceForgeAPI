@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceRepository: RepositoryBase<Invoice>, IInvoiceRepository
+    public class InvoiceRepository: RepositoryExtended<Invoice, InvoiceAddRequestRepository>, IInvoiceRepository
     {
         public InvoiceRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceGetRequest>?> GetAll(int userId, bool? plain = false)
@@ -39,36 +39,6 @@ namespace InvoiceForgeApi.Repository
             var invoiceResult = new InvoiceGetRequest(invoiceCall);
             return invoiceCall is not null ? invoiceResult : null;
         }
-        public async Task<int?> Add(int userId, InvoiceAddRequestRepository invoice)
-        {
-            var newInvoice = new Invoice
-            {
-                Outdated = false,
-                Owner = userId,
-                TemplateId = invoice.TemplateId,
-                NumberingId = invoice.NumberingId,
-                InvoiceNumber = invoice.InvoiceNumber,
-                OrderNumber = invoice.OrderNumber,
-                BasePriceTotal = invoice.BasePriceTotal,
-                VATTotal = invoice.VATTotal,
-                TotalAll = invoice.TotalAll,
-                Currency = invoice.Currency,
-
-                ClientLocal = invoice.ClientLocal,
-                ContractorLocal = invoice.ContractorLocal,
-                UserAccountLocal = invoice.UserAccountLocal,
-
-                Maturity = invoice.Maturity,
-                Exposure = invoice.Exposure,
-                TaxableTransaction = invoice.TaxableTransaction,
-                Created = invoice.Created
-            };
-            var entity = await _dbContext.Invoice.AddAsync(newInvoice);
-            
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-
-        }
         public async Task<bool> Update(int invoiceId, InvoiceUpdateRequest invoice)
         {
             var localInvoice = await Get(invoiceId);
@@ -84,6 +54,16 @@ namespace InvoiceForgeApi.Repository
 
             var update = _dbContext.Update(localInvoice);
             return update.State == EntityState.Modified;
+        }
+        public async Task<bool> IsUnique(int userId, InvoiceAddRequestRepository invoice)
+        {
+            var isInDatabase = await _dbContext.Invoice.AnyAsync((i) =>
+               i.Owner == userId &&
+               i.TemplateId == invoice.TemplateId &&
+               i.InvoiceNumber == invoice.InvoiceNumber &&
+               i.OrderNumber == invoice.OrderNumber
+            );
+            return !isInDatabase;
         }
     }
 }

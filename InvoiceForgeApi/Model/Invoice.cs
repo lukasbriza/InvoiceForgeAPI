@@ -6,6 +6,29 @@ namespace InvoiceForgeApi.Model
 {
     public class Invoice: ModelBase
     {
+        public Invoice() {}
+        public Invoice(int userId, InvoiceAddRequestRepository invoice) 
+        {
+                Outdated = false;
+                Owner = userId;
+                TemplateId = invoice.TemplateId;
+                NumberingId = invoice.NumberingId;
+                InvoiceNumber = invoice.InvoiceNumber;
+                OrderNumber = invoice.OrderNumber;
+                BasePriceTotal = invoice.BasePriceTotal;
+                VATTotal = invoice.VATTotal;
+                TotalAll = invoice.TotalAll;
+                Currency = invoice.Currency;
+
+                ClientLocal = invoice.ClientLocal;
+                ContractorLocal = invoice.ContractorLocal;
+                UserAccountLocal = invoice.UserAccountLocal;
+
+                Maturity = invoice.Maturity;
+                Exposure = invoice.Exposure;
+                TaxableTransaction = invoice.TaxableTransaction;
+                Created = invoice.Created;
+        }
         public bool Outdated { get; set;} = false;
         [ForeignKey("InvoiceTemplate")] public int TemplateId { get; set; }
         [Required] public int NumberingId { get; set; }

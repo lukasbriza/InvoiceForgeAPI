@@ -1,4 +1,5 @@
 using InvoiceForgeApi.Data.Enum;
+using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Model;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,6 +8,19 @@ namespace InvoiceForgeApi
 {
     public class Client: ModelBase
     {
+        public Client() {}
+        public Client(int userId , ClientAddRequest client, ClientType clientType)
+        {
+            AddressId = client.AddressId;
+            Owner = userId;
+            Type = clientType;
+            ClientName = client.ClientName;
+            IN = client.IN;
+            TIN = client.TIN;
+            Mobil = client.Mobil;
+            Tel = client.Tel;
+            Email = client.Email;
+        }
         [ForeignKey("Address")] public int? AddressId { get; set; }
 
         [Required] public ClientType Type { get; set; }

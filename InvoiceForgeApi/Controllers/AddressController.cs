@@ -1,6 +1,8 @@
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Model;
+using InvoiceForgeApi.Model.CodeLists;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
@@ -39,21 +41,11 @@ namespace InvoiceForgeApi.Controllers
         {
             if (address is null) throw new ValidationError("Address is not provided.");
 
-            var countryValidation = await _codeListRepository.GetCountryById(address.CountryId);
-            if (countryValidation is null) throw new ValidationError("Invalid country id.");
+            await IsInDatabase<Country>(address.CountryId);
+            await IsInDatabase<User>(userId);
 
-            var isValidOwner = await _userRepository.GetById(userId);
-            if (isValidOwner is null) throw new ValidationError("Something unexpected happened. Provided invalid user.");
-
-            var isAddressUnique = await _addressRepository.GetByCondition(a => 
-                a.Owner == userId && 
-                a.City == address.City && 
-                a.Street == address.Street && 
-                a.StreetNumber == address.StreetNumber && 
-                a.CountryId == address.CountryId && 
-                a.PostalCode == address.PostalCode
-            ); 
-            if (isAddressUnique is not null && isAddressUnique.Count > 0) throw new ValidationError("Address must be unique.");
+            var isAddressUnique = await _addressRepository.IsUnique(userId, address);
+            if (!isAddressUnique) throw new ValidationError("Address must be unique.");
 
             var addAddress = await _addressRepository.Add(userId, address);
 

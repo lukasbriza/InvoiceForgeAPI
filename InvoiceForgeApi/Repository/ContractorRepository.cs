@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class ContractorRepository: RepositoryBase<Contractor>, IContractorRepository
+    public class ContractorRepository: RepositoryExtendeClient<Contractor, ContractorAddRequest>, IContractorRepository
     {
         public ContractorRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
 
@@ -37,26 +37,6 @@ namespace InvoiceForgeApi.Repository
             var contractorResult = new ContractorGetRequest(contractorCall, plain);
             return contractorResult;
         }
-        public async Task<int?> Add(int userId, ContractorAddRequest contractor, ClientType clientType)
-        {
-            var newContractor = new Contractor
-            {
-                AddressId = contractor.AddressId,
-                Owner = userId,
-                ClientType = clientType,
-                ContractorName = contractor.ContractorName,
-                IN = contractor.IN,
-                TIN = contractor.TIN,
-                Email = contractor.Email,
-                Mobil = contractor.Mobil,
-                Tel = contractor.Tel,
-                Www = contractor.Www
-            };
-            var entity = await _dbContext.Contractor.AddAsync(newContractor);
-            
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-        }
         public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType? clientType)
         {
             var localContractor = await Get(contractorId);
@@ -78,6 +58,21 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localContractor);
             return update.State == EntityState.Modified;
+        }
+        public async Task<bool> IsUnique(int userId, ContractorAddRequest contractor)
+        {
+            var isInDatabase = await _dbContext.Contractor.AnyAsync((c) =>
+                c.Owner == userId &&
+                c.AddressId == contractor.AddressId &&
+                c.ContractorName == contractor.ContractorName &&
+                c.IN == contractor.IN &&
+                c.TIN == contractor.TIN &&
+                c.Mobil == contractor.Mobil &&
+                c.Tel == contractor.Tel &&
+                c.Email == contractor.Email &&
+                c.Www == contractor.Www
+            );
+            return !isInDatabase;
         }
     }
 }

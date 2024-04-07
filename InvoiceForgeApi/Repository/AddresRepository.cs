@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class AddressRepository: RepositoryBase<Address>, IAddressRepository
+    public class AddressRepository: RepositoryExtended<Address, AddressAddRequest>, IAddressRepository
     {
         public AddressRepository(InvoiceForgeDatabaseContext dbContext) : base(dbContext){}
 
@@ -36,22 +36,6 @@ namespace InvoiceForgeApi.Repository
                 var addressResult  = new AddressGetRequest(addressCall, plain);
                 return addressResult;
         }
-        public async Task<int?> Add(int userId, AddressAddRequest address)
-        {
-            var newAddress = new Address
-            {
-                Owner = userId,
-                CountryId = address.CountryId,
-                Street = address.Street,
-                StreetNumber = address.StreetNumber,
-                City = address.City,
-                PostalCode = address.PostalCode
-            };
-            var entity = await _dbContext.Address.AddAsync(newAddress);
-
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-        }
         public async Task<bool> Update(int addressId, AddressUpdateRequest address)
         {
             var localAddress = await Get(addressId);
@@ -68,6 +52,18 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localAddress);
             return update.State == EntityState.Modified;
+        }
+        public async Task<bool> IsUnique(int userId, AddressAddRequest address)
+        {
+            var isInDatabase = await _dbContext.Address.AnyAsync((a) => 
+                a.Owner == userId && 
+                a.City == address.City && 
+                a.Street == address.Street && 
+                a.StreetNumber == address.StreetNumber && 
+                a.CountryId == address.CountryId && 
+                a.PostalCode == address.PostalCode
+            );
+            return !isInDatabase;
         }
     }
 }

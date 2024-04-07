@@ -7,7 +7,7 @@ using InvoiceForgeApi.DTO.Model;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class UserRepository:RepositoryBase<User>, IUserRepository
+    public class UserRepository: RepositoryExtendedSimple<User, UserAddRequest>, IUserRepository
     {
         public UserRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
 
@@ -28,18 +28,6 @@ namespace InvoiceForgeApi.Repository
             var userResult = new UserGetRequest(userCall, plain);
             return userCall is not null ? userResult : null;
         }
-        public async Task<bool> Delete(int id)
-        {
-            var user = await Get(id);
-                
-            if (user is null)
-            {
-                throw new DatabaseCallError("User is not in database.");
-            }
-
-            var entity = _dbContext.User.Remove(user);
-            return entity.State == EntityState.Deleted;
-        }
         public async Task<bool> Update(int userId, UserUpdateRequest user)
         {
             if (user is null) throw new ValidationError("User is not provided.");
@@ -55,20 +43,6 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localUser);
             return update.State == EntityState.Modified; 
-        }
-        public async Task<int?> Add(int userId, UserAddRequest user)
-        {
-
-            if(user is null)
-            {
-                throw new ValidationError("User is not provided.");
-            }
-
-            var newUser = new User {AuthenticationId = user.AuthenticationId};
-            var entity = await _dbContext.User.AddAsync(newUser);
-            
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
         }
     }
 }

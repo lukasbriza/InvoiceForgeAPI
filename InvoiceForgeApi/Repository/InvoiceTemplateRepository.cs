@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceTemplateRepository: RepositoryBase<InvoiceTemplate>, IInvoiceTemplateRepository
+    public class InvoiceTemplateRepository: RepositoryExtended<InvoiceTemplate, InvoiceTemplateAddRequest>, IInvoiceTemplateRepository
     {
         public InvoiceTemplateRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceTemplateGetRequest>?> GetAll(int userId, bool? plain = false)
@@ -25,24 +25,6 @@ namespace InvoiceForgeApi.Repository
             var templateResult = new InvoiceTemplateGetRequest(templateCall, plain);
             return templateCall is not null ? templateResult : null;
         }
-        public async Task<int?> Add(int userId, InvoiceTemplateAddRequest template)
-        {
-            var newInvoiceTemplate = new InvoiceTemplate
-            {
-                Owner = userId,
-                ClientId = template.ClientId,
-                ContractorId = template.ContractorId,
-                UserAccountId = template.UserAccountId,
-                CurrencyId = template.CurrencyId,
-                TemplateName = template.TemplateName,
-                Created = new DateTime().ToUniversalTime(),
-                NumberingId = template.NumberingId
-            };
-            var entity = await _dbContext.InvoiceTemplate.AddAsync(newInvoiceTemplate);
-            
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-        }
         public async Task<bool> Update(int templateId, InvoiceTemplateUpdateRequest template)
         {
             var localTemplate = await Get(templateId);
@@ -56,6 +38,18 @@ namespace InvoiceForgeApi.Repository
            
             var update = _dbContext.Update(localTemplate);
             return update.State == EntityState.Modified;     
+        }
+        public async Task<bool> IsUnique(int userId, InvoiceTemplateAddRequest template)
+        {
+            var isInDatabase = await _dbContext.InvoiceTemplate.AnyAsync((t) =>
+                t.Owner == userId &&
+                t.ClientId == template.ClientId &&
+                t.ContractorId == template.ContractorId &&
+                t.UserAccountId == template.UserAccountId &&
+                t.CurrencyId == template.CurrencyId &&
+                t.NumberingId == template.NumberingId
+            );
+            return !isInDatabase;
         }
     }
 }

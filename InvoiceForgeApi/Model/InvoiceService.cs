@@ -1,13 +1,23 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using InvoiceForgeApi.DTO.Model;
 
 namespace InvoiceForgeApi.Model
 {
-    public class InvoiceService
+    public class InvoiceService: WithIdModel
     {
-        [Key] 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)] 
-        public int Id { get; set; }
+        public InvoiceService() {}
+        public InvoiceService(int invoiceId, InvoiceServiceExtendedAddRequest invoiceService)
+        {
+            InvoiceId = invoiceId;
+            InvoiceItemId = invoiceService.ItemId;
+            Units = invoiceService.Units;
+            PricePerUnit = invoiceService.PricePerUnit;
+            BasePrice = invoiceService.BasePrice;
+            VAT = invoiceService.VAT;
+            Total = invoiceService.Total;
+        }
+
         [ForeignKey("Invoice")] public int InvoiceId { get; set; }
         [ForeignKey("InvoiceItem")] public int InvoiceItemId { get; set; }
         [Required] public long Units { get; set; }

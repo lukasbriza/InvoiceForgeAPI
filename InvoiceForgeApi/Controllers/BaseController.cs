@@ -1,3 +1,4 @@
+using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +35,15 @@ namespace InvoiceForgeApi.Controllers
             _invoiceServiceRepository = repository.InvoiceService;
             _repository = repository;
         }
-        
+        public virtual async Task<TEntity> IsInDatabase<TEntity>(int entityId, string? errorMessage = null) where TEntity: class
+        {
+            var dbSet = await _repository.GetSet<TEntity>();
+            var setName = typeof(TEntity).FullName;
+            if (dbSet is null) throw new DatabaseCallError($"There is no {setName} dbSet in given context.");
+            var entity = await dbSet.FindAsync(entityId);
+            if (entity is null) throw new ValidationError(errorMessage ?? "Entity is not in database.");
+           
+            return entity;
+        }
     }
 }

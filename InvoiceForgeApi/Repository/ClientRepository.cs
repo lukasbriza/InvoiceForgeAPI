@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class ClientRepository: RepositoryBase<Client>, IClientRepository
+    public class ClientRepository: RepositoryExtendeClient<Client, ClientAddRequest>, IClientRepository
     {
         public ClientRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
 
@@ -41,25 +41,7 @@ namespace InvoiceForgeApi.Repository
             var clientResult = new ClientGetRequest(clientCall, plain);
             return clientResult;
         }
-        public async Task<int?> Add(int userId ,ClientAddRequest client, ClientType clientType)
-        {
-            var newClient = new Client
-            {
-                AddressId = client.AddressId,
-                Owner = userId,
-                Type = clientType,
-                ClientName = client.ClientName,
-                IN = client.IN,
-                TIN = client.TIN,
-                Mobil = client.Mobil,
-                Tel = client.Tel,
-                Email = client.Email
-            };
-            var entity = await _dbContext.Client.AddAsync(newClient);
-
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-        }
+        
         public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType? clientType)
         {
             var localClient = await Get(clientId);
@@ -77,6 +59,20 @@ namespace InvoiceForgeApi.Repository
 
             var update = _dbContext.Update(localClient);
             return update.State == EntityState.Modified;
+        }
+        public async Task<bool> IsUnique(int userId, ClientAddRequest client)
+        {
+            var isInDatabase = await _dbContext.Client.AnyAsync((c) =>
+                c.Owner == userId &&
+                c.AddressId == client.AddressId &&
+                c.ClientName == client.ClientName &&
+                c.IN == client.IN &&
+                c.TIN == client.TIN &&
+                c.Mobil == client.Mobil &&
+                c.Tel == client.Tel &&
+                c.Email == client.Email
+            );
+            return !isInDatabase;
         }
     }
 }

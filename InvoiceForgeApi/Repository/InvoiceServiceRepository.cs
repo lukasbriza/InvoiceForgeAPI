@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceServiceRepository: RepositoryBase<InvoiceService>, IInvoiceServiceRepository
+    public class InvoiceServiceRepository: RepositoryExtended<InvoiceService, InvoiceServiceExtendedAddRequest>, IInvoiceServiceRepository
     {
         public InvoiceServiceRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceServiceGetRequest>?> GetAll(int invoiceId, bool? plain = false)
@@ -37,22 +37,6 @@ namespace InvoiceForgeApi.Repository
             var invoiceServiceCall = await invoiceService.FindAsync(itemServiceId);
             var invoiceServiceResult = new InvoiceServiceGetRequest(invoiceServiceCall, plain);
             return invoiceServiceCall is not null ? invoiceServiceResult : null;
-        }
-        public async Task<int?> Add(int InvoiceId, InvoiceServiceExtendedAddRequest invoiceService)
-        {
-            var newInvoiceService = new InvoiceService
-            {
-                InvoiceId = InvoiceId, 
-                InvoiceItemId = invoiceService.ItemId,
-                Units = invoiceService.Units,
-                PricePerUnit = invoiceService.PricePerUnit,
-                BasePrice = invoiceService.BasePrice,
-                VAT = invoiceService.VAT,
-                Total = invoiceService.Total,
-            };
-            var entity = await _dbContext.InvoiceService.AddAsync(newInvoiceService);
-
-            return entity.State == EntityState.Added ? entity.Entity.Id : null;
         }
         public async Task<bool> Add(int InvoiceId, List<InvoiceServiceExtendedAddRequest> invoiceServices)
         {
@@ -86,6 +70,18 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localInvoiceservice);
             return update.State == EntityState.Modified;
+        }
+        public async Task<bool> IsUnique(int invoiceId, InvoiceServiceExtendedAddRequest service)
+        {
+            var isInDatabase = await _dbContext.InvoiceService.AnyAsync((s) =>
+               s.Units == service.Units &&
+               s.PricePerUnit == service.PricePerUnit &&
+               s.InvoiceItemId == service.ItemId &&
+               s.BasePrice == service.BasePrice &&
+               s.VAT == service.VAT &&
+               s.Total == service.Total
+            );
+            return !isInDatabase;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace InvoiceForgeApi.Controllers
         [HttpPost]
         public async Task<bool> Add(UserAddRequest user)
         {
-            var userAdd = await _userRepository.Add(1,user);
+            var userAdd = await _userRepository.Add(user);
             var userAddResult = userAdd is not null;
 
             if (userAddResult) {

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace InvoiceForgeApi.Interfaces
 {
     public interface IRepositoryWrapper
@@ -13,6 +15,7 @@ namespace InvoiceForgeApi.Interfaces
         IInvoiceServiceRepository InvoiceService { get; }
         IInvoiceRepository Invoice { get; }
         INumberingRepository Numbering { get; }
+        Task<DbSet<TEntity>?> GetSet<TEntity>() where TEntity: class;
         Task Save();
         void DetachChanges();
     }

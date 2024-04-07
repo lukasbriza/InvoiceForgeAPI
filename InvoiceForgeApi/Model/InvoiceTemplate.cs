@@ -1,11 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Model.CodeLists;
 
 namespace InvoiceForgeApi.Model
 {
     public class InvoiceTemplate: ModelBase
     {
+        public InvoiceTemplate() {}
+        public InvoiceTemplate(int userId, InvoiceTemplateAddRequest template)
+        {
+            Owner = userId;
+            ClientId = template.ClientId;
+            ContractorId = template.ContractorId;
+            UserAccountId = template.UserAccountId;
+            CurrencyId = template.CurrencyId;
+            TemplateName = template.TemplateName;
+            Created = new DateTime().ToUniversalTime();
+            NumberingId = template.NumberingId;
+        }
+
         [ForeignKey("Currency")] public int CurrencyId { get; set; } 
         [ForeignKey("Numbering")] public int NumberingId { get; set; }
         [ForeignKey("Client")] public int ClientId { get; set; }

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class NumberingRepository: RepositoryBase<Numbering>, INumberingRepository
+    public class NumberingRepository: RepositoryExtended<Numbering, NumberingAddRequest>, INumberingRepository
     {
         public NumberingRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
 
@@ -49,21 +49,7 @@ namespace InvoiceForgeApi.Repository
             invoiceNumberObject.invoiceNumber = invoiceNumber.InvoiceNumber;
             return invoiceNumberObject;
         }
-        public async Task<int?> AddNumbering(int userId, NumberingAddRequest numbering)
-        {
-            var newNumbering = new Numbering
-            {
-                Owner = userId,
-                NumberingTemplate = numbering.NumberingTemplate,
-                NumberingPrefix = numbering.NumberingPrefix ?? null
-            };
-
-            var entity = await _dbContext.Numbering.AddAsync(newNumbering);
-            
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-        }
-        public async Task<bool> UpdateNumbering(int numberingId, NumberingUpdateRequest numbering)
+        public async Task<bool> Update(int numberingId, NumberingUpdateRequest numbering)
         {
             var localNumbering = await Get(numberingId);
 
@@ -75,14 +61,7 @@ namespace InvoiceForgeApi.Repository
             var update = _dbContext.Update(localNumbering);
             return update.State == EntityState.Modified;    
         }
-        public async Task<bool> DeleteNumbering(int numberingId)
-        {
-            var numbering = await Get(numberingId);
 
-            if (numbering is null) throw new DatabaseCallError("Numbering is not in database.");
-            var entity = _dbContext.Numbering.Remove(numbering);
-            return entity.State == EntityState.Deleted;
-        }
         private async Task<bool> ExtendNumberVariableForNumbering (int numberingId)
         {
             var numbering = await Get(numberingId);

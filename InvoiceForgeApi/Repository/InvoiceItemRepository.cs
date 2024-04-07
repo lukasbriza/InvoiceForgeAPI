@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository
 {
-    public class InvoiceItemRepository: RepositoryBase<InvoiceItem>, IInvoiceItemRepository
+    public class InvoiceItemRepository: RepositoryExtended<InvoiceItem, InvoiceItemAddRequest>, IInvoiceItemRepository
     {
         public InvoiceItemRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
         public async Task<List<InvoiceItemGetRequest>?> GetAll(int userId, bool? plain = false)
@@ -34,19 +34,6 @@ namespace InvoiceForgeApi.Repository
             var invoiceItemResult = new InvoiceItemGetRequest(invoiceItemCall, plain);
             return invoiceItemCall is not null ? invoiceItemResult : null;
         }
-        public async Task<int?> Add(int userId, InvoiceItemAddRequest invoiceItem)
-        {
-            var newInvoiceItem = new InvoiceItem
-            {
-                Owner = userId,
-                ItemName = invoiceItem.ItemName,
-                TariffId = invoiceItem.TariffId
-            };
-            var entity = await _dbContext.InvoiceItem.AddAsync(newInvoiceItem);
-            
-            if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-            return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-        }
         public async Task<bool> Update(int invoiceItemId, InvoiceItemUpdateRequest invoiceItem)
         {
             var localInvoiceItem = await Get(invoiceItemId);
@@ -60,6 +47,15 @@ namespace InvoiceForgeApi.Repository
             
             var update = _dbContext.Update(localInvoiceItem);
             return update.State == EntityState.Modified;
+        }
+        public async Task<bool> IsUnique(int userId, InvoiceItemAddRequest item)
+        {
+            var isInDatabase = await _dbContext.InvoiceItem.AnyAsync((i) =>
+                i.Owner == userId &&
+                i.ItemName == item.ItemName &&
+                i.TariffId == item.TariffId
+            );
+            return !isInDatabase;
         }
     }
 }

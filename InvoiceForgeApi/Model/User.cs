@@ -1,13 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using InvoiceForgeApi.DTO.Model;
 
 namespace InvoiceForgeApi.Model
 {
-    public class User
+    public class User: WithIdModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public User() {}
+        public User(UserAddRequest user)
+        {
+
+        }
         [Required] public int AuthenticationId { get; set; }
 
         //Reference

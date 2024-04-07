@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InvoiceForgeApi\InvoiceForgeApi.csproj" />
+    <ProjectReference Include="..\InvoiceForgeApi\InvoiceForge.Api.csproj" />
   </ItemGroup>
 
 </Project>

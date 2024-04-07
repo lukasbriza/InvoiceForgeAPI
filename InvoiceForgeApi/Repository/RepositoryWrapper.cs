@@ -141,6 +141,11 @@ namespace InvoiceForgeApi.Repository
                 throw new DatabaseCallError("Saving failed. Modifications was not applied.");
             }
         }
+        public async Task<DbSet<TEntity>?> GetSet<TEntity>() where TEntity: class
+        {
+            var set =  _context.Set<TEntity>();
+            return await Task.FromResult(set);
+        }
         public void DetachChanges()
         {
             _context.ChangeTracker.Entries().ToList().ForEach(e => e.State = EntityState.Unchanged);

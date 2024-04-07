@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository;
 
-public class UserAccountRepository:RepositoryBase<UserAccount>, IUserAccountRepository
+public class UserAccountRepository: RepositoryExtended<UserAccount, UserAccountAddRequest>, IUserAccountRepository
 {
     public UserAccountRepository(InvoiceForgeDatabaseContext dbContext): base(dbContext) {}
     public async Task<List<UserAccountGetRequest>?> GetAll(int userId, bool? plain)
@@ -45,21 +45,6 @@ public class UserAccountRepository:RepositoryBase<UserAccount>, IUserAccountRepo
         if (isDuplicitIBANOrAccountNumber is null || isDuplicitIBANOrAccountNumber.Count() == 0) return false;
         return true;
     }
-    public async Task<int?> Add(int userId, UserAccountAddRequest userAccount)
-    {
-        var newUserAccount = new UserAccount
-        {
-            Owner = userId,
-            BankId = userAccount.BankId,
-            AccountNumber = userAccount.AccountNumber,
-            IBAN = userAccount.IBAN
-        };
-
-        var entity = await _dbContext.UserAccount.AddAsync(newUserAccount);
-       
-        if (entity.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-        return entity.State == EntityState.Unchanged ? entity.Entity.Id : null;
-    }
     public async Task<bool> Update(int userAccountId, UserAccountUpdateRequest userAccount)
     {
         var localUserAccount = await Get(userAccountId);
@@ -76,16 +61,14 @@ public class UserAccountRepository:RepositoryBase<UserAccount>, IUserAccountRepo
         var update = _dbContext.Update(localUserAccount);
         return update.State == EntityState.Modified; 
     }
-    public async Task<bool> Delete(int userAccountId)
-    {
-        var userAccount = await Get(userAccountId);
-
-        if (userAccount is null)
+    public async Task<bool> IsUnique(int userId, UserAccountAddRequest account)
         {
-            throw new DatabaseCallError("User account is not in database.");
+            var isInDatabase = await _dbContext.UserAccount.AnyAsync((a) =>
+                a.Owner == userId &&
+                a.BankId == account.BankId &&
+                a.AccountNumber == account.AccountNumber &&
+                a.IBAN == account.IBAN
+            );
+            return !isInDatabase;
         }
-
-        var entity = _dbContext.UserAccount.Remove(userAccount);
-        return entity.State == EntityState.Deleted;
-    }
 }
