@@ -1,5 +1,5 @@
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Helpers
 {

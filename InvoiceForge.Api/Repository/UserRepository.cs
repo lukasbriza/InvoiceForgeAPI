@@ -1,9 +1,9 @@
 ﻿using InvoiceForgeApi.Data;
-using InvoiceForgeApi.Interfaces;
-using InvoiceForgeApi.Model;
 using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Models.Interfaces;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -36,9 +36,7 @@ namespace InvoiceForgeApi.Repository
             var localUser = await Get(userId);
 
             if (localUser == null) throw new DatabaseCallError("User is not in database.");
-            var userWithNewAuthIdExists = await _dbContext.User
-                .Where(u => u.AuthenticationId == user.AuthenticationId)
-                .ToListAsync();
+            var userWithNewAuthIdExists = await _dbContext.User.Where(u => u.AuthenticationId == user.AuthenticationId).ToListAsync();
 
             if (userWithNewAuthIdExists.Count > 0) throw new ValidationError("Provided values are incorrect.");
             localUser.AuthenticationId = user.AuthenticationId;

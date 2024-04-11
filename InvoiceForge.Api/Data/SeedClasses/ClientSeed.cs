@@ -1,4 +1,7 @@
-﻿namespace InvoiceForgeApi.Data.SeedClasses
+﻿using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Models.Enum;
+
+namespace InvoiceForgeApi.Data.SeedClasses
 {
     public class ClientSeed
     {
@@ -10,7 +13,7 @@
                 {
                     AddressId = 1,
                     Owner = 1,
-                    Type = Enum.ClientType.LegalEntity,
+                    Type = ClientType.LegalEntity,
                     ClientName = "ClientName1",
                     IN = 9611280833,
                     TIN = "CZ9611280833",
@@ -19,7 +22,7 @@
                 {
                     AddressId = 1,
                     Owner = 1,
-                    Type = Enum.ClientType.Entrepreneur,
+                    Type = ClientType.Entrepreneur,
                     ClientName = "ClientName2",
                     IN = 1111111111,
                     TIN = "CZ1111111111",

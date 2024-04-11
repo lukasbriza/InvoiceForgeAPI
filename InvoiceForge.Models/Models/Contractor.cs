@@ -1,9 +1,9 @@
-﻿using InvoiceForgeApi.Enum;
-using InvoiceForgeApi.DTO.Model;
+﻿using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class Contractor: ModelBase
     {

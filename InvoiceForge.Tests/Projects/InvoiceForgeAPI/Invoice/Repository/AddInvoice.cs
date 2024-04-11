@@ -1,7 +1,7 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model;
+using InvoiceForgeApi.Models;
 using Xunit;
 
 namespace InvoiceRepository

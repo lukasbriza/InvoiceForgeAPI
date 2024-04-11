@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceForge.Tests", "Invoi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceForge.Models", "InvoiceForge.Models\InvoiceForge.Models.csproj", "{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceForge.Abl", "InvoiceForge.Abl\InvoiceForge.Abl.csproj", "{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

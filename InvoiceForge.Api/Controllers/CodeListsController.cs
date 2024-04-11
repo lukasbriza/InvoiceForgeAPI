@@ -1,5 +1,5 @@
 ﻿using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers

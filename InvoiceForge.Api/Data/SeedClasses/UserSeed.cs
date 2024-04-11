@@ -1,4 +1,4 @@
-﻿using InvoiceForgeApi.Model;
+﻿using InvoiceForgeApi.Models;
 
 namespace InvoiceForgeApi.Data.SeedClasses
 {

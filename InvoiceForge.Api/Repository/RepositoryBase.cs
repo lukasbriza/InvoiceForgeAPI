@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Models.Enum;
+using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository

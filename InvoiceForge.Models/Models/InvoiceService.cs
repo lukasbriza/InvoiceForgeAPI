@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using InvoiceForgeApi.DTO.Model;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class InvoiceService: WithIdModel
     {

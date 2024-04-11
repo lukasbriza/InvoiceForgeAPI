@@ -1,4 +1,4 @@
-using InvoiceForgeApi.Model.CodeLists;
+using InvoiceForgeApi.Models.CodeLists;
 
 namespace InvoiceForgeApi.DTO.Model
 {

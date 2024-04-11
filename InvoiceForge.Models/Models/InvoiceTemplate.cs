@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model.CodeLists;
+using InvoiceForgeApi.Models.CodeLists;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class InvoiceTemplate: ModelBase
     {

@@ -1,5 +1,5 @@
-﻿using InvoiceForgeApi.Enum;
-using InvoiceForgeApi.DTO;
+﻿using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Models.Enum;
 using Newtonsoft.Json;
 using System.Net;
 

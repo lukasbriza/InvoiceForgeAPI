@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace InvoiceForgeApi.Model.CodeLists
+namespace InvoiceForgeApi.Models.CodeLists
 {
     public class Bank: CodeListBase
     {

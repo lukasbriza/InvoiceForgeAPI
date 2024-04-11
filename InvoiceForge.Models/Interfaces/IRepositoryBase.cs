@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using InvoiceForgeApi.Enum;
+using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.Interfaces
+namespace InvoiceForgeApi.Models.Interfaces
 {
     public interface IIsUnique<TEntity>
     {

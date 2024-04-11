@@ -1,7 +1,8 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -149,6 +150,12 @@ namespace InvoiceForgeApi.Repository
         public void DetachChanges()
         {
             _context.ChangeTracker.Entries().ToList().ForEach(e => e.State = EntityState.Unchanged);
+        }
+
+        public async Task<IDbContextTransaction> BeginTransaction()
+        {
+            var transaction = await _context.Database.BeginTransactionAsync();
+            return transaction;
         }
     }
 }

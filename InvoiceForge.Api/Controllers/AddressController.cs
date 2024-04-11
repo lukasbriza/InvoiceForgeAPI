@@ -1,7 +1,7 @@
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model;
-using InvoiceForgeApi.Model.CodeLists;
+using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Models.CodeLists;
 using InvoiceForgeApi.Repository;
 using Microsoft.AspNetCore.Mvc;
 

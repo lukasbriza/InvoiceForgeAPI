@@ -1,10 +1,9 @@
-﻿
-using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model.CodeLists;
+﻿using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.CodeLists;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class Address: ModelBase
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace InvoiceForgeApi.Enum
+namespace InvoiceForgeApi.Models.Enum
 {
     public enum ClientType
     {

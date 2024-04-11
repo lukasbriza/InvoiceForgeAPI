@@ -1,8 +1,9 @@
 ﻿using InvoiceForgeApi.Data;
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Models.Enum;
+using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceForgeApi.Repository

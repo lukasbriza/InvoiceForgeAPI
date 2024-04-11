@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class Numbering: ModelBase
     {

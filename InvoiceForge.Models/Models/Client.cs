@@ -1,10 +1,9 @@
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model;
+using InvoiceForgeApi.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvoiceForgeApi
+namespace InvoiceForgeApi.Models
 {
     public class Client: ModelBase
     {

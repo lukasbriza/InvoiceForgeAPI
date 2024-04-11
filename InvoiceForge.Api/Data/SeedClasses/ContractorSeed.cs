@@ -1,4 +1,5 @@
-﻿using InvoiceForgeApi.Model;
+﻿using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Data.SeedClasses
 {
@@ -11,7 +12,7 @@ namespace InvoiceForgeApi.Data.SeedClasses
                 {
                     AddressId= 1,
                     Owner = 1,
-                    ClientType = Enum.ClientType.Entrepreneur,
+                    ClientType = ClientType.Entrepreneur,
                     ContractorName = "Contractor1",
                     IN = 123456789,
                     TIN = "CZ123456789",

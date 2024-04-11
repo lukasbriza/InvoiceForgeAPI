@@ -3,7 +3,7 @@ using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model;
+using InvoiceForgeApi.Models;
 using Xunit;
 
 namespace UserRepository

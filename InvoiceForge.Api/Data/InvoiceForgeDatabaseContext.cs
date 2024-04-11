@@ -1,7 +1,7 @@
-﻿using InvoiceForgeApi.Enum;
-using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model;
-using InvoiceForgeApi.Model.CodeLists;
+﻿using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Models.CodeLists;
+using InvoiceForgeApi.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 

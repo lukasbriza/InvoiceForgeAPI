@@ -1,7 +1,7 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.Enum;
 using Xunit;
 
 namespace ContractorRepository

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using InvoiceForgeApi.DTO.Model;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class User: WithIdModel
     {

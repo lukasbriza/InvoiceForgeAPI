@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
-namespace InvoiceForgeApi.Interfaces
+namespace InvoiceForgeApi.Models.Interfaces
 {
     public interface IRepositoryWrapper
     {
@@ -20,5 +21,6 @@ namespace InvoiceForgeApi.Interfaces
         Task<DbSet<TEntity>?> GetSet<TEntity>() where TEntity: class;
         Task Save();
         void DetachChanges();
+        Task<IDbContextTransaction> BeginTransaction();
     }
 }

@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using InvoiceForgeApi.Interfaces;
+using InvoiceForgeApi.Models.Interfaces;
 
-namespace InvoiceForgeApi.Model
+namespace InvoiceForgeApi.Models
 {
     public class ModelBase: WithIdModel, IEntityBase
     {

@@ -1,4 +1,4 @@
-﻿using InvoiceForgeApi.Model;
+﻿using InvoiceForgeApi.Models;
 
 namespace InvoiceForgeApi.DTO.Model
 {

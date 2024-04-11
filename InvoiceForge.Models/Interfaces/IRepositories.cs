@@ -1,8 +1,7 @@
-using InvoiceForgeApi.Enum;
 using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Model;
+using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.Interfaces
+namespace InvoiceForgeApi.Models.Interfaces
 {
     public interface IAddressRepository: IBaseRepository<AddressGetRequest, AddressAddRequest, AddressUpdateRequest, Address> {}
     public interface IClientRepository: IBaseClientRepository<ClientGetRequest, ClientAddRequest, ClientUpdateRequest, Client> {}

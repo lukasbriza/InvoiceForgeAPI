@@ -1,4 +1,4 @@
-namespace InvoiceForgeApi.Model.CodeLists
+namespace InvoiceForgeApi.Models.CodeLists
 {
     public class Currency: CodeListBase
     {

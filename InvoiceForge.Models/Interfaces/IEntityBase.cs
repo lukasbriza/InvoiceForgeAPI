@@ -1,4 +1,4 @@
-namespace InvoiceForgeApi.Interfaces
+namespace InvoiceForgeApi.Models.Interfaces
 {
     public interface IEntityBase: IEntityId {
         int Owner {  get; set; }
