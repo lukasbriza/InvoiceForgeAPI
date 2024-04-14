@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InvoiceForge.Models\InvoiceForge.Models.csproj" />
+    <ProjectReference Include="..\InvoiceForge.Abl\InvoiceForge.Abl.csproj" />
   </ItemGroup>
 
 </Project>

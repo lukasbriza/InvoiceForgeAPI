@@ -67,5 +67,18 @@ namespace InvoiceForgeApi.Repository
             );
             return !isInDatabase;
         }
+
+        public async Task<bool> IsUnique(int userId, AddressUpdateRequest address)
+        {
+            var isInDatabase = await _dbContext.Address.AnyAsync((a) => 
+                a.Owner == userId && 
+                a.City == address.City && 
+                a.Street == address.Street && 
+                a.StreetNumber == address.StreetNumber && 
+                a.CountryId == address.CountryId && 
+                a.PostalCode == address.PostalCode
+            );
+            return !isInDatabase;
+        }
     }
 }

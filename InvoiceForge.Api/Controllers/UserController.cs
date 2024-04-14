@@ -1,4 +1,5 @@
-﻿using InvoiceForgeApi.DTO.Model;
+﻿using InvoiceForgeApi.Abl.user;
+using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,50 +13,34 @@ namespace InvoiceForgeApi.Controllers
         [Route("{id}")]
         public async Task<UserGetRequest?> Get(int id)
         {   
-            return await _userRepository.GetById(id);
+            return await _repository.User.GetById(id);
         }
         [HttpGet]
         [Route("plain/{id}")]
         public async Task<UserGetRequest?> GetPlain(int id)
         {   
-            return await _userRepository.GetById(id, true);
+            return await _repository.User.GetById(id, true);
         }
         [HttpPost]
         public async Task<bool> Add(UserAddRequest user)
         {
-            var userAdd = await _userRepository.Add(user);
-            var userAddResult = userAdd is not null;
-
-            if (userAddResult) {
-                await _repository.Save();
-            } else {
-                _repository.DetachChanges();
-            };
-            return userAddResult;
+            var abl = new AddUserAbl(_repository);
+            var result = await abl.Resolve(user);
+            return result;
         }
         [HttpPut]
         public async Task<bool> Update(UserUpdateRequest user)
         { 
-            var userUpdate = await _userRepository.Update(user.Id, user);
-
-            if (userUpdate) {
-                await _repository.Save();
-            } else {
-                _repository.DetachChanges();
-            };
-            return userUpdate;
+            var abl = new UpdateUserAbl(_repository);
+            var result = await abl.Resolve(user);
+            return result;
         }
         [HttpDelete]
         public async Task<bool> Delete(int id)
         {
-            var userDelete = await _userRepository.Delete(id);
-
-            if (userDelete) {
-                await _repository.Save();
-            } else {
-                _repository.DetachChanges();
-            };
-            return userDelete;
+            var abl = new DeleteUserAbl(_repository);
+            var result = await abl.Resolve(id);
+            return result;
         }
     }
 }
