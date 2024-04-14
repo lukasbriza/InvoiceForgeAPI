@@ -3,7 +3,9 @@ using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Models.Interfaces
 {
-    public interface IAddressRepository: IBaseRepository<AddressGetRequest, AddressAddRequest, AddressUpdateRequest, Address> {}
+    public interface IAddressRepository: 
+        IIsUnique<AddressUpdateRequest>, 
+        IBaseRepository<AddressGetRequest, AddressAddRequest, AddressUpdateRequest, Address> {}
     public interface IClientRepository: IBaseClientRepository<ClientGetRequest, ClientAddRequest, ClientUpdateRequest, Client> {}
     public interface IContractorRepository: IBaseClientRepository<ContractorGetRequest, ContractorAddRequest, ContractorUpdateRequest, Contractor> {}
     public interface IInvoiceItemRepository: IBaseRepository<InvoiceItemGetRequest, InvoiceItemAddRequest, InvoiceItemUpdateRequest, InvoiceItem> {}

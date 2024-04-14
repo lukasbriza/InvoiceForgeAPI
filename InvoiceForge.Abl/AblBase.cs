@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace InvoiceForgeApi.Abl
 {
-    public class AblBase
+    public class AblBase: IAblBase
     {
         protected readonly IRepositoryWrapper _repository;
         public AblBase(IRepositoryWrapper repository)
@@ -12,7 +12,7 @@ namespace InvoiceForgeApi.Abl
             _repository = repository;
         }
 
-        public virtual async Task<bool> IsInDatabase<TEntity>(int entityId, string? errorMessage = null) where TEntity: class
+        public virtual async Task<TEntity> IsInDatabase<TEntity>(int entityId, string? errorMessage = null) where TEntity: class
         {
             var dbSet = await _repository.GetSet<TEntity>();
             var setName = typeof(TEntity).FullName;
@@ -20,7 +20,11 @@ namespace InvoiceForgeApi.Abl
             if (dbSet is null) throw new DatabaseCallError($"There is no {setName} dbSet in given context.");
 
             var entity = await dbSet.FindAsync(entityId);
-            return entity is not null;
+
+            if (errorMessage is not null && entity is null) throw new ValidationError(errorMessage);
+            if (entity is null) throw new DatabaseCallError("Entity is not in database.");
+
+            return entity;
         }
         public virtual async Task SaveResult(bool resultCondition) => await SaveResult(resultCondition, null);
         public virtual async Task SaveResult(bool resultCondition, IDbContextTransaction? transaction) {

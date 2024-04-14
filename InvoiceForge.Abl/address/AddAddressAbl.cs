@@ -4,7 +4,7 @@ using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.CodeLists;
 using InvoiceForgeApi.Models.Interfaces;
 
-namespace InvoiceForgeApi.Abl
+namespace InvoiceForgeApi.Abl.address
 {
     public class AddAddressAbl: AblBase
     {
@@ -16,9 +16,12 @@ namespace InvoiceForgeApi.Abl
             {
                 try
                 {
-                    bool isCountry = await IsInDatabase<Country>(address.CountryId);
-                    bool isUser = await IsInDatabase<User>(userId);
+                    await IsInDatabase<Country>(address.CountryId, "Invalid country id.");
+                    await IsInDatabase<User>(userId, "Invalid user Id.");
+
                     bool isAddressUnique = await _repository.Address.IsUnique(userId, address);
+                    if (!isAddressUnique) throw new ValidationError("Address is not unique.");
+                    
                     int? addAddress = await _repository.Address.Add(userId, address);
                     bool saveCondition = addAddress is not null;
 

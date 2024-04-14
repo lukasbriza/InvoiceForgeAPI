@@ -13,25 +13,25 @@ namespace InvoiceForgeApi.Controllers
         [Route("countries")]
         public async Task<List<CountryGetRequest>?> GetCountries()
         {
-            return await _codeListRepository.GetCountries();
+            return await _repository.CodeLists.GetCountries();
         }
         [HttpGet]
         [Route("banks")]
         public async Task<List<BankGetRequest>?> GetBanks()
         {
-            return await _codeListRepository.GetBanks();
+            return await _repository.CodeLists.GetBanks();
         }
         [HttpGet]
         [Route("client-type")]
         public List<ClientTypeGetRequest>? GetClientTypes()
         {
-            return _codeListRepository.GetClientTypes();
+            return _repository.CodeLists.GetClientTypes();
         }
         [HttpGet]
         [Route("all")]
         public async Task<CodeListsAllGetRequest> GetCodeListsAll()
         {
-            return await _codeListRepository.GetCodeListsAll();
+            return await _repository.CodeLists.GetCodeListsAll();
         }
     }
 }
