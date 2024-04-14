@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceForgeApi", "InvoiceForgeApi\InvoiceForgeApi.csproj", "{CC3078C9-47DB-4746-8F27-055DE1614B76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvoiceForge.Api", "InvoiceForge.Api\InvoiceForge.Api.csproj", "{CC3078C9-47DB-4746-8F27-055DE1614B76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalTests", "FunctionalTests\FunctionalTests.csproj", "{EE9C6C95-DA5F-4248-98C8-523B29B9E532}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceForge.Tests", "InvoiceForge.Tests\InvoiceForge.Tests.csproj", "{EE9C6C95-DA5F-4248-98C8-523B29B9E532}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceForge.Models", "InvoiceForge.Models\InvoiceForge.Models.csproj", "{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvoiceForge.Abl", "InvoiceForge.Abl\InvoiceForge.Abl.csproj", "{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{EE9C6C95-DA5F-4248-98C8-523B29B9E532}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE9C6C95-DA5F-4248-98C8-523B29B9E532}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE9C6C95-DA5F-4248-98C8-523B29B9E532}.Release|Any CPU.Build.0 = Release|Any CPU
+		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{075DB4F7-696D-4930-8A09-C8DBE9E9FBC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{046AE1F7-FE44-4D08-AB93-7BEBA3A060A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
