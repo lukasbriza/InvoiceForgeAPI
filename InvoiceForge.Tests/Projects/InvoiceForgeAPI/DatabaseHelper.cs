@@ -24,6 +24,57 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI
         public void InitializeDbForTest()
         {
             Seed.PopulateDatabase(_context);
+            InitTestData();
+        }
+        public void InitTestData(){
+            //User
+            if (!_context.User.Any())
+            {
+                _context.User.AddRange(new UserSeed().Populate());
+                _context.SaveChanges();
+            }
+            //Numbering
+            if(!_context.Numbering.Any())
+            {
+                _context.Numbering.AddRange(new NumberingSeed().Populate());
+                _context.SaveChanges();
+            }
+            //InvoiceItem
+            if(!_context.InvoiceItem.Any())
+            {
+                _context.InvoiceItem.AddRange(new InvoiceItemSeed().Populate());
+                _context.SaveChanges();
+            }
+            //Address
+            if (!_context.Address.Any())
+            {
+                _context.Address.AddRange(new AddressSeed().Populate());
+                _context.SaveChanges();
+            }
+            //Client
+            if(!_context.Client.Any()) 
+            {
+                _context.Client.AddRange(new ClientSeed().Populate());
+                _context.SaveChanges();
+            }
+            //Contractor
+            if (!_context.Contractor.Any())
+            {
+                _context.Contractor.AddRange(new ContractorSeed().Populate());
+                _context.SaveChanges();
+            }
+            //UserAccount
+            if (!_context.UserAccount.Any())
+            {
+                _context.UserAccount.AddRange(new UserAccountSeed().Populate());
+                _context.SaveChanges();
+            }
+            //InvoiceTemplate
+            if (!_context.InvoiceTemplate.Any()) 
+            {
+                _context.InvoiceTemplate.AddRange(new InvoiceTemplateSeed().Populate());
+                _context.SaveChanges();
+            }
         }
         public void InitBanks()
         {

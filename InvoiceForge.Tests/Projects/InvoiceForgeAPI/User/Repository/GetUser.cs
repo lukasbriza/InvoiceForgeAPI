@@ -1,7 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.DTO.Model;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -51,7 +50,6 @@ namespace UserRepository
                 var usersIds = await db._context.User.Select(u => u.Id).ToListAsync();
                 var clients = new ClientSeed().Populate();
                 var userAccounts = new ContractorSeed().Populate();
-                var invoiceTemplates = new InvoiceTemplateSeed().Populate();
                 var addresses = new AddressSeed().Populate();
                 var invoiceItems = new InvoiceItemSeed().Populate();
 
@@ -59,7 +57,6 @@ namespace UserRepository
                 usersIds.ForEach(async userId => {
                     var userClients = clients.FindAll(c => c.Owner == userId);
                     var userUserAccounts = userAccounts.FindAll(a => a.Owner == userId);
-                    var userInvoiceTemplates = invoiceTemplates.FindAll(t => t.Owner == userId);
                     var userAddresses = addresses.FindAll(a => a.Owner == userId);
                     var userInvoiceItems = invoiceItems.FindAll(i => i.Owner == userId);
 
@@ -69,7 +66,6 @@ namespace UserRepository
                     Assert.IsType<UserGetRequest>(dbUser);
                     Assert.Equal(dbUser?.Clients?.Count(), userClients.Count);
                     Assert.Equal(dbUser?.UserAccounts?.Count(), userUserAccounts.Count);
-                    Assert.Equal(dbUser?.InvoiceTemplates?.Count(), userInvoiceTemplates.Count);
                     Assert.Equal(dbUser?.Addresses?.Count(), userAddresses.Count);
                     Assert.Equal(dbUser?.InvoiceItems?.Count(), userInvoiceItems.Count);
                 });

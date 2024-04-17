@@ -46,4 +46,4 @@ app.MapControllers();
 app.Run();
 
 //Acess app from outside
-public partial class InvoiceForgeApiProgram { }
+public partial class InvoiceForgeApiProgram {}

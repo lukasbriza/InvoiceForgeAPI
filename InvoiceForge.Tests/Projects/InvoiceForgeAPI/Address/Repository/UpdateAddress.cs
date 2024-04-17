@@ -1,5 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO.Model;
 using Xunit;
 
@@ -22,13 +23,14 @@ namespace AddressRepository
 
                 if (addressToCompare is not null)
                 {
+                    var tAddress = new TestAddress();
                     var updateAddress = new AddressUpdateRequest
                     {
                         Owner = addressToCompare.Owner,
-                        Street = "TestStreet",
-                        StreetNumber = 1000,
-                        City = "TestCity",
-                        PostalCode = 123456789
+                        Street = tAddress.Street,
+                        StreetNumber = tAddress.StreetNumber,
+                        City = tAddress.City,
+                        PostalCode = tAddress.PostalCode
                     };
 
                     var updateAddressResult = await db._repository.Address.Update(addressToCompare.Id,updateAddress);
@@ -41,10 +43,10 @@ namespace AddressRepository
 
                     if (updatedAddress is not null)
                     {
-                        Assert.Equal("TestStreet", updatedAddress.Street);
-                        Assert.Equal(1000, updatedAddress.StreetNumber);
-                        Assert.Equal("TestCity", updatedAddress.City);
-                        Assert.Equal(123456789, updatedAddress.PostalCode);
+                        Assert.Equal(tAddress.Street, updatedAddress.Street);
+                        Assert.Equal(tAddress.StreetNumber, updatedAddress.StreetNumber);
+                        Assert.Equal(tAddress.City, updatedAddress.City);
+                        Assert.Equal(tAddress.PostalCode, updatedAddress.PostalCode);
                     }
                 }
                 

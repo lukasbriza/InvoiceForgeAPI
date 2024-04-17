@@ -20,7 +20,7 @@ namespace InvoiceForgeApi.Models
             Tel = client.Tel;
             Email = client.Email;
         }
-        [ForeignKey("Address")] public int? AddressId { get; set; }
+        [ForeignKey("Address")] public int AddressId { get; set; }
 
         [Required] public ClientType Type { get; set; }
         [Required] public string ClientName { get; set; } = null!;

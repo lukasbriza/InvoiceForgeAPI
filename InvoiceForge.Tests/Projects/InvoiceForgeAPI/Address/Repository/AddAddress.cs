@@ -1,5 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO.Model;
 using Xunit;
 
@@ -17,13 +18,14 @@ namespace AddressRepository
                 db.InitializeDbForTest();
 
                 //ASSERT
+                var tAddres = new TestAddress();
                 var addAddress = new AddressAddRequest
                 {
-                    CountryId = 1,
-                    Street = "TestStreet",
-                    StreetNumber = 123456789,
-                    City = "TestCity",
-                    PostalCode = 123456789
+                    CountryId = tAddres.CountryId,
+                    Street = tAddres.Street,
+                    StreetNumber = tAddres.StreetNumber,
+                    City = tAddres.City,
+                    PostalCode = tAddres.PostalCode
                 };
 
                 var addAddressResult = await db._repository.Address.Add(1, addAddress);

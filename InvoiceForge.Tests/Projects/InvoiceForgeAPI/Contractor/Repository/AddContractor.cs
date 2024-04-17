@@ -1,5 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Models.Enum;
 using Xunit;
@@ -18,17 +19,18 @@ namespace ContractorRepository
                 db.InitializeDbForTest();
                 
                 //ASSERT
+                var tContractor = new TestContractor();
                 var addContractor = new ContractorAddRequest
                 {
                     AddressId = 1,
                     TypeId = 1,
-                    ContractorName = "TestContractorName",
-                    IN = 123456789,
-                    TIN = "TestTIN",
-                    Email = "TestEmail",
-                    Mobil = "+420774876504",
-                    Tel = "+420774876504",
-                    Www = "www.test.cz"
+                    ContractorName = tContractor.ContractorName,
+                    IN = tContractor.IN,
+                    TIN = tContractor.TIN,
+                    Email = tContractor.Email,
+                    Mobil = tContractor.Mobil,
+                    Tel = tContractor.Tel,
+                    Www = tContractor.Www
                 };
 
                 var addContractorResult = await db._repository.Contractor.Add(1, addContractor, ClientType.LegalEntity);

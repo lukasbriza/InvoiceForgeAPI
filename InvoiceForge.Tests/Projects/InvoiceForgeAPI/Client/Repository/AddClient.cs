@@ -1,5 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO.Model;
 using InvoiceForgeApi.Models.Enum;
 using Xunit;
@@ -18,16 +19,17 @@ namespace ClientRepository
                 db.InitializeDbForTest();
 
                 //ASSERT
+                var tClient = new TestClient();
                 var addClient = new ClientAddRequest
                 {
                     AddressId = 1,
                     TypeId = 1,
-                    ClientName = "ClientNameTest",
-                    IN = 123456789,
-                    TIN = "TestTIN",
-                    Mobil = "+420774876504",
-                    Tel = "+420774876504",
-                    Email = "TestEmail"
+                    ClientName = tClient.ClientName,
+                    IN = tClient.IN,
+                    TIN = tClient.TIN,
+                    Mobil = tClient.Mobil,
+                    Tel = tClient.Tel,
+                    Email = tClient.Email
                 };
 
                 var addClientResult = await db._repository.Client.Add(1, addClient, ClientType.LegalEntity);

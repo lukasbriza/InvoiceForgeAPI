@@ -21,20 +21,17 @@ namespace InvoiceForgeApi.Abl
 
             var entity = await dbSet.FindAsync(entityId);
 
-            if (errorMessage is not null && entity is null) throw new ValidationError(errorMessage);
+            if (errorMessage is not null && entity is null) throw new DatabaseCallError(errorMessage);
             if (entity is null) throw new DatabaseCallError("Entity is not in database.");
 
             return entity;
         }
-        public virtual async Task SaveResult(bool resultCondition) => await SaveResult(resultCondition, null);
-        public virtual async Task SaveResult(bool resultCondition, IDbContextTransaction? transaction) {
+        public virtual async Task SaveResult(bool resultCondition, IDbContextTransaction transaction) {
             if (resultCondition) {
-                await _repository.Save();
-                if(transaction is not null) await transaction.CommitAsync();
+                await transaction.CommitAsync();
                 return;
             };
-
-            if(transaction is not null) await transaction.RollbackAsync();
+            await transaction.RollbackAsync();
             return;
         }
     }

@@ -1,5 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO.Model;
 using Xunit;
 
@@ -17,11 +18,12 @@ namespace UserAccountRepository
                 db.InitializeDbForTest();
 
                 //ASSERT
+                var tAccount = new TestUserAccount();
                 var addUserAccount = new UserAccountAddRequest
                 {
-                    BankId = 1,
-                    AccountNumber = "TestAccountNumber",
-                    IBAN = "TestIBAN"
+                    BankId = tAccount.BankId,
+                    AccountNumber = tAccount.AccountNumber,
+                    IBAN = tAccount.IBAN
                 };
 
                 var addUserAccountResult = await db._repository.UserAccount.Add(1, addUserAccount);

@@ -2,6 +2,7 @@
 
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
+using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO.Model;
 using Xunit;
 
@@ -24,16 +25,17 @@ namespace ClientRepository
                 
                 if (clientToCompare is not null)
                 {
+                    var tClient = new TestClient();
                     var updateClient = new ClientUpdateRequest
                     {
                         Owner = clientToCompare.Owner,
-                        AddressId = 2,
-                        ClientName = "TestName",
-                        IN = 123456789,
-                        TIN = "TestTIN",
-                        Mobil = "+420774876504",
-                        Tel = "+420774876504",
-                        Email = "TestMail"
+                        AddressId = 1,
+                        ClientName = tClient.ClientName,
+                        IN = tClient.IN,
+                        TIN = tClient.TIN,
+                        Mobil = tClient.Mobil,
+                        Tel = tClient.Tel,
+                        Email = tClient.Email
                     };
 
                     var updateClientResult = await db._repository.Client.Update(clientToCompare.Id, updateClient, null);
@@ -46,13 +48,13 @@ namespace ClientRepository
 
                     if (updatedClient is not null)
                     {
-                        Assert.Equal(2, updateClient.AddressId);
-                        Assert.Equal("TestName", updateClient.ClientName);
-                        Assert.Equal(123456789, updateClient.IN);
-                        Assert.Equal("TestTIN", updateClient.TIN);
-                        Assert.Equal("+420774876504", updateClient.Mobil);
-                        Assert.Equal("+420774876504", updateClient.Tel);
-                        Assert.Equal("TestMail", updateClient.Email);
+                        Assert.Equal(1, updateClient.AddressId);
+                        Assert.Equal(tClient.ClientName, updateClient.ClientName);
+                        Assert.Equal(tClient.IN, updateClient.IN);
+                        Assert.Equal(tClient.TIN, updateClient.TIN);
+                        Assert.Equal(tClient.Mobil, updateClient.Mobil);
+                        Assert.Equal(tClient.Tel, updateClient.Tel);
+                        Assert.Equal(tClient.Email, updateClient.Email);
                     }
                 }
 
