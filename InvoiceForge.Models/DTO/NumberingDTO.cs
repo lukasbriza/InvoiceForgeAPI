@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
     public class NumberingGetRequest
     {

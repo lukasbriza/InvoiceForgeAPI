@@ -1,8 +1,7 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
-using InvoiceForgeApi.Helpers;
 using InvoiceForgeApi.Models;
+using InvoiceForgeApi.Helpers;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using InvoiceForgeApi.Models.DTO;
 
 namespace InvoiceForgeApi.Models
 {

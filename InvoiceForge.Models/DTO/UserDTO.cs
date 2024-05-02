@@ -1,17 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class UserAddRequest
+    public class UserEntityBase
     {
         public int AuthenticationId { get; set; }
     }
 
-    public class UserUpdateRequest: UserAddRequest
+    public class UserAddRequest: UserEntityBase {}
+
+    public class UserUpdateRequest: UserEntityBase
     {
         public int Id { get; set; }
-
     }
+
     public class UserGetRequest
     {
         public UserGetRequest(){}
@@ -27,7 +29,7 @@ namespace InvoiceForgeApi.Models.DTO
                 InvoiceItems = plain == false ? user.InvoiceItems.Select(i => new InvoiceItemGetRequest(i)) : null;
             }
         }
-        [Required] public int Id { get; set; }
+        public int Id { get; set; }
         public IEnumerable<ClientGetRequest>? Clients { get; set; } = new List<ClientGetRequest>();
         public IEnumerable<ContractorGetRequest>? Contractors { get; set; } = new List<ContractorGetRequest>();
         public IEnumerable<UserAccountGetRequest>? UserAccounts { get; set; } = new List<UserAccountGetRequest>();

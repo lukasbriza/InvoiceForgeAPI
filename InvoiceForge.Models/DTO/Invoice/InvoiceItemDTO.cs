@@ -1,6 +1,12 @@
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class InvoiceItemGetRequest
+    public class InvoiceItemEntityBase
+    {
+        public string ItemName { get; set; } = null!;
+        public int TariffId { get; set; }
+    }
+
+    public class InvoiceItemGetRequest: InvoiceItemEntityBase
     {
         public InvoiceItemGetRequest() {}
         public InvoiceItemGetRequest(InvoiceItem? invoiceItem, bool? plain = false)
@@ -16,17 +22,12 @@ namespace InvoiceForgeApi.Models.DTO
         }
         public int Id { get; set; }
         public int Owner { get; set; }
-        public string ItemName { get; set; } = null!;
-        public int TariffId { get; set; }
         public TariffGetRequest? Tariff {get; set; } = null!;
     }
 
-    public class InvoiceItemAddRequest
-    {
-        public string ItemName { get; set; } = null!;
-        public int TariffId { get; set; }
-    }
-    public class InvoiceItemUpdateRequest: InvoiceItemAddRequest
+    public class InvoiceItemAddRequest: InvoiceItemEntityBase {}
+
+    public class InvoiceItemUpdateRequest: InvoiceItemEntityBase
     {
         public int Owner { get; set; }
     }

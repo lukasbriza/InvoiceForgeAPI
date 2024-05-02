@@ -3,7 +3,6 @@ using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Abl.invoice;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

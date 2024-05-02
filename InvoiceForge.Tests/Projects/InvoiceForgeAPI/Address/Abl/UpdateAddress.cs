@@ -4,7 +4,6 @@ using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.Abl.address;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -243,7 +242,7 @@ namespace Abl
                 //ASSERT
                 var address = new AddressUpdateRequest{
                     Owner = 1,
-                    CountryId = tAddress.CountryId,
+                    CountryId = tAddress!.CountryId,
                     Street = tAddress.Street,
                     StreetNumber = tAddress.StreetNumber,
                     City = tAddress.City,

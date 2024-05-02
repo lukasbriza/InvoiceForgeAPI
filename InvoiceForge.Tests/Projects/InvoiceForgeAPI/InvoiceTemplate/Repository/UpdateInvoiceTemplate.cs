@@ -1,7 +1,7 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using Xunit;
 
 namespace Repository
@@ -69,7 +69,7 @@ namespace Repository
                 Assert.NotNull(template);
                 var updateTemplate = new InvoiceTemplateUpdateRequest
                 {
-                    ClientId = template.ClientId,
+                    ClientId = template!.ClientId,
                     ContractorId = template.ContractorId,
                     UserAccountId = template.UserAccountId,
                     TemplateName = template.TemplateName,

@@ -1,7 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
@@ -73,7 +72,7 @@ namespace Repository
                 //ASSERT
                 var updateInvoiceItem = new InvoiceItemUpdateRequest
                 {
-                    Owner = invoiceItem.Owner,
+                    Owner = invoiceItem!.Owner,
                     ItemName = invoiceItem.ItemName,
                     TariffId = invoiceItem.TariffId,
                 };

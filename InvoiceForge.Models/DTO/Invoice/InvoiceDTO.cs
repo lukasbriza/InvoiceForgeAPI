@@ -1,6 +1,13 @@
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class InvoiceGetRequest
+    public class InvoiceEntityBase
+    {
+        public DateTime Maturity { get; set; }
+        public DateTime Exposure { get; set; }
+        public DateTime TaxableTransaction { get; set; }
+    }
+
+    public class InvoiceGetRequest: InvoiceEntityBase
     {
         public InvoiceGetRequest() {}
         public InvoiceGetRequest(Invoice? invoice, bool? plain = false)
@@ -60,9 +67,6 @@ namespace InvoiceForgeApi.Models.DTO
         public ICollection<InvoiceServiceGetRequest>? InvoiceServices { get; set; } = new List<InvoiceServiceGetRequest>();
 
         public DateTime Created { get; set; }
-        public DateTime Maturity { get; set; }
-        public DateTime Exposure { get; set; }
-        public DateTime TaxableTransaction { get; set; }
 
         public InvoiceEntityCopyGetRequest? ClientCopy { get; set; } = null!;
         public InvoiceEntityCopyGetRequest? ContractorCopy { get; set; } = null!;
@@ -70,17 +74,13 @@ namespace InvoiceForgeApi.Models.DTO
         public string Currency { get; set; } = null!;
     }
 
-    public class InvoiceAddRequest: InvoiceAddRequestBase
+    public class InvoiceAddRequest: InvoiceEntityBase
     {
+        public int TemplateId { get; set; }
         public List<InvoiceServiceAddRequest> InvoiceServices { get; set; } = new List<InvoiceServiceAddRequest>();
     }
-    public class InvoiceAddRequestBase {
-        public int TemplateId { get; set; }
-        public DateTime Maturity { get; set; }
-        public DateTime Exposure { get; set; }
-        public DateTime TaxableTransaction { get; set; }
-    }
-    public class InvoiceAddRequestRepository: InvoiceAddRequestBase
+
+    public class InvoiceAddRequestRepository: InvoiceEntityBase
     {
         public int ClientCopyId { get; set;}
         public int ContractorCopyId { get; set; }
@@ -92,13 +92,12 @@ namespace InvoiceForgeApi.Models.DTO
         public long VATTotal { get; set; }
         public long TotalAll { get; set; }
         public string Currency { get; set; } = null!;
+        public int TemplateId { get; set; }
         public DateTime Created { get; set; }
     }
-    public class InvoiceUpdateRequest
+
+    public class InvoiceUpdateRequest: InvoiceEntityBase
     {
         public int Owner { get; set; }
-        public DateTime Maturity { get; set; }
-        public DateTime Exposure { get; set; }
-        public DateTime TaxableTransaction { get; set; }
     }
 }

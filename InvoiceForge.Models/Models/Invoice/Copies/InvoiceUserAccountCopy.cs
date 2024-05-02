@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using InvoiceForgeApi.Models.CodeLists;
-using InvoiceForgeApi.Models.DTO;
 
 namespace InvoiceForgeApi.Models
 {

@@ -1,6 +1,13 @@
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class InvoiceServiceGetRequest
+    public class InvoiceServiceEntityBase
+    {
+        public long Units { get; set; }
+        public long PricePerUnit { get; set; }
+        public int ItemId { get; set; }
+    }
+
+    public class InvoiceServiceGetRequest: InvoiceServiceEntityBase
     {
         public InvoiceServiceGetRequest() {}
         public InvoiceServiceGetRequest(InvoiceService? invoiceService, bool? plain = false)
@@ -20,27 +27,21 @@ namespace InvoiceForgeApi.Models.DTO
         }
         public int Id { get; set; }
         public int InvoiceId { get; set; }
-        public long Units { get; set; }
-        public long PricePerUnit { get; set; }
         public long BasePrice { get; set; }
         public long VAT { get; set; }
         public long Total { get; set; }
-        public int ItemId { get; set; }
         public InvoiceItemGetRequest? Item { get; set; }
     }
-    public class InvoiceServiceAddRequest
-    {
-        public long Units { get; set; }
-        public long PricePerUnit { get; set; }
-        public int ItemId { get; set; }
-    }
-    public class InvoiceServiceExtendedAddRequest: InvoiceServiceAddRequest
+
+    public class InvoiceServiceAddRequest: InvoiceServiceEntityBase {}
+
+    public class InvoiceServiceExtendedAddRequest: InvoiceServiceEntityBase
     {
         public long BasePrice { get; set; }
         public long VAT { get; set; }
         public long Total { get; set; }
     }
-     public class InvoiceServiceUpdateRequest: InvoiceServiceAddRequest
+     public class InvoiceServiceUpdateRequest: InvoiceServiceEntityBase
     {
         public long BasePrice { get; set; }
     }

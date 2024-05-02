@@ -2,7 +2,7 @@ using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using Xunit;
 
 namespace Repository
@@ -76,7 +76,7 @@ namespace Repository
                 Assert.NotNull(contractor);
                 var updateContractor = new ContractorUpdateRequest
                 {
-                    Owner = contractor.Owner,
+                    Owner = contractor!.Owner,
                     AddressId = contractor.AddressId,
                     Name = contractor.Name,
                     IN = contractor.IN,

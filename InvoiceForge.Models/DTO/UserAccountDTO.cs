@@ -1,6 +1,13 @@
-﻿namespace InvoiceForgeApi.Models.DTO
+﻿namespace InvoiceForgeApi.Models
 {
-    public class UserAccountGetRequest
+    public class UserAccountEntityBase
+    {
+        public int BankId { get; set; }
+        public string AccountNumber { get; set; } = null!;
+        public string? IBAN { get; set; }
+    }
+
+    public class UserAccountGetRequest: UserAccountEntityBase
     {
         public UserAccountGetRequest () {}
         public UserAccountGetRequest(UserAccount? userAccount, bool? plain = false)
@@ -17,20 +24,11 @@
         }
         public int Id { get; set; }
         public int Owner { get; set; }
-        public int BankId { get; set; }
-        public string AccountNumber { get; set; } = null!;
-        public string? IBAN { get; set; }
-
         public BankGetRequest? Bank { get; set; } = null!;
     }
-    public class UserAccountAddRequest
-    {
-        public int BankId { get; set; }
-        public string AccountNumber { get; set; } = null!;
-        public string? IBAN { get; set; }
-    }
+    public class UserAccountAddRequest: UserAccountEntityBase {}
 
-    public class UserAccountUpdateRequest: UserAccountAddRequest
+    public class UserAccountUpdateRequest: UserAccountEntityBase
     {
         public int Owner { get; set; }
     }

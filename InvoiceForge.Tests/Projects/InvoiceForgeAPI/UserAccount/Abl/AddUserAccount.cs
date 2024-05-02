@@ -2,7 +2,7 @@ using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Abl.userAccount;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

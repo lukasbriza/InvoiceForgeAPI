@@ -1,5 +1,4 @@
 using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.Interfaces;
 using InvoiceForgeApi.Repository;
 
 namespace InvoiceForgeApi.Data.SeedClasses
@@ -22,7 +21,7 @@ namespace InvoiceForgeApi.Data.SeedClasses
                     Outdated = false,
                     TemplateId = 1,
                     NumberingId = 1,
-                    InvoiceNumber = num.invoiceNumber,
+                    InvoiceNumber = num!.invoiceNumber,
                     OrderNumber = num.invoiceOrder,
                     BasePriceTotal = 1000,
                     VATTotal = 0,
@@ -48,7 +47,7 @@ namespace InvoiceForgeApi.Data.SeedClasses
                 Outdated = false,
                 TemplateId = 1,
                 NumberingId = 1,
-                InvoiceNumber = num2.invoiceNumber,
+                InvoiceNumber = num2!.invoiceNumber,
                 OrderNumber = num2.invoiceOrder,
                 BasePriceTotal = 1000,
                 VATTotal = 0,

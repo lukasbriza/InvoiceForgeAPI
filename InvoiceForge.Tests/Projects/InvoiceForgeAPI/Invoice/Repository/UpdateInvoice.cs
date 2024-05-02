@@ -1,7 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
@@ -104,7 +103,7 @@ namespace Repository
                 Assert.NotNull(invoice);
                 var updateInvoice = new InvoiceUpdateRequest
                 {
-                    Owner = invoice.Owner,
+                    Owner = invoice!.Owner,
                     Exposure = invoice.Exposure,
                     Maturity = invoice.Maturity,
                     TaxableTransaction = invoice.TaxableTransaction

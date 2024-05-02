@@ -1,4 +1,3 @@
-using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

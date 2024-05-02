@@ -2,7 +2,7 @@ using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Abl.invoice;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using Xunit;
 
 namespace Abl
@@ -24,7 +24,7 @@ namespace Abl
                 Assert.NotNull(invoice);
                 var updateInvoice = new InvoiceUpdateRequest
                 {
-                    Owner = invoice.Owner,
+                    Owner = invoice!.Owner,
                     Maturity = new DateTime(2030, 1,1),
                     Exposure = new DateTime(2030, 1,1),
                     TaxableTransaction = new DateTime(2030, 1,1)
@@ -110,7 +110,7 @@ namespace Abl
                 var abl = new UpdateInvoiceAbl(db._repository);
 
                 var invoice = await db._context.Invoice.FindAsync(1);
-                invoice.Owner = 2;
+                invoice!.Owner = 2;
                 
                 db._context.Invoice.Update(invoice);
                 await db._context.SaveChangesAsync();
