@@ -3,11 +3,11 @@ using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.Abl.address;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace AddressAbl
+namespace Abl
 {
     [Collection("Sequential")]
     public class AddAddress: WebApplicationFactory
@@ -18,7 +18,7 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var abl = new AddAddressAbl(db._repository);
                 
                 //ASSERT
@@ -61,7 +61,7 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var abl = new AddAddressAbl(db._repository);
                 
                 //ASSERT
@@ -95,7 +95,7 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var abl = new AddAddressAbl(db._repository);
                 
                 //ASSERT
@@ -129,7 +129,7 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var abl = new AddAddressAbl(db._repository);
                 var tAddres = new TestAddress();
                 var addAddress = new AddressAddRequest

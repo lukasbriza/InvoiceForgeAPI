@@ -7,7 +7,7 @@ namespace InvoiceForgeApi.Controllers
     [Route("[controller]")]
     public abstract class BaseController: ControllerBase
     {
-        public readonly IRepositoryWrapper _repository;
+        public IRepositoryWrapper _repository;
         protected BaseController(IRepositoryWrapper repository)
         {
             _repository = repository;

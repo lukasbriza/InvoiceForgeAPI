@@ -5,7 +5,7 @@ using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace AddressAbl
+namespace Abl
 {
     [Collection("Sequential")]
     public class DeleteAddress: WebApplicationFactory
@@ -16,8 +16,8 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
                 var abl = new DeleteAddressAbl(db._repository);
+                
                 var contractorAddressIds = await db._context.Contractor.Select(c => new {c.Id, c.AddressId}).ToListAsync();
                 var clientAddressIds = await db._context.Client.Select(c => new {c.Id, c.AddressId}).ToListAsync();
                 var ids = await db._context.Address
@@ -50,7 +50,7 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var abl = new DeleteAddressAbl(db._repository);
 
                 //ASSERT
@@ -89,7 +89,7 @@ namespace AddressAbl
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var abl = new DeleteAddressAbl(db._repository);
                 
                 //ASSERT

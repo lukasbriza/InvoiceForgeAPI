@@ -1,9 +1,9 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace InvoiceItemRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddInvoiceItem: WebApplicationFactory
@@ -14,7 +14,6 @@ namespace InvoiceItemRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
 
                 //ASSERT
                 var invoiceItem = new InvoiceItemAddRequest

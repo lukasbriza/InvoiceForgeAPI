@@ -1,6 +1,6 @@
 ﻿using InvoiceForgeApi.Models.CodeLists;
 
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class BankBase 
     {
@@ -24,12 +24,6 @@ namespace InvoiceForgeApi.DTO.Model
         public int Id { get; set; }
     }
 
-    public class BankUpdateRequest
-    {
-        public string? Value { get; set; } = null!;  
-        public string? Shortcut { get; set; } = null!;
-        public string? SWIFT { get; set; }
-    };
-
+    public class BankUpdateRequest: BankAddRequest {};
     public class BankAddRequest:BankBase {}
 }

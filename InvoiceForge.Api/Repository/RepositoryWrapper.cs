@@ -19,6 +19,9 @@ namespace InvoiceForgeApi.Repository
         private IInvoiceItemRepository _invoiceItem = null!;
         private IInvoiceServiceRepository _invoiceService = null!;
         private IInvoiceRepository _invoice = null!;
+        private IInvoiceEntityCopyRepository _invoiceEntityCopy = null!;
+        private IInvoiceAddressCopyRepository _invoiceAddressCopy = null!;
+        private IInvoiceUserAccountCopyRepository _invoiceUserAccountCopy = null!;
         private INumberingRepository _numbering = null!;
 
         public RepositoryWrapper(InvoiceForgeDatabaseContext context)
@@ -124,6 +127,36 @@ namespace InvoiceForgeApi.Repository
                 return _invoice;
             }
         }
+        public IInvoiceEntityCopyRepository InvoiceEntityCopy
+        {
+            get{
+                if (_invoiceEntityCopy == null)
+                {
+                    _invoiceEntityCopy = new InvoiceEntityCopyRepository(_context);
+                }
+                return _invoiceEntityCopy;
+            }
+        }
+        public IInvoiceAddressCopyRepository InvoiceAddressCopy
+        {
+            get{
+                if (_invoiceAddressCopy == null)
+                {
+                    _invoiceAddressCopy = new InvoiceAddressCopyRepository(_context);
+                }
+                return _invoiceAddressCopy;
+            }
+        }
+        public IInvoiceUserAccountCopyRepository InvoiceUserAccountCopy
+        {
+            get{
+                if (_invoiceUserAccountCopy == null)
+                {
+                    _invoiceUserAccountCopy = new InvoiceUserAccountCopyRepository(_context);
+                }
+                return _invoiceUserAccountCopy;
+            }
+        }
         public ICodeListsRepository CodeLists
         {
             get {
@@ -150,6 +183,11 @@ namespace InvoiceForgeApi.Repository
         public void DetachChanges()
         {
             _context.ChangeTracker.Entries().ToList().ForEach(e => e.State = EntityState.Unchanged);
+        }
+
+        public async Task DisposeAsync()
+        {
+            await _context.DisposeAsync();
         }
 
         public async Task<IDbContextTransaction> BeginTransaction()

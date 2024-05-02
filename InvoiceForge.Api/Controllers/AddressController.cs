@@ -1,7 +1,7 @@
 using InvoiceForgeApi.Abl.address;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
-using InvoiceForgeApi.Repository;
+using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InvoiceForgeApi.Controllers
@@ -9,7 +9,8 @@ namespace InvoiceForgeApi.Controllers
     [Route("api/address")]
     public class AddressController: BaseController
     {
-        public AddressController(RepositoryWrapper repository): base(repository) {}
+        public AddressController(IRepositoryWrapper repository): base(repository) {}
+        
         [HttpGet]
         [Route("all/{userId}")]
         public async Task<List<AddressGetRequest>?> GetAllAddresses(int userId)

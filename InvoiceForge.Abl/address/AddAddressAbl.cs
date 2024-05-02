@@ -1,5 +1,5 @@
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.CodeLists;
 using InvoiceForgeApi.Models.Interfaces;
@@ -30,7 +30,7 @@ namespace InvoiceForgeApi.Abl.address
                         throw new DatabaseCallError("Id was not generated.");
                     }
 
-                    await SaveResult(saveCondition, transaction);
+                    await SaveResult(saveCondition, transaction, false);
                     return saveCondition;
                 }
                 catch (Exception)

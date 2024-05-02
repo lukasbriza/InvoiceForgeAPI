@@ -1,6 +1,4 @@
-using InvoiceForgeApi.Models;
-
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class InvoiceItemGetRequest
     {
@@ -28,10 +26,8 @@ namespace InvoiceForgeApi.DTO.Model
         public string ItemName { get; set; } = null!;
         public int TariffId { get; set; }
     }
-    public class InvoiceItemUpdateRequest
+    public class InvoiceItemUpdateRequest: InvoiceItemAddRequest
     {
         public int Owner { get; set; }
-        public string? ItemName { get; set; } = null!;
-        public int? TariffId { get; set; }
     }
 }

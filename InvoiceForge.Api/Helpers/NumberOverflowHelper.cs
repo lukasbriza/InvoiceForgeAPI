@@ -2,14 +2,18 @@ namespace InvoiceForgeApi.Helpers
 {
     public class NumberOverflowHelper
     {
+        readonly int _numberOfNumberVariables;
+        public NumberOverflowHelper(int numberOfNumberVariables)
+        {
+            _numberOfNumberVariables = numberOfNumberVariables;
+        }
         public bool IsOverflowingOnAdd(int number)
         {
-            string stringNumber = number.ToString();
-            int lnActual = stringNumber.Length;
             int newNumber = number + 1;
             string newStringNumber = newNumber.ToString();
             int lnNew = newStringNumber.Length;
-            return lnActual != lnNew;
+            bool isOverflowing = _numberOfNumberVariables < lnNew;
+            return isOverflowing;
         }
     }
 }

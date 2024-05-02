@@ -1,7 +1,7 @@
 
 
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.CodeLists;
 using InvoiceForgeApi.Models.Interfaces;
@@ -25,15 +25,13 @@ namespace InvoiceForgeApi.Abl.invoiceItem
                 List<InvoiceService>? invoiceServiceReferences = await _repository.InvoiceService.GetByCondition(s => s.InvoiceItemId == invoiceItemId);
                 if (invoiceServiceReferences is not null && invoiceServiceReferences.Any()) throw new ValidationError("Can´t update. Still assigned to some entity.");
 
-                if (invoiceItem.TariffId is not null) await IsInDatabase<Tariff>((int)invoiceItem.TariffId, "Invalid tariff Id.");
-                if (invoiceItem.ItemName is not null)
-                {
-                    var isInvoiceItemNameDuplicit = await _repository.InvoiceItem.GetByCondition(i => i.ItemName == invoiceItem.ItemName && i.Owner == isUser.Id);
-                    if (isInvoiceItemNameDuplicit is not null && isInvoiceItemNameDuplicit.Any()) throw new ValidationError("Invoice item name must be unique.");
-                }
+                await IsInDatabase<Tariff>(invoiceItem.TariffId, "Invalid tariff Id.");
+
+                var isInvoiceItemNameDuplicit = await _repository.InvoiceItem.GetByCondition(i => i.ItemName == invoiceItem.ItemName && i.Owner == isUser.Id);
+                if (isInvoiceItemNameDuplicit is not null && isInvoiceItemNameDuplicit.Any()) throw new ValidationError("Invoice item name must be unique.");
 
                 bool updateInvoiceItem = await _repository.InvoiceItem.Update(invoiceItemId, invoiceItem);
-                if (updateInvoiceItem) throw new ValidationError("Invoice item update failed.");
+                if (!updateInvoiceItem) throw new ValidationError("Invoice item update failed.");
 
                 await SaveResult(updateInvoiceItem, transaction);
                 return updateInvoiceItem;

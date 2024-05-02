@@ -1,6 +1,4 @@
-using InvoiceForgeApi.Models;
-
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class InvoiceServiceGetRequest
     {
@@ -42,11 +40,8 @@ namespace InvoiceForgeApi.DTO.Model
         public long VAT { get; set; }
         public long Total { get; set; }
     }
-     public class InvoiceServiceUpdateRequest
+     public class InvoiceServiceUpdateRequest: InvoiceServiceAddRequest
     {
-        public long? Units { get; set; }
-        public long? PricePerUnit { get; set; }
-        public long? BasePrice { get; set; }
-        public int? ItemId { get; set; }
+        public long BasePrice { get; set; }
     }
 }

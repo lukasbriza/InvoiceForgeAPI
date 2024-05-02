@@ -1,11 +1,13 @@
+using System.Runtime.CompilerServices;
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Xunit;
 
-namespace UserAccountRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class GetUserAccount: WebApplicationFactory
@@ -16,23 +18,27 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var users = await db._context.User.Select(u => u.Id).ToListAsync();
                 
                 //ASSERT
                 Assert.NotNull(users);
                 Assert.IsType<List<int>>(users);
 
-                users.ForEach(async userId => {
+                async Task call(int userId){
                     var userAccountValidation = new UserAccountSeed().Populate().FindAll(a => a.Owner == userId);
                     var userAccounts = await db._repository.UserAccount.GetAll(userId, true);
-
                     Assert.NotNull(userAccounts);
                     Assert.IsType<List<UserAccountGetRequest>>(userAccounts);
                     if (userAccounts is not null)
                     {
                         Assert.Equal(userAccountValidation.Count, userAccounts.Count);
                     }
+                };
+
+                users.ForEach(userId => {
+                    var task = call(userId);
+                    task.Wait();
                 });
 
                 //CLEAN
@@ -45,14 +51,15 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                var semaphor = new SemaphoreSlim(1,1);
+                
                 var userAccounts = await db._context.UserAccount.Select(a => a.Id).ToListAsync();
 
                 //ASSERT
                 Assert.NotNull(userAccounts);
                 Assert.IsType<List<int>>(userAccounts);
 
-                userAccounts.ForEach(async userAccountId => {
+                async Task call(int userAccountId){
                     var repoUserAccount = await db._repository.UserAccount.GetById(userAccountId);
                     Assert.NotNull(repoUserAccount);
 
@@ -61,6 +68,11 @@ namespace UserAccountRepository
                         Assert.IsType<UserAccountGetRequest>(repoUserAccount);
                         Assert.Equal(repoUserAccount.Id, userAccountId);
                     }
+                }
+
+                userAccounts.ForEach(userAccountId => {
+                    var task = call(userAccountId);
+                    task.Wait();
                 });
 
                 //CLEAN
@@ -74,7 +86,7 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 var nonExistentUserAccount = await db._repository.UserAccount.GetById(100);   

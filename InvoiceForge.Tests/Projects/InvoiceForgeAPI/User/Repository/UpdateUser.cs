@@ -2,11 +2,11 @@ using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
-namespace UserRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateUser: WebApplicationFactory
@@ -17,8 +17,7 @@ namespace UserRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
-
+                
                 //ASSERT
                 var updateUser = new UserUpdateRequest
                 {
@@ -50,7 +49,7 @@ namespace UserRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 
                 //ASSERT
                 var entity = new UserUpdateRequest{ AuthenticationId=1234567890 };
@@ -73,7 +72,7 @@ namespace UserRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var users = new UserSeed().Populate();
 
                 //ASSERT

@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -20,24 +20,25 @@ namespace InvoiceForgeApi.Repository
             var invoiceServices = _dbContext.InvoiceService;
             if (plain == false)
             {
-                invoiceServices
-                .Include(i => i.InvoiceItem)
-                .ThenInclude(i => i!.Tariff);
+                await invoiceServices
+                    .Include(i => i.InvoiceItem)
+                    .ThenInclude(i => i!.Tariff)
+                    .LoadAsync();
             }
             var invoiceServicesList = await invoiceServices
-                .Select(i => new InvoiceServiceGetRequest(i, plain))
                 .Where(i => i.InvoiceId == invoiceId)
                 .ToListAsync();
-            return invoiceServicesList;
+            return invoiceServicesList.ConvertAll(i => new InvoiceServiceGetRequest(i, plain));
         }
         public async Task<InvoiceServiceGetRequest?> GetById(int itemServiceId, bool? plain = false)
         {
             var invoiceService = _dbContext.InvoiceService;
             if (plain == false)
             {
-                invoiceService
+                await invoiceService
                     .Include(i => i.InvoiceItem)
-                    .ThenInclude(i => i!.Tariff);
+                    .ThenInclude(i => i!.Tariff)
+                    .LoadAsync();
             }
             var invoiceServiceCall = await invoiceService.FindAsync(itemServiceId);
             var invoiceServiceResult = new InvoiceServiceGetRequest(invoiceServiceCall, plain);
@@ -68,10 +69,24 @@ namespace InvoiceForgeApi.Repository
             var localInvoiceservice = await Get(invoiceServiceId);
             if (localInvoiceservice is null) throw new DatabaseCallError("Invoice service is not provided.");
 
-            localInvoiceservice.Units = invoiceService.Units ?? localInvoiceservice.Units;
-            localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit ?? localInvoiceservice.PricePerUnit;
-            localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit ?? localInvoiceservice.PricePerUnit;
-            localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit ?? localInvoiceservice.PricePerUnit;
+            var localSelect = new { 
+                localInvoiceservice.Units, 
+                localInvoiceservice.PricePerUnit, 
+                localInvoiceservice.InvoiceItemId, 
+                localInvoiceservice.BasePrice
+            };
+            var updateSelect = new {  
+                invoiceService.Units,
+                invoiceService.PricePerUnit,
+                InvoiceItemId = invoiceService.ItemId,
+                invoiceService.BasePrice
+            };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+
+            localInvoiceservice.Units = invoiceService.Units;
+            localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit;
+            localInvoiceservice.InvoiceItemId = invoiceService.ItemId;
+            localInvoiceservice.BasePrice = invoiceService.BasePrice;
             
             var update = _dbContext.Update(localInvoiceservice);
             return update.State == EntityState.Modified;

@@ -1,6 +1,4 @@
-﻿using InvoiceForgeApi.Models;
-
-namespace InvoiceForgeApi.DTO.Model
+﻿namespace InvoiceForgeApi.Models.DTO
 {
     public class UserAccountGetRequest
     {
@@ -19,7 +17,7 @@ namespace InvoiceForgeApi.DTO.Model
         }
         public int Id { get; set; }
         public int Owner { get; set; }
-        public int? BankId { get; set; }
+        public int BankId { get; set; }
         public string AccountNumber { get; set; } = null!;
         public string? IBAN { get; set; }
 
@@ -32,12 +30,9 @@ namespace InvoiceForgeApi.DTO.Model
         public string? IBAN { get; set; }
     }
 
-    public class UserAccountUpdateRequest
+    public class UserAccountUpdateRequest: UserAccountAddRequest
     {
         public int Owner { get; set; }
-        public int? BankId { get; set; }
-        public string? AccountNumber { get; set; } = null!;
-        public string? IBAN { get; set; }
     }
 }
 

@@ -1,10 +1,10 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace UserAccountRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddUserAccount: WebApplicationFactory
@@ -15,7 +15,7 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 var tAccount = new TestUserAccount();

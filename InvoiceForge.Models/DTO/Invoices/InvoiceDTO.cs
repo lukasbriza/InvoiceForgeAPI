@@ -1,6 +1,4 @@
-using InvoiceForgeApi.Models;
-
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class InvoiceGetRequest
     {
@@ -27,9 +25,23 @@ namespace InvoiceForgeApi.DTO.Model
                 Exposure = invoice.Exposure;
                 TaxableTransaction = invoice.TaxableTransaction;
 
-                ClientLocal = invoice.ClientLocal;
-                ContractorLocal = invoice.ContractorLocal;
-                UserAccountLocal = invoice.UserAccountLocal;
+                ClientCopyId = invoice.ClientCopyId;
+                ContractorCopyId = invoice.ContractorCopyId;
+                UserAccountCopyId = invoice.UserAccountCopyId;
+                
+                if (plain == false)
+                {
+                    var clientCopyFind = invoice.InvoiceEntityCopies.ToList().Find(c => c.Id == ClientCopyId);
+                    var contractorCopyFind = invoice.InvoiceEntityCopies.ToList().Find(c => c.Id == ContractorCopyId);
+                    
+                    ClientCopy = new InvoiceEntityCopyGetRequest(clientCopyFind, plain);
+                    ContractorCopy = new InvoiceEntityCopyGetRequest(contractorCopyFind, plain);
+                } else {
+                    ClientCopy = null;
+                    ContractorCopy = null;
+                }
+                
+                UserAccountCopy = plain == false ? new InvoiceUserAccountCopyGetRequest(invoice.InvoiceUserAccountCopy, plain) : null;
             }
         }
         public int Id { get; set; }
@@ -37,6 +49,9 @@ namespace InvoiceForgeApi.DTO.Model
         public int Owner { get; set; }
         public int TemplateId { get; set; }
         public int NumberingId { get; set; }
+        public int ClientCopyId { get; set;}
+        public int ContractorCopyId { get; set; }
+        public int UserAccountCopyId { get; set; }
         public string InvoiceNumber { get; set; } = null!;
         public long OrderNumber { get; set; }
         public long BasePriceTotal { get; set; }
@@ -49,9 +64,9 @@ namespace InvoiceForgeApi.DTO.Model
         public DateTime Exposure { get; set; }
         public DateTime TaxableTransaction { get; set; }
 
-        public ClientGetRequest ClientLocal { get; set; } = null!;
-        public ContractorGetRequest ContractorLocal { get; set; } = null!;
-        public UserAccountGetRequest UserAccountLocal { get; set; } = null!;
+        public InvoiceEntityCopyGetRequest? ClientCopy { get; set; } = null!;
+        public InvoiceEntityCopyGetRequest? ContractorCopy { get; set; } = null!;
+        public InvoiceUserAccountCopyGetRequest? UserAccountCopy { get; set; } = null!;
         public string Currency { get; set; } = null!;
     }
 
@@ -59,7 +74,7 @@ namespace InvoiceForgeApi.DTO.Model
     {
         public List<InvoiceServiceAddRequest> InvoiceServices { get; set; } = new List<InvoiceServiceAddRequest>();
     }
-    public class InvoiceAddRequestBase{
+    public class InvoiceAddRequestBase {
         public int TemplateId { get; set; }
         public DateTime Maturity { get; set; }
         public DateTime Exposure { get; set; }
@@ -67,9 +82,9 @@ namespace InvoiceForgeApi.DTO.Model
     }
     public class InvoiceAddRequestRepository: InvoiceAddRequestBase
     {
-        public ClientGetRequest ClientLocal { get; set;} = null!;
-        public ContractorGetRequest ContractorLocal { get; set; } = null!;
-        public UserAccountGetRequest UserAccountLocal { get; set; } = null!;
+        public int ClientCopyId { get; set;}
+        public int ContractorCopyId { get; set; }
+        public int UserAccountCopyId { get; set; }
         public int NumberingId { get; set; }
         public string InvoiceNumber { get; set; } = null!;
         public long OrderNumber { get; set; }
@@ -82,8 +97,8 @@ namespace InvoiceForgeApi.DTO.Model
     public class InvoiceUpdateRequest
     {
         public int Owner { get; set; }
-        public DateTime? Maturity { get; set; }
-        public DateTime? Exposure { get; set; }
-        public DateTime? TaxableTransaction { get; set; }
+        public DateTime Maturity { get; set; }
+        public DateTime Exposure { get; set; }
+        public DateTime TaxableTransaction { get; set; }
     }
 }

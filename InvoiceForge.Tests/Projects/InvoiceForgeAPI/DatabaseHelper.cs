@@ -2,6 +2,7 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.Repository;
+using InvoiceForgeApi.Triggers;
 using Microsoft.EntityFrameworkCore;
 
 namespace FunctionalTests.Projects.InvoiceForgeAPI
@@ -10,16 +11,26 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI
     {
         public readonly InvoiceForgeDatabaseContext _context;
         public readonly RepositoryWrapper _repository;
-        public DatabaseHelper()
+        public DatabaseHelper(bool init = true)
         {
             var options = new DbContextOptionsBuilder<InvoiceForgeDatabaseContext>()
-                .UseSqlServer("Data Source=LB_NTB;Initial Catalog=InvoiceForgeAPI_Tests;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False")
-                .Options;
+                .UseSqlServer("Data Source=LB_NTB;Initial Catalog=InvoiceForgeAPI_Test;Integrated Security=True;MultipleActiveResultSets=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False")
+                .UseTriggers(triggerOptions => {
+                    triggerOptions.AddTrigger<AddressUpdateTrigger>();
+                    triggerOptions.AddTrigger<InvoiceAddressCopyUpdateTrigger>();
+                    triggerOptions.AddTrigger<InvoiceEntityCopyUpdateTrigger>();
+                    triggerOptions.AddTrigger<ClientUpdateTrigger>();
+                    triggerOptions.AddTrigger<ContractorUpdateTrigger>();
+                    triggerOptions.AddTrigger<InvoiceTemplateUpdateTrigger>();
+                    triggerOptions.AddTrigger<UserAccountUpdateTrigger>();
+                    triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>(); 
+                }).Options;
             _context = new InvoiceForgeDatabaseContext(options);
             _context.Database.EnsureDeleted();
             _context.Database.Migrate();
             
             _repository = new RepositoryWrapper(_context);
+            if (init) InitializeDbForTest();
         }
         public void InitializeDbForTest()
         {
@@ -170,6 +181,28 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI
             {
                 _context.InvoiceTemplate.AddRange(new InvoiceTemplateSeed().Populate());
                 _context.SaveChanges();
+            }
+        }
+        public async Task InitInvoiceCopies()
+        {
+            if (!_context.InvoiceUserAccountCopy.Any())
+            {
+                _context.InvoiceUserAccountCopy.AddRange(new InvoiceUserAccountCopySeed().Populate());
+                _context.SaveChanges();
+            }
+            if (!_context.InvoiceAddressCopy.Any())
+            {
+                _context.InvoiceAddressCopy.AddRange(new InvoiceAddressCopySeed().Populate());
+                _context.SaveChanges();
+            }
+            if (!_context.InvoiceEntityCopy.Any())
+            {
+                _context.InvoiceEntityCopy.AddRange(new InvoiceEntityCopySeed().Populate());
+                _context.SaveChanges();
+            }
+            if (!_context.Invoice.Any())
+            {
+                await new InvoiceSeed(_context).Populate();
             }
         }
         public async void  Dispose()

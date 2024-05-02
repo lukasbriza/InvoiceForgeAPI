@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,20 +17,19 @@ namespace InvoiceForgeApi.Repository
             DbSet<InvoiceItem> invoiceItems = _dbContext.InvoiceItem;
             if (plain == false)
             {
-                invoiceItems.Include(i => i.Tariff);
+                await invoiceItems.Include(i => i.Tariff).LoadAsync();
             }
             var invoiceItemList = await invoiceItems
-                .Select(i => new InvoiceItemGetRequest(i, plain))
                 .Where(i => i.Owner == userId)
                 .ToListAsync();
-            return invoiceItemList;
+            return invoiceItemList.ConvertAll(i => new InvoiceItemGetRequest(i, plain));
         }
         public async Task<InvoiceItemGetRequest?> GetById(int invoiceItemId, bool? plain = false)
         {
             DbSet<InvoiceItem> invoiceItem = _dbContext.InvoiceItem;
             if (plain == false)
             {
-                invoiceItem.Include(i => i.Tariff);
+                await invoiceItem.Include(i => i.Tariff).LoadAsync();
             }
             var invoiceItemCall = await invoiceItem.FindAsync(invoiceItemId);
             var invoiceItemResult = new InvoiceItemGetRequest(invoiceItemCall, plain);
@@ -39,13 +38,14 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int invoiceItemId, InvoiceItemUpdateRequest invoiceItem)
         {
             var localInvoiceItem = await Get(invoiceItemId);
-            if (localInvoiceItem is null)
-            {
-                throw new DatabaseCallError("InvoiceItem is not in database.");
-            }
+            if (localInvoiceItem is null) throw new DatabaseCallError("InvoiceItem is not in database.");
 
-            localInvoiceItem.ItemName = invoiceItem.ItemName ?? localInvoiceItem.ItemName;
-            localInvoiceItem.TariffId = invoiceItem.TariffId ?? localInvoiceItem.TariffId;
+            var localSelect = new { localInvoiceItem.ItemName, localInvoiceItem.TariffId };
+            var updateSelect = new { invoiceItem.ItemName, invoiceItem.TariffId };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+
+            localInvoiceItem.ItemName = invoiceItem.ItemName;
+            localInvoiceItem.TariffId = invoiceItem.TariffId;
             
             var update = _dbContext.Update(localInvoiceItem);
             return update.State == EntityState.Modified;

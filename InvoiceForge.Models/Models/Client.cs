@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,7 +13,7 @@ namespace InvoiceForgeApi.Models
             AddressId = client.AddressId;
             Owner = userId;
             Type = clientType;
-            ClientName = client.ClientName;
+            Name = client.Name;
             IN = client.IN;
             TIN = client.TIN;
             Mobil = client.Mobil;
@@ -23,7 +23,7 @@ namespace InvoiceForgeApi.Models
         [ForeignKey("Address")] public int AddressId { get; set; }
 
         [Required] public ClientType Type { get; set; }
-        [Required] public string ClientName { get; set; } = null!;
+        [Required] public string Name { get; set; } = null!;
         [Required] public long IN { get; set; }
         [Required] public string TIN { get; set; } = null!;
         public string? Mobil { get; set; } = null;

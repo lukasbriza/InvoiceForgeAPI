@@ -1,11 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace InvoiceTemplateRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class GetInvoicetemplate: WebApplicationFactory
@@ -16,18 +16,22 @@ namespace InvoiceTemplateRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
 
                 var userIds = await db._context.User.Select(u => u.Id).ToListAsync();
                 
                 //ASSERT
-                userIds.ForEach(async userId => {
+                async Task call(int userId){
                     var invoiceTemplates = new InvoiceTemplateSeed().Populate().FindAll(t => t.Owner == userId);
                     var dbInvoiceTemplates = await db._repository.InvoiceTemplate.GetAll(userId);
 
                     Assert.NotNull(dbInvoiceTemplates);
                     Assert.IsType<List<InvoiceTemplateGetRequest>>(dbInvoiceTemplates);
                     Assert.Equal(dbInvoiceTemplates?.Count, invoiceTemplates.Count);
+                }
+
+                userIds.ForEach(userId => {
+                    var task = call(userId);
+                    task.Wait();
                 });
 
                 //CLEAN
@@ -41,15 +45,20 @@ namespace InvoiceTemplateRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 var invoiceTemplatesIds = await db._context.InvoiceTemplate.Select(t => t.Id).ToListAsync();
 
                 //ASSERT
-                invoiceTemplatesIds.ForEach(async tempateId => {
-                    var dbInvoiceTemplate = await db._repository.InvoiceTemplate.GetById(tempateId, true);
+                async Task call(int templateId){
+                    var dbInvoiceTemplate = await db._repository.InvoiceTemplate.GetById(templateId, true);
                     Assert.NotNull(dbInvoiceTemplate);
                     Assert.IsType<InvoiceTemplateGetRequest>(dbInvoiceTemplate);
+                }
+
+                invoiceTemplatesIds.ForEach(templateId => {
+                    var task = call(templateId);
+                    task.Wait();
                 });
 
                 //CLEAN

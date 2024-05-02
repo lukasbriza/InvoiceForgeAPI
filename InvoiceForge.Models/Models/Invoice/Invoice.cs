@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 
 namespace InvoiceForgeApi.Models
 {
@@ -11,19 +11,19 @@ namespace InvoiceForgeApi.Models
         {
                 Outdated = false;
                 Owner = userId;
+                
                 TemplateId = invoice.TemplateId;
                 NumberingId = invoice.NumberingId;
+                ClientCopyId = invoice.ClientCopyId;
+                ContractorCopyId = invoice.ContractorCopyId;
+                UserAccountCopyId = invoice.UserAccountCopyId;
+
                 InvoiceNumber = invoice.InvoiceNumber;
                 OrderNumber = invoice.OrderNumber;
                 BasePriceTotal = invoice.BasePriceTotal;
                 VATTotal = invoice.VATTotal;
                 TotalAll = invoice.TotalAll;
                 Currency = invoice.Currency;
-
-                ClientLocal = invoice.ClientLocal;
-                ContractorLocal = invoice.ContractorLocal;
-                UserAccountLocal = invoice.UserAccountLocal;
-
                 Maturity = invoice.Maturity;
                 Exposure = invoice.Exposure;
                 TaxableTransaction = invoice.TaxableTransaction;
@@ -40,10 +40,9 @@ namespace InvoiceForgeApi.Models
         [Required] public string Currency { get; set; } = null!;
 
         //LOCAL SOURCE COPY
-        [Required] public ClientGetRequest ClientLocal { get; set;} = null!;
-        [Required] public ContractorGetRequest ContractorLocal { get; set; } = null!;
-        [Required] public UserAccountGetRequest UserAccountLocal { get; set; } = null!;
-        
+        [ForeignKey("InvoiceEntityCopy")] public int ClientCopyId { get; set; }
+        [ForeignKey("InvoiceEntityCopy")] public int ContractorCopyId { get; set; }
+        [ForeignKey("InvoiceUserAccountCopy")] public int UserAccountCopyId { get; set; }
         [Required] public DateTime Maturity { get; set; }
         [Required] public DateTime Exposure { get; set; }
         [Required] public DateTime TaxableTransaction { get; set; }
@@ -53,5 +52,9 @@ namespace InvoiceForgeApi.Models
         public virtual User User { get; set; } = null!; 
         public virtual ICollection<InvoiceService> InvoiceServices { get; set; } = null!;
         public virtual InvoiceTemplate? InvoiceTemplate { get; set; }
+
+        //Copy references
+        public virtual ICollection<InvoiceEntityCopy> InvoiceEntityCopies { get; set; } = new List<InvoiceEntityCopy>();
+        public virtual InvoiceUserAccountCopy InvoiceUserAccountCopy { get; set; } = null!;
     }
 }

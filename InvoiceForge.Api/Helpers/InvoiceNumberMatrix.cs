@@ -79,6 +79,7 @@ namespace InvoiceForgeApi.Helpers
                 _replaceString += "*";
             });
         }
+        //RESOLVER
         public ResolveDTO GetNumbering()
         {
             PrepareInvoiceNumber();
@@ -88,7 +89,7 @@ namespace InvoiceForgeApi.Helpers
             var hasDays = _numberingTemplate.Contains(NumberingVariable.Day);
             return ComputeNumberValue(hasYears, hasMonts, hasDays);
         }
-
+        //METHODS
         private void PrepareInvoiceNumber()
         {
             if(_invoiceNumber.Length == 0){
@@ -136,8 +137,7 @@ namespace InvoiceForgeApi.Helpers
         private ResolveDTO ComputeNumberValue(bool hasYears, bool hasMonths, bool hasDays)
         {
             int numberStartIndex = _invoiceNumber.IndexOf("*");
-            int numberEndIndex = _replaceString.Length - 1;
-            int lastNumber = _lastInvoiceNumber is null ? 0 : int.Parse(_lastInvoiceNumber.Substring(numberStartIndex,numberEndIndex-numberStartIndex));
+            int lastNumber = _lastInvoiceNumber is null ? 0 : int.Parse(_lastInvoiceNumber.Substring(numberStartIndex, _replaceString.Length));
             
             bool compareYears = _actualInvoiceYear == _lastInvoiceYear;
             bool compareMonths = _actualInvoiceMonth == _lastInvoiceMonth;
@@ -150,8 +150,9 @@ namespace InvoiceForgeApi.Helpers
         }
         private ResolveDTO ResolveNumberValue(int lastNumber, bool condition)
         {
+            int numberOfNumbervariables = _numberingTemplate.FindAll(i => i == NumberingVariable.Number).Count();
             var zeroGenerator = new ZeroGeneratorHelper();
-            var overflowHelper = new NumberOverflowHelper();
+            var overflowHelper = new NumberOverflowHelper(numberOfNumbervariables);
             bool isOverflowing = overflowHelper.IsOverflowingOnAdd(lastNumber);
 
             int numberValue = lastNumber + 1;

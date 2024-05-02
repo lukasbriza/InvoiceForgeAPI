@@ -1,6 +1,6 @@
 ﻿using InvoiceForgeApi.Models.CodeLists;
 
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class CountryGetRequest
     {

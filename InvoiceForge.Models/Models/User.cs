@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 
 namespace InvoiceForgeApi.Models
 {
@@ -20,5 +20,7 @@ namespace InvoiceForgeApi.Models
         public virtual ICollection<UserAccount> UserAccounts { get; set; } = new List<UserAccount>();
         public virtual ICollection<InvoiceItem> InvoiceItems { get; set; } = new List<InvoiceItem>();
         public virtual ICollection<Numbering> Numberings { get; set;} = new List<Numbering>();
+        public virtual ICollection<InvoiceEntityCopy> InvoiceEntityCopies { get; set; } = new List<InvoiceEntityCopy>();
+        public virtual ICollection<InvoiceAddressCopy> InvoiceAddressCopies { get; set;} = new List<InvoiceAddressCopy>();
     }
 }

@@ -25,6 +25,12 @@ namespace InvoiceForgeApi.Data.SeedClasses
                     Owner = 1,
                     ItemName = "Monitoring",
                     TariffId = 3
+                },
+                new InvoiceItem()
+                {
+                    Owner = 1,
+                    ItemName = "Programming",
+                    TariffId = 1
                 }
             };
         }

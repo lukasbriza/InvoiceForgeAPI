@@ -1,6 +1,6 @@
 
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -28,7 +28,7 @@ namespace InvoiceForgeApi.Abl.contractor
                     int? addContractor = await _repository.Contractor.Add(userId, contractor, (ClientType)isClientType);
                     bool saveCondition = addContractor is not null;
 
-                    await SaveResult(saveCondition, transaction);
+                    await SaveResult(saveCondition, transaction, false);
                     return saveCondition;
                 }
                 catch (Exception)

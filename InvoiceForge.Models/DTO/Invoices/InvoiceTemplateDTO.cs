@@ -1,6 +1,4 @@
-﻿using InvoiceForgeApi.Models;
-
-namespace InvoiceForgeApi.DTO.Model
+﻿namespace InvoiceForgeApi.Models.DTO
 {
     public class InvoiceTemplateGetRequest
     {
@@ -43,14 +41,8 @@ namespace InvoiceForgeApi.DTO.Model
         public int NumberingId { get; set; }
     }
 
-    public class InvoiceTemplateUpdateRequest
+    public class InvoiceTemplateUpdateRequest: InvoiceTemplateAddRequest
     {
         public int Owner { get; set; }
-        public int? ClientId { get; set; }
-        public int? ContractorId { get; set; }
-        public int? UserAccountId { get; set; }
-        public int? NumberingId { get; set; }
-        public int? CurrencyId { get; set; } 
-        public string? TemplateName { get; set; }
     }
 }

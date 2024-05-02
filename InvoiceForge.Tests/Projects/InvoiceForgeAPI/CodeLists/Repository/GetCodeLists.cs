@@ -1,12 +1,12 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.CodeLists;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace CodeListsRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class GetCodeLists: WebApplicationFactory
@@ -17,7 +17,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var banksValidation = new BankSeed().Populate();
 
                 //ASSERT
@@ -39,7 +39,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var banks = await db._context.Bank.ToListAsync();
 
                 //ASSERT
@@ -69,7 +69,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var countriesValidation = new CountrySeed().Populate();
 
                 //ASSERT
@@ -91,7 +91,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var countries = await db._context.Country.ToListAsync();
 
                 //ASSERT
@@ -122,7 +122,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var currenciesValidation = new CurrencySeed().Populate();
 
                 //ASSERT
@@ -144,7 +144,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var currencies = await db._context.Currency.ToListAsync();
 
                 //ASSERT
@@ -174,7 +174,7 @@ namespace CodeListsRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var tariffsValidation = new TariffSeed().Populate();
 
                 //ASSERT

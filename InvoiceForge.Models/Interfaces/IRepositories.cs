@@ -1,21 +1,45 @@
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Models.Interfaces
 {
     public interface IAddressRepository: 
-        IIsUnique<AddressUpdateRequest>, 
+        IIsUnique<Address>, 
         IBaseRepository<AddressGetRequest, AddressAddRequest, AddressUpdateRequest, Address> {}
-    public interface IClientRepository: IBaseClientRepository<ClientGetRequest, ClientAddRequest, ClientUpdateRequest, Client> {}
-    public interface IContractorRepository: IBaseClientRepository<ContractorGetRequest, ContractorAddRequest, ContractorUpdateRequest, Contractor> {}
-    public interface IInvoiceItemRepository: IBaseRepository<InvoiceItemGetRequest, InvoiceItemAddRequest, InvoiceItemUpdateRequest, InvoiceItem> {}
-    public interface IInvoiceRepository: IBaseRepository<InvoiceGetRequest, InvoiceAddRequestRepository, InvoiceUpdateRequest, Invoice> {}
-    public interface IInvoiceServiceRepository: IBaseRepository<InvoiceServiceGetRequest, InvoiceServiceExtendedAddRequest, InvoiceServiceUpdateRequest, InvoiceService>, IAddRange<InvoiceServiceExtendedAddRequest> {}
-    public interface IInvoiceTemplateRepository: IBaseRepository<InvoiceTemplateGetRequest, InvoiceTemplateAddRequest, InvoiceTemplateUpdateRequest, InvoiceTemplate> {}
-    public interface IUserAccountRepository: IBaseRepository<UserAccountGetRequest, UserAccountAddRequest, UserAccountUpdateRequest, UserAccount>
+    public interface IClientRepository: 
+        IBaseClientRepository<ClientGetRequest, ClientAddRequest, ClientUpdateRequest, Client> {}
+    public interface IContractorRepository: 
+        IBaseClientRepository<ContractorGetRequest, ContractorAddRequest, ContractorUpdateRequest, Contractor> {}
+    public interface IInvoiceItemRepository: 
+        IBaseRepository<InvoiceItemGetRequest, InvoiceItemAddRequest, InvoiceItemUpdateRequest, InvoiceItem> {}
+    public interface IInvoiceRepository: 
+        IBaseRepository<InvoiceGetRequest, InvoiceAddRequestRepository, InvoiceUpdateRequest, Invoice> {}
+    public interface IInvoiceServiceRepository: 
+        IBaseRepository<InvoiceServiceGetRequest, InvoiceServiceExtendedAddRequest, InvoiceServiceUpdateRequest, InvoiceService>, IAddRange<InvoiceServiceExtendedAddRequest> {}
+    public interface IInvoiceTemplateRepository: 
+        IBaseRepository<InvoiceTemplateGetRequest, InvoiceTemplateAddRequest, InvoiceTemplateUpdateRequest, InvoiceTemplate> {}
+    public interface IUserAccountRepository: 
+        IBaseRepository<UserAccountGetRequest, UserAccountAddRequest, UserAccountUpdateRequest, UserAccount>
     {
         public Task<bool> HasDuplicitIbanOrAccountNumber(int userId, UserAccountAddRequest userAccount);
     }
+
+    public interface IInvoiceEntityCopyRepository: 
+        IAdd<InvoiceEntityCopyAddRequest>,
+        IBaseMethods<InvoiceEntityCopyGetRequest, InvoiceEntityCopy>
+        {}
+    
+    public interface IInvoiceAddressCopyRepository:
+        IAdd<InvoiceAddressCopyAddRequest>,
+        IBaseMethods<InvoiceAddressCopyGetRequest, InvoiceAddressCopy>
+        {}
+    
+    public interface IInvoiceUserAccountCopyRepository:
+        IAdd<InvoiceUserAccountCopyAddRequest>,
+        IBaseMethods<InvoiceUserAccountCopyGetRequest, InvoiceUserAccountCopy>
+        {}
+
+
     public interface IUserRepository:
         IAddSimple<UserAddRequest>, 
         IUpdate<UserUpdateRequest>, 

@@ -1,6 +1,5 @@
-
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -24,7 +23,7 @@ namespace InvoiceForgeApi.Abl.userAccount
                     int? addUserAccount = await _repository.UserAccount.Add(userId, userAccount);
                     bool saveCondition = addUserAccount is not null;
 
-                    await SaveResult(saveCondition, transaction);
+                    await SaveResult(saveCondition, transaction, false);
                     return saveCondition;
                 }
                 catch (Exception)

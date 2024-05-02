@@ -1,6 +1,6 @@
 ﻿using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -19,15 +19,14 @@ namespace InvoiceForgeApi.Repository
             DbSet<Client> clients = _dbContext.Client;
             if (plain == true)
             {
-                clients.Include(c => c.Address).ThenInclude(a => a!.Country);
+                await clients.Include(c => c.Address).ThenInclude(a => a!.Country).LoadAsync();
             }
               
               var clientsList = await clients
-                .Select(c => new ClientGetRequest(c, plain))
                 .Where(c => c.Owner == userId)
                 .ToListAsync();
                 
-            return clientsList;
+            return clientsList.ConvertAll(c => new ClientGetRequest(c, plain));
 
 
         }
@@ -36,7 +35,7 @@ namespace InvoiceForgeApi.Repository
             var client = _dbContext.Client;
             if (plain == false)
             {
-                client.Include(c => c.Address).ThenInclude(a => a!.Country);
+                await client.Include(c => c.Address).ThenInclude(a => a!.Country).LoadAsync();
             }
 
             var clientCall = await client.FindAsync(clientId);
@@ -45,20 +44,41 @@ namespace InvoiceForgeApi.Repository
             return clientResult;
         }
         
-        public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType? clientType)
+        public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType clientType)
         {
             var localClient = await Get(clientId);
-
             if (localClient is null) throw new DatabaseCallError("Client is not in database.");
             
-            localClient.AddressId = client.AddressId ?? localClient.AddressId;
-            localClient.Type = clientType ?? localClient.Type;
-            localClient.ClientName = client.ClientName ?? localClient.ClientName;
-            localClient.IN = client.IN ?? localClient.IN;
-            localClient.TIN = client.TIN ?? localClient.TIN;
-            localClient.Mobil = client.Mobil ?? localClient.Mobil;
-            localClient.Tel = client.Tel ?? localClient.Tel;
-            localClient.Email = client.Email ?? localClient.Email;  
+            var localSelect = new { 
+                localClient.AddressId,
+                localClient.Type,
+                localClient.Name,
+                localClient.IN,
+                localClient.TIN,
+                localClient.Mobil,
+                localClient.Tel,
+                localClient.Email
+            };
+            var updateSelect = new {
+                client.AddressId,
+                Type = clientType,
+                client.Name,
+                client.IN,
+                client.TIN,
+                client.Mobil,
+                client.Tel,
+                client.Email
+            };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            
+            localClient.AddressId = client.AddressId;
+            localClient.Type = clientType;
+            localClient.Name = client.Name;
+            localClient.IN = client.IN;
+            localClient.TIN = client.TIN;
+            localClient.Mobil = client.Mobil;
+            localClient.Tel = client.Tel;
+            localClient.Email = client.Email;  
 
             var update = _dbContext.Update(localClient);
             return update.State == EntityState.Modified;
@@ -68,7 +88,7 @@ namespace InvoiceForgeApi.Repository
             var isInDatabase = await _dbContext.Client.AnyAsync((c) =>
                 c.Owner == userId &&
                 c.AddressId == client.AddressId &&
-                c.ClientName == client.ClientName &&
+                c.Name == client.Name &&
                 c.IN == client.IN &&
                 c.TIN == client.TIN &&
                 c.Mobil == client.Mobil &&

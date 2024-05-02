@@ -3,7 +3,7 @@ using FunctionalTests.Projects.InvoiceForgeAPI;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace ClientRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class RemoveClient: WebApplicationFactory
@@ -13,7 +13,7 @@ namespace ClientRepository
         {
             return RunTest(async (client) => {
                 //SETUP
-                var db = new DatabaseHelper();
+                var db = new DatabaseHelper(false);
                 db.InitCountries();
                 db.InitUsers();
                 db.InitAddresses();

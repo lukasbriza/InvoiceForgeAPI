@@ -1,11 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using Xunit;
 
-namespace ContractorRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddContractor: WebApplicationFactory
@@ -16,7 +16,7 @@ namespace ContractorRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 
                 //ASSERT
                 var tContractor = new TestContractor();
@@ -24,7 +24,7 @@ namespace ContractorRepository
                 {
                     AddressId = 1,
                     TypeId = 1,
-                    ContractorName = tContractor.ContractorName,
+                    Name = tContractor.Name,
                     IN = tContractor.IN,
                     TIN = tContractor.TIN,
                     Email = tContractor.Email,
@@ -42,8 +42,8 @@ namespace ContractorRepository
                     var newContractor = await db._context.Contractor.FindAsync(addContractorResult);
 
                     Assert.Equal(addContractor.AddressId, newContractor?.AddressId);
-                    Assert.Equal(ClientType.LegalEntity, newContractor?.ClientType);
-                    Assert.Equal(addContractor.ContractorName, newContractor?.ContractorName);
+                    Assert.Equal(ClientType.LegalEntity, newContractor?.Type);
+                    Assert.Equal(addContractor.Name, newContractor?.Name);
                     Assert.Equal(addContractor.IN, newContractor?.IN);
                     Assert.Equal(addContractor.TIN, newContractor?.TIN);
                     Assert.Equal(addContractor.Email, newContractor?.Email);

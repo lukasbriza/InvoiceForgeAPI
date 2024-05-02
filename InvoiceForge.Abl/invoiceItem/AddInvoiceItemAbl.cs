@@ -1,5 +1,5 @@
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.CodeLists;
 using InvoiceForgeApi.Models.Interfaces;
@@ -24,7 +24,7 @@ namespace InvoiceForgeApi.Abl.invoiceItem
                     int? addInvoiceItem = await _repository.InvoiceItem.Add(userId, invoiceItem);
                     bool saveCondition = addInvoiceItem is not null;
 
-                    await SaveResult(saveCondition, transaction);
+                    await SaveResult(saveCondition, transaction, false);
                     return saveCondition;
                 }
                 catch (Exception)

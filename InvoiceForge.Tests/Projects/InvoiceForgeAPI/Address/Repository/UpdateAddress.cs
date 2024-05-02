@@ -1,10 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace AddressRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateAddress: WebApplicationFactory
@@ -15,7 +16,7 @@ namespace AddressRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var addressToCompare = await db._repository.Address.GetById(1);
 
                 //ASSERT
@@ -26,6 +27,7 @@ namespace AddressRepository
                     var tAddress = new TestAddress();
                     var updateAddress = new AddressUpdateRequest
                     {
+                        CountryId = 1,
                         Owner = addressToCompare.Owner,
                         Street = tAddress.Street,
                         StreetNumber = tAddress.StreetNumber,
@@ -50,6 +52,39 @@ namespace AddressRepository
                     }
                 }
                 
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                var address = await db._context.Address.FindAsync(1);
+                
+                //ASSERT
+                Assert.NotNull(address);
+                var updateAddress = new AddressUpdateRequest {
+                    Owner = address.Owner,
+                    CountryId = address.CountryId,
+                    Street = address.Street,
+                    StreetNumber = address.StreetNumber,
+                    City = address.City,
+                    PostalCode = address.PostalCode
+                };
+
+                try
+                {
+                    var result = await db._repository.Address.Update(1, updateAddress);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
+                }
+
                 //CLEAN
                 db.Dispose();
             });

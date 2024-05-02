@@ -1,7 +1,6 @@
-using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class NumberingGetRequest
     {
@@ -21,11 +20,9 @@ namespace InvoiceForgeApi.DTO.Model
         public List<NumberingVariable> NumberingTemplate { get; set; } = new List<NumberingVariable>();
         public string? NumberingPrefix {get; set;} = null!;
     }
-    public class NumberingUpdateRequest
+    public class NumberingUpdateRequest: NumberingAddRequest
     {
         public int Owner { get; set; }
-        public List<NumberingVariable>? NumberingTemplate { get; set; } = new List<NumberingVariable>();
-        public string? NumberingPrefix {get; set;} = null!;
     }
     public class NumberingAddRequest
     {

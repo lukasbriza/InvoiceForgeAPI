@@ -1,17 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using InvoiceForgeApi.Models;
 
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class UserAddRequest
     {
-        [Required] public int AuthenticationId { get; set; }
+        public int AuthenticationId { get; set; }
     }
 
-    public class UserUpdateRequest
+    public class UserUpdateRequest: UserAddRequest
     {
-        [Required] public int Id { get; set; }
-        public int AuthenticationId { get; set; }
+        public int Id { get; set; }
 
     }
     public class UserGetRequest

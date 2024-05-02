@@ -1,4 +1,4 @@
-﻿using InvoiceForgeApi.DTO.Model;
+﻿using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,8 +12,8 @@ namespace InvoiceForgeApi.Models
         {
             AddressId = contractor.AddressId;
             Owner = userId;
-            ClientType = clientType;
-            ContractorName = contractor.ContractorName;
+            Type = clientType;
+            Name = contractor.Name;
             IN = contractor.IN;
             TIN = contractor.TIN;
             Email = contractor.Email;
@@ -21,9 +21,9 @@ namespace InvoiceForgeApi.Models
             Tel = contractor.Tel;
             Www = contractor.Www;
         }
-        [ForeignKey("Address")] public int? AddressId { get; set; }
-        [Required] public ClientType ClientType { get; set; }
-        [Required] public string ContractorName { get; set; } = null!;
+        [ForeignKey("Address")] public int AddressId { get; set; }
+        [Required] public ClientType Type { get; set; }
+        [Required] public string Name { get; set; } = null!;
         [Required] public long IN { get; set; }
         [Required] public string TIN { get; set; } = null!;
         [Required] public string Email { get; set; } = null!;

@@ -51,7 +51,7 @@ namespace InvoiceForgeApi.Repository
         var dbSet = _dbContext.Set<TEntity>();
         var entityAddResult = await dbSet.AddAsync(newEntity);
         if (entityAddResult.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-
+ 
         var entity = entityAddResult.Entity as IEntityId;
         return entityAddResult.State == EntityState.Unchanged ? entity.Id : null;
         }

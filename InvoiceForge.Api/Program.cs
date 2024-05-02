@@ -3,6 +3,7 @@ using InvoiceForgeApi.Models.Interfaces;
 using InvoiceForgeApi.Middleware;
 using InvoiceForgeApi.Repository;
 using Microsoft.EntityFrameworkCore;
+using InvoiceForgeApi.Triggers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,16 @@ builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddDbContext<InvoiceForgeDatabaseContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseTriggers(triggerOptions => {
+        triggerOptions.AddTrigger<AddressUpdateTrigger>();
+        triggerOptions.AddTrigger<InvoiceAddressCopyUpdateTrigger>();
+        triggerOptions.AddTrigger<InvoiceEntityCopyUpdateTrigger>();
+        triggerOptions.AddTrigger<ClientUpdateTrigger>();
+        triggerOptions.AddTrigger<ContractorUpdateTrigger>();
+        triggerOptions.AddTrigger<InvoiceTemplateUpdateTrigger>();
+        triggerOptions.AddTrigger<UserAccountUpdateTrigger>();
+        triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>();
+    });
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>

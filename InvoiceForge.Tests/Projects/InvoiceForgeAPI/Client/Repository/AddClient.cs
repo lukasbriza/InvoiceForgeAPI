@@ -1,11 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using Xunit;
 
-namespace ClientRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddClient: WebApplicationFactory
@@ -16,7 +16,7 @@ namespace ClientRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 var tClient = new TestClient();
@@ -24,7 +24,7 @@ namespace ClientRepository
                 {
                     AddressId = 1,
                     TypeId = 1,
-                    ClientName = tClient.ClientName,
+                    Name = tClient.Name,
                     IN = tClient.IN,
                     TIN = tClient.TIN,
                     Mobil = tClient.Mobil,
@@ -42,7 +42,7 @@ namespace ClientRepository
 
                     Assert.Equal(addClient.AddressId, newClient?.AddressId);
                     Assert.Equal(ClientType.LegalEntity, newClient?.Type);
-                    Assert.Equal(addClient.ClientName, newClient?.ClientName);
+                    Assert.Equal(addClient.Name, newClient?.Name);
                     Assert.Equal(addClient.IN, newClient?.IN);
                     Assert.Equal(addClient.TIN, newClient?.TIN);
                     Assert.Equal(addClient.Mobil, newClient?.Mobil);

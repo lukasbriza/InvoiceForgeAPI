@@ -4,7 +4,7 @@ using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace InvoiceTemplateRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class RemoveInvoiceTemplate: WebApplicationFactory  
@@ -15,7 +15,6 @@ namespace InvoiceTemplateRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
 
                 var dbTemplateIds = await db._context.InvoiceTemplate.Select(t => t.Id).ToListAsync();
 
@@ -43,7 +42,7 @@ namespace InvoiceTemplateRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 try

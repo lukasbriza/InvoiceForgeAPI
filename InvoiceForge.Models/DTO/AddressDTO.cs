@@ -1,6 +1,4 @@
-﻿using InvoiceForgeApi.Models;
-
-namespace InvoiceForgeApi.DTO.Model
+﻿namespace InvoiceForgeApi.Models.DTO
 {
     public class AddressGetRequest
     {
@@ -20,12 +18,12 @@ namespace InvoiceForgeApi.DTO.Model
             }
         }
         public int Id { get; set; }
+        public int CountryId { get; set; }
         public int Owner {  get; set; }
         public string Street { get; set; } = null!;
         public int StreetNumber { get; set; }
         public string City { get; set; } = null!;
         public int PostalCode { get; set; }
-        public int CountryId { get; set; }
         public CountryGetRequest? Country { get; set; } = null!;
     }
     public class AddressAddRequest
@@ -37,13 +35,8 @@ namespace InvoiceForgeApi.DTO.Model
         public int PostalCode { get; set; }
     }
 
-    public class AddressUpdateRequest
+    public class AddressUpdateRequest: AddressAddRequest
     {
         public int Owner {  get; set; }
-        public int? CountryId { get; set; }
-        public string? Street { get; set; }
-        public int? StreetNumber { get; set; }
-        public string? City { get; set; }
-        public int? PostalCode { get; set; }
     }
 }

@@ -1,11 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
-namespace InvoiceRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateInvoice: WebApplicationFactory
@@ -16,10 +16,7 @@ namespace InvoiceRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
-                var dbclient = await db._context.Client.FindAsync(1);
-                var contractor = await db._context.Contractor.FindAsync(1);
-                var userAccount = await db._context.UserAccount.FindAsync(1);
+                await db.InitInvoiceCopies();
 
                 var invoice = new InvoiceAddRequestRepository {
                     TemplateId = 1,
@@ -30,9 +27,11 @@ namespace InvoiceRepository
                     VATTotal = 2,
                     TotalAll = 12,
                     Currency = " CZK",
-                    ClientLocal = new ClientGetRequest(dbclient, true),
-                    ContractorLocal = new ContractorGetRequest(contractor, true),
-                    UserAccountLocal = new UserAccountGetRequest(userAccount, true),
+
+                    ClientCopyId = 1,
+                    ContractorCopyId = 2,
+                    UserAccountCopyId = 1,
+
                     Maturity = DateTime.Now,
                     Exposure = DateTime.Now,
                     TaxableTransaction = DateTime.Now,
@@ -47,9 +46,9 @@ namespace InvoiceRepository
 
                 var updateInvoice = new InvoiceUpdateRequest{
                     Owner = 1,
-                    Maturity = DateTime.MaxValue,
-                    Exposure = DateTime.MinValue,
-                    TaxableTransaction = DateTime.Now
+                    Maturity = new DateTime(1,1,2020),
+                    Exposure = new DateTime(1,1,2020),
+                    TaxableTransaction = new DateTime(1,1,2020)
                 };
 
                 var updateResult = await db._repository.Invoice.Update((int)addInvoice, updateInvoice);
@@ -74,7 +73,7 @@ namespace InvoiceRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 try
@@ -88,6 +87,39 @@ namespace InvoiceRepository
                 }
 
                 //CLIENT
+                db.Dispose();
+            });
+        }
+    
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                await db.InitInvoiceCopies();
+                var invoice = await db._context.Invoice.FindAsync(1);
+
+                //ASSERT
+                Assert.NotNull(invoice);
+                var updateInvoice = new InvoiceUpdateRequest
+                {
+                    Owner = invoice.Owner,
+                    Exposure = invoice.Exposure,
+                    Maturity = invoice.Maturity,
+                    TaxableTransaction = invoice.TaxableTransaction
+                };
+
+                try
+                {
+                    var result = await db._repository.Invoice.Update(1, updateInvoice);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
+                }
+
+                //CLEAN
                 db.Dispose();
             });
         }

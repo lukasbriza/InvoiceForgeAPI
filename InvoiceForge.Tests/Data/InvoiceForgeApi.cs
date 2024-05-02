@@ -33,7 +33,7 @@ namespace InvoiceForge.Tests.Data
             Owner = new TestUser().Id;
             AddressId = new TestAddress().Id;
             Type = ClientType.Entrepreneur;
-            ClientName = "TestClientName";
+            Name = "TestClientName";
             IN = 123456789;
             TIN = "CZ123456789";
             Mobil = "+420774876504";
@@ -48,8 +48,8 @@ namespace InvoiceForge.Tests.Data
             Id = 100;
             Owner = new TestUser().Id;
             AddressId = new TestAddress().Id;
-            ClientType = ClientType.Entrepreneur;
-            ContractorName = "TestContractorName";
+            Type = ClientType.Entrepreneur;
+            Name = "TestContractorName";
             IN = 123456789;
             TIN = "CZ123456789";
             Mobil = "+420774876504";
