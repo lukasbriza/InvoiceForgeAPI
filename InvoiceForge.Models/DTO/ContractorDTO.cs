@@ -1,7 +1,6 @@
-﻿using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.Enum;
+﻿using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
     public class ContractorGetRequest
     {
@@ -12,8 +11,8 @@ namespace InvoiceForgeApi.DTO.Model
             {
                 Id = contractor.Id;
                 Owner = contractor.Owner;
-                ClientType = contractor.ClientType;
-                ContractorName = contractor.ContractorName;
+                Type = contractor.Type;
+                Name = contractor.Name;
                 IN = contractor.IN;
                 TIN = contractor.TIN;
                 Email = contractor.Email;
@@ -25,9 +24,9 @@ namespace InvoiceForgeApi.DTO.Model
         }
         public int Id { get; set; }
         public int Owner { get; set; }
-        public ClientType ClientType { get; set; }
+        public ClientType Type { get; set; }
         public int AddressId { get; set; }
-        public string ContractorName { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public long IN { get; set; }
         public string TIN { get; set; } = null!;
         public string Email { get; set; } = null!;
@@ -40,7 +39,7 @@ namespace InvoiceForgeApi.DTO.Model
     {
         public int AddressId { get; set; }
         public int TypeId { get; set; }
-        public string ContractorName { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public long IN { get; set; }
         public string TIN { get; set; } = null!;
         public string Email { get; set; } = null!;
@@ -48,17 +47,8 @@ namespace InvoiceForgeApi.DTO.Model
         public string? Tel { get; set; }
         public string? Www { get; set; }
     }
-    public class ContractorUpdateRequest
+    public class ContractorUpdateRequest: ContractorAddRequest
     {
         public int Owner { get; set; }
-        public int? AddressId { get; set; }
-        public int? TypeId { get; set; }
-        public string? ContractorName { get; set; } = null!;
-        public long? IN { get; set; }
-        public string? TIN { get; set; } = null!;
-        public string? Email { get; set; } = null!;
-        public string? Mobil { get; set; }
-        public string? Tel { get; set; }
-        public string? Www { get; set; }
     }
 }

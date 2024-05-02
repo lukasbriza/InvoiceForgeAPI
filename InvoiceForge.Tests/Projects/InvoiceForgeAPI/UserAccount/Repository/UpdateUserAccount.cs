@@ -1,11 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
-namespace UserAccountRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateUserAccount: WebApplicationFactory
@@ -16,7 +16,7 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 var updateUserAccount = new UserAccountUpdateRequest
@@ -55,7 +55,7 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 var entity = new UserAccountUpdateRequest{ AccountNumber = "TestAccountNumber", IBAN = "TestIBAN" };
@@ -66,6 +66,37 @@ namespace UserAccountRepository
                 catch (Exception error)
                 {
                     Assert.IsType<DatabaseCallError>(error);
+                }
+
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                var userAccount = await db._context.UserAccount.FindAsync(1);
+
+                //ASSERT
+                Assert.NotNull(userAccount);
+                var updateUserAccount = new UserAccountUpdateRequest
+                {
+                    BankId = userAccount.BankId,
+                    AccountNumber = userAccount.AccountNumber,
+                    IBAN = userAccount.IBAN
+                };
+
+                try
+                {
+                    var result = await db._repository.UserAccount.Update(1, updateUserAccount);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
                 }
 
                 //CLEAN

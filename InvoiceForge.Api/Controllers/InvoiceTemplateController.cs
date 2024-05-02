@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Abl.invoiceTemplate;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

@@ -4,7 +4,7 @@ using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace UserAccountRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class RemoveUserAccount: WebApplicationFactory
@@ -14,7 +14,7 @@ namespace UserAccountRepository
         {
             return RunTest(async (client) => {
                 //SETUP
-                var db = new DatabaseHelper();
+                var db = new DatabaseHelper(false);
                 db.InitUsers();
                 db.InitBanks();
                 db.InitUserAccounts();
@@ -24,8 +24,12 @@ namespace UserAccountRepository
                 Assert.NotNull(dbUserAccounts);
                 Assert.IsType<List<int>>(dbUserAccounts);
 
-                dbUserAccounts.ForEach(async accountId => {
+                async Task call(int accountId){
                     var removeResult = await db._repository.UserAccount.Delete(accountId);
+                }
+                dbUserAccounts.ForEach(accountId => {
+                    var task = call(accountId);
+                    task.Wait();
                 });
 
                 await db._repository.Save();
@@ -46,8 +50,7 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
-
+                
                 //ASSERT
                 try
                 {

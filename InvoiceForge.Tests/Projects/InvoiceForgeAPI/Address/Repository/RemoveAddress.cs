@@ -3,7 +3,7 @@ using FunctionalTests.Projects.InvoiceForgeAPI;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace AddressRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class RemoveAddress: WebApplicationFactory
@@ -13,7 +13,7 @@ namespace AddressRepository
         {
             return RunTest(async (client) => {
                 //SETUP
-                var db = new DatabaseHelper();
+                var db = new DatabaseHelper(false);
                 db.InitCountries();
                 db.InitUsers();
                 db.InitAddresses();

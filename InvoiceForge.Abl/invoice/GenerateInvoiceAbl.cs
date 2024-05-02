@@ -1,9 +1,8 @@
-
-
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
+
 
 namespace InvoiceForgeApi.Abl.invoice
 {
@@ -26,7 +25,8 @@ namespace InvoiceForgeApi.Abl.invoice
 
                     var invoiceServiceList = new List<InvoiceServiceExtendedAddRequest>();
 
-                    invoice.InvoiceServices.ForEach(async service => {
+                    async Task addService(InvoiceServiceAddRequest service)
+                    {
                         var invoiceItem = await _repository.InvoiceItem.GetById(service.ItemId);
                         if (invoiceItem is not null)
                         {
@@ -44,6 +44,11 @@ namespace InvoiceForgeApi.Abl.invoice
                                 }
                             );
                         }
+                    }
+
+                    invoice.InvoiceServices.ForEach(service => {
+                        var task = addService(service);
+                        task.Wait();
                     });
 
                     if (invoiceServiceList.Count != invoice.InvoiceServices.Count) throw new ValidationError("Some invoice item id is invalid.");
@@ -55,11 +60,118 @@ namespace InvoiceForgeApi.Abl.invoice
                             Total = a.Total + b.Total
                         });
                     
-                    ClientGetRequest? localCLient = await _repository.Client.GetById(isTemplate.ClientId);
-                    ContractorGetRequest? localContractor = await _repository.Contractor.GetById(isTemplate.ContractorId);
-                    UserAccountGetRequest? localUserAccount = await _repository.UserAccount.GetById(isTemplate.UserAccountId);
+                    CurrencyGetRequest? templateCurrency = await _repository.CodeLists.GetCurrencyById(isTemplate.CurrencyId);
+                    ClientGetRequest? invoiceClient = await _repository.Client.GetById(isTemplate.ClientId, false);
+                    ContractorGetRequest? invoiceContractor = await _repository.Contractor.GetById(isTemplate.ContractorId, false);
+                    UserAccountGetRequest? invoiceUserAccount = await _repository.UserAccount.GetById(isTemplate.UserAccountId, true);
+                    
+                    if (
+                        invoiceClient is null || 
+                        invoiceContractor is null || 
+                        invoiceUserAccount is null || 
+                        templateCurrency is null
+                    ) throw new ValidationError("Unable to find local entities.");
+                     
+                    List<InvoiceEntityCopy>? isDuplicitClientInEntities = await _repository.InvoiceEntityCopy.GetByCondition(e => 
+                        e.Outdated == false &&
+                        e.Owner == invoiceClient.Owner &&
+                        e.Type == invoiceClient.Type &&
+                        e.Name == invoiceClient.Name &&
+                        e.IN == invoiceClient.IN &&
+                        e.TIN == invoiceClient.TIN &&
+                        e.Email == invoiceClient.Email &&
+                        e.Mobil == invoiceClient.Mobil &&
+                        e.Tel == invoiceClient.Tel &&
 
-                    if (localCLient is null || localContractor is null || localUserAccount is null) throw new ValidationError("Unable to find local entities.");
+                        e.AddressCopy.Outdated == false &&
+                        e.AddressCopy.CountryId == invoiceClient.Address!.CountryId &&
+                        e.AddressCopy.Street == invoiceClient.Address.Street &&
+                        e.AddressCopy.StreetNumber == invoiceClient.Address.StreetNumber && 
+                        e.AddressCopy.City == invoiceClient.Address.City &&
+                        e.AddressCopy.PostalCode == invoiceClient.Address.PostalCode
+                    );
+
+                    List<InvoiceEntityCopy>? isDuplicitContractorInEntities = await _repository.InvoiceEntityCopy.GetByCondition(e =>
+                        e.Outdated == false &&
+                        e.Owner == invoiceContractor.Owner &&
+                        e.Type == invoiceContractor.Type &&
+                        e.Name == invoiceContractor.Name &&
+                        e.IN == invoiceContractor.IN &&
+                        e.TIN == invoiceContractor.TIN &&
+                        e.Email == invoiceContractor.Email &&
+                        e.Mobil == invoiceContractor.Mobil &&
+                        e.Tel == invoiceContractor.Tel &&
+                        e.Www == invoiceContractor.Www &&
+
+                        e.AddressCopy.Outdated == false &&
+                        e.AddressCopy.CountryId == invoiceContractor.Address!.CountryId &&
+                        e.AddressCopy.Street == invoiceContractor.Address.Street &&
+                        e.AddressCopy.StreetNumber == invoiceContractor.Address.StreetNumber && 
+                        e.AddressCopy.City == invoiceContractor.Address.City &&
+                        e.AddressCopy.PostalCode == invoiceContractor.Address.PostalCode
+                    );
+
+                    List<InvoiceUserAccountCopy>? isDuplicitUserAccountCopy = await _repository.InvoiceUserAccountCopy.GetByCondition(a =>
+                        a.Outdated == false &&
+                        a.Owner == invoiceUserAccount.Owner &&
+                        a.BankId == invoiceUserAccount.BankId &&
+                        a.AccountNumber == invoiceUserAccount.AccountNumber &&
+                        a.IBAN == invoiceUserAccount.IBAN
+                    );
+
+                    int? invoiceClientCopyId = null;
+                    int? invoiceContractorCopyId = null;
+                    int? invoiceUserAccountCopyId = null;
+
+                    if (isDuplicitClientInEntities is null || isDuplicitClientInEntities.Count == 0)
+                    {
+                        //ADD CLIENT AND CLIENT ADDRESS COPY
+                        var address = new InvoiceAddressCopyAddRequest
+                        {
+                            OriginId = invoiceClient.Address!.Id,
+                            CountryId = invoiceClient.Address.CountryId,
+                            Street = invoiceClient.Address.Street,
+                            StreetNumber = invoiceClient.Address.StreetNumber,
+                            City = invoiceClient.Address.City,
+                            PostalCode = invoiceClient.Address.PostalCode
+                        };
+                        int? addressId = await _repository.InvoiceAddressCopy.Add(userId, address);
+                        if (addressId is null) throw new ValidationError("Address copy insertion failed.");
+                        
+                        var entity = new InvoiceEntityCopyAddRequest(invoiceClient, addressId);
+                        invoiceClientCopyId = await _repository.InvoiceEntityCopy.Add(userId, entity);
+                    } else if (isDuplicitClientInEntities.Count == 1) invoiceClientCopyId = isDuplicitClientInEntities[0].Id;
+                    else throw new ValidationError("There is more than one local client.");
+                    
+                    if (isDuplicitContractorInEntities is null || isDuplicitContractorInEntities.Count == 0)
+                    {
+                        //ADD CONTRACTOR AND CONTRACTOR ADDRESS COPY
+                        var address = new InvoiceAddressCopyAddRequest
+                        {
+                            OriginId = invoiceContractor.Address!.Id,
+                            CountryId = invoiceContractor.Address.CountryId,
+                            Street = invoiceContractor.Address.Street,
+                            StreetNumber = invoiceContractor.Address.StreetNumber,
+                            City = invoiceContractor.Address.City,
+                            PostalCode = invoiceContractor.Address.PostalCode
+                        };
+                        int? addressId = await _repository.InvoiceAddressCopy.Add(userId, address);
+                        if (addressId is null) throw new ValidationError("Address copy insertion failed.");
+
+                        var entity = new InvoiceEntityCopyAddRequest(invoiceContractor, addressId);
+                        invoiceContractorCopyId = await _repository.InvoiceEntityCopy.Add(userId, entity);
+                    } else if (isDuplicitContractorInEntities.Count == 1) invoiceContractorCopyId = isDuplicitContractorInEntities[0].Id;
+                    else throw new ValidationError("There is more than one local contractor.");
+
+                    if (isDuplicitUserAccountCopy is null || isDuplicitUserAccountCopy.Count == 0)
+                    {
+                        //ADD USER ACCOUNT COPY
+                        var entity = new InvoiceUserAccountCopyAddRequest(invoiceUserAccount);
+                        invoiceUserAccountCopyId = await _repository.InvoiceUserAccountCopy.Add(userId, entity);
+                    } else if (isDuplicitUserAccountCopy.Count == 1) invoiceUserAccountCopyId = isDuplicitUserAccountCopy[0].Id;
+                    else throw new ValidationError("There is more than one local user account.");
+
+                    if (invoiceClientCopyId == null || invoiceContractorCopyId == null || invoiceUserAccountCopyId == null) throw new ValidationError("Unasigned one of id variables.");
                     
                     var newInvoiceObject = new InvoiceAddRequestRepository
                     {
@@ -74,10 +186,12 @@ namespace InvoiceForgeApi.Abl.invoice
                         Exposure = invoice.Exposure,
                         TaxableTransaction = invoice.TaxableTransaction,
                         Created = DateTime.UtcNow,
+                        
+                        ClientCopyId = (int)invoiceClientCopyId,
+                        ContractorCopyId = (int)invoiceContractorCopyId,
+                        UserAccountCopyId = (int)invoiceUserAccountCopyId,
 
-                        ClientLocal = localCLient,
-                        ContractorLocal = localContractor,
-                        UserAccountLocal = localUserAccount
+                        Currency = templateCurrency.Value
                     };
 
                     int? addInvoiceId = await _repository.Invoice.Add(userId, newInvoiceObject);

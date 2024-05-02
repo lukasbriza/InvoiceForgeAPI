@@ -46,12 +46,12 @@ namespace InvoiceForgeApi.Repository
         public virtual async Task<int?> Add(int userId, TAddRequest addRequest)
         {
         var newEntity = Activator.CreateInstance(typeof(TEntity), userId, addRequest) as TEntity;
-        if(newEntity is null) throw new ValidationError("Dynamic entity creation failed.");
+        if(newEntity is null) throw new DatabaseCallError("Dynamic entity creation failed.");
         
         var dbSet = _dbContext.Set<TEntity>();
         var entityAddResult = await dbSet.AddAsync(newEntity);
         if (entityAddResult.State == EntityState.Added) await _dbContext.SaveChangesAsync();
-
+ 
         var entity = entityAddResult.Entity as IEntityId;
         return entityAddResult.State == EntityState.Unchanged ? entity.Id : null;
         }

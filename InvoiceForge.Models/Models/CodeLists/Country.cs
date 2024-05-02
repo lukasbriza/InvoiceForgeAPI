@@ -8,5 +8,6 @@ namespace InvoiceForgeApi.Models.CodeLists
 
         //Reference
         public virtual ICollection<Address>? Addresses { get; set; } = new List<Address>();
+        public virtual ICollection<InvoiceAddressCopy>? AddressCopies { get; set; } = new List<InvoiceAddressCopy>();
     }
 }

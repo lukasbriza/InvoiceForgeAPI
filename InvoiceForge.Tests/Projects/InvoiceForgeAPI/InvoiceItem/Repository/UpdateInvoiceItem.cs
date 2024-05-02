@@ -1,11 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
-namespace InvoiceItemRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateInvoiceItem: WebApplicationFactory
@@ -16,10 +16,10 @@ namespace InvoiceItemRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
-                var updateItem = new InvoiceItemUpdateRequest { Owner = 1, ItemName = "TestItemName" };
+                var updateItem = new InvoiceItemUpdateRequest { Owner = 1, ItemName = "TestItemName", TariffId = 1 };
                 var updateItemResult = await db._repository.InvoiceItem.Update(1, updateItem);
                 await db._repository.Save();
 
@@ -43,7 +43,7 @@ namespace InvoiceItemRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
                 try
@@ -55,6 +55,36 @@ namespace InvoiceItemRepository
                 catch (Exception error)
                 {
                     Assert.IsType<DatabaseCallError>(error);
+                }
+
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                var invoiceItem = await db._context.InvoiceItem.FindAsync(1);
+
+                //ASSERT
+                var updateInvoiceItem = new InvoiceItemUpdateRequest
+                {
+                    Owner = invoiceItem.Owner,
+                    ItemName = invoiceItem.ItemName,
+                    TariffId = invoiceItem.TariffId,
+                };
+
+                try
+                {
+                    var result = await db._repository.InvoiceItem.Update(1, updateInvoiceItem);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
                 }
 
                 //CLEAN

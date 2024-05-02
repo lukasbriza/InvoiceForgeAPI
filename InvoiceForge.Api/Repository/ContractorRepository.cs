@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -19,44 +19,63 @@ namespace InvoiceForgeApi.Repository
             DbSet<Contractor> contractors = _dbContext.Contractor;
             if (plain == false)
             {
-                contractors.Include(c => c.Address);
+                await contractors.Include(c => c.Address).ToListAsync();
             }
             var contractorsList = await contractors
-                .Select(c => new ContractorGetRequest(c, plain))
                 .Where(c => c.Owner == userId)
                 .ToListAsync();
-            return contractorsList;
+            return contractorsList.ConvertAll(c => new ContractorGetRequest(c, plain));
         }
         public async Task<ContractorGetRequest?> GetById(int contractorId, bool? plain = false)
         {
             DbSet<Contractor> contractor = _dbContext.Contractor;
             if (plain == true)
             {
-                contractor.Include(c => c.Address);
+                await contractor.Include(c => c.Address).LoadAsync();
             }
             
             var contractorCall = await contractor.FindAsync(contractorId);
             var contractorResult = new ContractorGetRequest(contractorCall, plain);
             return contractorResult;
         }
-        public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType? clientType)
+        public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType clientType)
         {
             var localContractor = await Get(contractorId);
+            if(localContractor is null) throw new DatabaseCallError("Contractor is not in database.");
+            
+            var localSelect = new {
+                localContractor.AddressId,
+                localContractor.Type,
+                localContractor.Name,
+                localContractor.IN,
+                localContractor.TIN,
+                localContractor.Email,
+                localContractor.Mobil,
+                localContractor.Tel,
+                localContractor.Www
+            };
+            var updateSelect = new {
+                contractor.AddressId,
+                Type = clientType,
+                contractor.Name,
+                contractor.IN,
+                contractor.TIN,
+                contractor.Email,
+                contractor.Mobil,
+                contractor.Tel,
+                contractor.Www
+            };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
 
-            if(localContractor is null)
-            {
-                throw new DatabaseCallError("Contractor is not in database.");
-            }
-
-            localContractor.AddressId = contractor.AddressId ?? localContractor.AddressId;
-            localContractor.ClientType = clientType ?? localContractor.ClientType;
-            localContractor.ContractorName = contractor.ContractorName ?? localContractor.ContractorName;
-            localContractor.IN = contractor.IN ?? localContractor.IN;
-            localContractor.TIN = contractor.TIN ?? localContractor.TIN;
-            localContractor.Email = contractor.Email ?? localContractor.Email;
-            localContractor.Mobil = contractor.Mobil ?? localContractor.Mobil;
-            localContractor.Tel = contractor.Tel ?? localContractor.Tel;
-            localContractor.Www = contractor.Www ?? localContractor.Www;
+            localContractor.AddressId = contractor.AddressId;
+            localContractor.Type = clientType;
+            localContractor.Name = contractor.Name;
+            localContractor.IN = contractor.IN;
+            localContractor.TIN = contractor.TIN;
+            localContractor.Email = contractor.Email;
+            localContractor.Mobil = contractor.Mobil;
+            localContractor.Tel = contractor.Tel;
+            localContractor.Www = contractor.Www;
             
             var update = _dbContext.Update(localContractor);
             return update.State == EntityState.Modified;
@@ -66,7 +85,7 @@ namespace InvoiceForgeApi.Repository
             var isInDatabase = await _dbContext.Contractor.AnyAsync((c) =>
                 c.Owner == userId &&
                 c.AddressId == contractor.AddressId &&
-                c.ContractorName == contractor.ContractorName &&
+                c.Name == contractor.Name &&
                 c.IN == contractor.IN &&
                 c.TIN == contractor.TIN &&
                 c.Mobil == contractor.Mobil &&

@@ -1,9 +1,10 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace InvoiceTemplateRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateInvoiceTemplate: WebApplicationFactory
@@ -14,7 +15,7 @@ namespace InvoiceTemplateRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var invoiceTempalteToCompare = await db._repository.InvoiceTemplate.GetById(1);
 
                 //ASSERT
@@ -49,6 +50,39 @@ namespace InvoiceTemplateRepository
                         Assert.Equal(updateInvoiceTemplate.TemplateName, updatedInvoiceTemplate?.TemplateName);
                         Assert.Equal(updateInvoiceTemplate.NumberingId, updatedInvoiceTemplate?.NumberingId);
                     }
+                }
+
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                var template = await db._context.InvoiceTemplate.FindAsync(1);
+                
+                //ASSERT
+                Assert.NotNull(template);
+                var updateTemplate = new InvoiceTemplateUpdateRequest
+                {
+                    ClientId = template.ClientId,
+                    ContractorId = template.ContractorId,
+                    UserAccountId = template.UserAccountId,
+                    TemplateName = template.TemplateName,
+                    NumberingId = template.NumberingId,
+                };
+
+                try
+                {
+                    var result = await db._repository.InvoiceTemplate.Update(1, updateTemplate);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
                 }
 
                 //CLEAN

@@ -2,11 +2,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace ContractorRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class GetContractor: WebApplicationFactory
@@ -17,14 +17,14 @@ namespace ContractorRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var users = await db._context.User.Select(u => u.Id).ToListAsync();
 
                 //ASSERT
                 Assert.NotNull(users);
                 Assert.IsType<List<int>>(users);
 
-                users.ForEach(async userId => {
+                async Task call(int userId){
                     var contractorValidation = new ContractorSeed().Populate().FindAll(c => c.Owner == userId);
                     var contractors = await db._repository.Contractor.GetAll(userId);
 
@@ -34,6 +34,11 @@ namespace ContractorRepository
                     {
                         Assert.Equal(contractorValidation.Count, contractors.Count);
                     }
+                }
+
+                users.ForEach(userId => {
+                    var task = call(userId);
+                    task.Wait();
                 });
 
                 //CLEAN
@@ -47,7 +52,7 @@ namespace ContractorRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var contractors = await db._context.Contractor.Select(c => c.Id).ToListAsync();
                 
                 //ASSERT

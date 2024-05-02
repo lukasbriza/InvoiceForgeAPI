@@ -1,9 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForge.Tests.Data;
+using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace ContractorRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateContractor: WebApplicationFactory
@@ -14,7 +16,7 @@ namespace ContractorRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var contractorToCompare = await db._repository.Contractor.GetById(1);
 
                 //ASSERT
@@ -22,20 +24,21 @@ namespace ContractorRepository
 
                 if (contractorToCompare is not null)
                 {
+                    var tContractor = new TestContractor();
                     var updateContractor = new ContractorUpdateRequest
                     {
                         Owner = contractorToCompare.Owner,
                         AddressId = 2,
-                        ContractorName = "TestName",
-                        IN = 123456789,
-                        TIN = "TestTIN",
-                        Mobil = "+420774876504",
-                        Tel = "+420774876504",
-                        Email = "TestMail",
-                        Www = "www.test.cz"
+                        Name = tContractor.Name,
+                        IN = tContractor.IN,
+                        TIN = tContractor.TIN,
+                        Mobil = tContractor.Mobil,
+                        Tel = tContractor.Tel,
+                        Email = tContractor.Email,
+                        Www = tContractor.Email
                     };
 
-                    var updateContractorResult = await db._repository.Contractor.Update(contractorToCompare.Id, updateContractor, null);
+                    var updateContractorResult = await db._repository.Contractor.Update(contractorToCompare.Id, updateContractor, tContractor.Type);
 
                     await db._repository.Save();
                     Assert.True(updateContractorResult);
@@ -46,7 +49,7 @@ namespace ContractorRepository
                     if (updatedContractor is not null)
                     {
                         Assert.Equal(updatedContractor.AddressId, updateContractor.AddressId);
-                        Assert.Equal(updatedContractor.ContractorName, updateContractor.ContractorName);
+                        Assert.Equal(updatedContractor.Name, updateContractor.Name);
                         Assert.Equal(updatedContractor.IN, updateContractor.IN);
                         Assert.Equal(updatedContractor.TIN, updateContractor.TIN);
                         Assert.Equal(updatedContractor.Tel, updateContractor.Tel);
@@ -54,6 +57,43 @@ namespace ContractorRepository
                         Assert.Equal(updatedContractor.Email, updateContractor.Email);
                         Assert.Equal(updatedContractor.Www, updateContractor.Www);
                     }
+                }
+
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                var contractor = await db._context.Contractor.FindAsync(1);
+
+                //ASSERT
+                Assert.NotNull(contractor);
+                var updateContractor = new ContractorUpdateRequest
+                {
+                    Owner = contractor.Owner,
+                    AddressId = contractor.AddressId,
+                    Name = contractor.Name,
+                    IN = contractor.IN,
+                    TIN = contractor.TIN,
+                    Email = contractor.Email,
+                    Mobil = contractor.Mobil,
+                    Tel = contractor.Tel,
+                    Www = contractor.Www
+                };
+
+                try
+                {
+                    var result = await db._repository.Contractor.Update(1, updateContractor, contractor.Type);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
                 }
 
                 //CLEAN

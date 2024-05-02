@@ -9,5 +9,6 @@ namespace InvoiceForgeApi.Models.CodeLists
 
         //Reference
         public virtual ICollection<UserAccount>? UserAccounts { get; set; } = new List<UserAccount>();
+        public virtual ICollection<InvoiceUserAccountCopy>? UserAccountCopies { get; set; } = new List<InvoiceUserAccountCopy>();
     }
 }

@@ -1,7 +1,6 @@
-﻿using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.Enum;
+﻿using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.DTO.Model
+namespace InvoiceForgeApi.Models.DTO
 {
 
     public class ClientGetRequest
@@ -12,10 +11,10 @@ namespace InvoiceForgeApi.DTO.Model
             if (client is not null)
             {
                 Id = client.Id;
-                AddressId = (int)client.AddressId!;
+                AddressId = client.AddressId;
                 Owner = client.Owner;
                 Type = client.Type;
-                ClientName = client.ClientName;
+                Name = client.Name;
                 IN = client.IN;
                 TIN = client.TIN;
                 Mobil = client.Mobil;
@@ -28,7 +27,7 @@ namespace InvoiceForgeApi.DTO.Model
         public int AddressId { get; set; }
         public int Owner { get; set; }
         public ClientType Type { get; set; }
-        public string ClientName { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public long IN { get; set; }
         public string TIN { get; set; } = null!;
         public string? Mobil { get; set; } = null!;
@@ -41,7 +40,7 @@ namespace InvoiceForgeApi.DTO.Model
     {
         public int AddressId { get; set; }
         public int TypeId { get; set; }
-        public string ClientName { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public long IN { get; set; }
         public string TIN { get; set; } = null!;
         public string? Mobil { get; set; } = null!;
@@ -49,16 +48,8 @@ namespace InvoiceForgeApi.DTO.Model
         public string? Email { get; set; } = null!;
     }
 
-    public class ClientUpdateRequest
+    public class ClientUpdateRequest: ClientAddRequest
     {
         public int Owner { get; set; }
-        public int? AddressId { get; set; }
-        public int? TypeId { get; set; }
-        public string? ClientName { get; set; } = null!;
-        public long? IN { get; set; }
-        public string? TIN { get; set; } = null!;
-        public string? Mobil { get; set; } = null!;
-        public string? Tel { get; set; } = null!;
-        public string? Email { get; set; } = null!;
     }
 }

@@ -4,7 +4,7 @@ using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace ContractorRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class RemoveContractor: WebApplicationFactory
@@ -14,7 +14,7 @@ namespace ContractorRepository
         {
             return RunTest(async (client) => {
                 //SETUP
-                var db = new DatabaseHelper();
+                var db = new DatabaseHelper(false);
                 db.InitCountries();
                 db.InitUsers();
                 db.InitAddresses();

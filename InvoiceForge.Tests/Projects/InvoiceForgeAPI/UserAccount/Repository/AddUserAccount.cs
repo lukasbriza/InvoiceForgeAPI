@@ -1,9 +1,10 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForge.Tests.Data;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace UserAccountRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddUserAccount: WebApplicationFactory
@@ -14,14 +15,15 @@ namespace UserAccountRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
 
                 //ASSERT
+                var tAccount = new TestUserAccount();
                 var addUserAccount = new UserAccountAddRequest
                 {
-                    BankId = 1,
-                    AccountNumber = "TestAccountNumber",
-                    IBAN = "TestIBAN"
+                    BankId = tAccount.BankId,
+                    AccountNumber = tAccount.AccountNumber,
+                    IBAN = tAccount.IBAN
                 };
 
                 var addUserAccountResult = await db._repository.UserAccount.Add(1, addUserAccount);

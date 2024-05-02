@@ -1,10 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForge.Tests.Data;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 using Xunit;
 
-namespace ContractorRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddContractor: WebApplicationFactory
@@ -15,20 +16,21 @@ namespace ContractorRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 
                 //ASSERT
+                var tContractor = new TestContractor();
                 var addContractor = new ContractorAddRequest
                 {
                     AddressId = 1,
                     TypeId = 1,
-                    ContractorName = "TestContractorName",
-                    IN = 123456789,
-                    TIN = "TestTIN",
-                    Email = "TestEmail",
-                    Mobil = "+420774876504",
-                    Tel = "+420774876504",
-                    Www = "www.test.cz"
+                    Name = tContractor.Name,
+                    IN = tContractor.IN,
+                    TIN = tContractor.TIN,
+                    Email = tContractor.Email,
+                    Mobil = tContractor.Mobil,
+                    Tel = tContractor.Tel,
+                    Www = tContractor.Www
                 };
 
                 var addContractorResult = await db._repository.Contractor.Add(1, addContractor, ClientType.LegalEntity);
@@ -40,8 +42,8 @@ namespace ContractorRepository
                     var newContractor = await db._context.Contractor.FindAsync(addContractorResult);
 
                     Assert.Equal(addContractor.AddressId, newContractor?.AddressId);
-                    Assert.Equal(ClientType.LegalEntity, newContractor?.ClientType);
-                    Assert.Equal(addContractor.ContractorName, newContractor?.ContractorName);
+                    Assert.Equal(ClientType.LegalEntity, newContractor?.Type);
+                    Assert.Equal(addContractor.Name, newContractor?.Name);
                     Assert.Equal(addContractor.IN, newContractor?.IN);
                     Assert.Equal(addContractor.TIN, newContractor?.TIN);
                     Assert.Equal(addContractor.Email, newContractor?.Email);

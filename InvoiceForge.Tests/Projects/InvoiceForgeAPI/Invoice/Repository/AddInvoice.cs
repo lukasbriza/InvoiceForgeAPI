@@ -1,10 +1,10 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
-namespace InvoiceRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class AddInvoice: WebApplicationFactory
@@ -15,11 +15,7 @@ namespace InvoiceRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
-
-                var dbclient = await db._context.Client.FindAsync(1);
-                var contractor = await db._context.Contractor.FindAsync(1);
-                var userAccount = await db._context.UserAccount.FindAsync(1);
+                await db.InitInvoiceCopies();
                 
                 //ASSERT
                 var invoice = new InvoiceAddRequestRepository {
@@ -31,9 +27,11 @@ namespace InvoiceRepository
                     VATTotal = 2,
                     TotalAll = 12,
                     Currency = " CZK",
-                    ClientLocal = new ClientGetRequest(dbclient, true),
-                    ContractorLocal = new ContractorGetRequest(contractor, true),
-                    UserAccountLocal = new UserAccountGetRequest(userAccount, true),
+
+                    ClientCopyId = 1,
+                    ContractorCopyId = 2,
+                    UserAccountCopyId = 1,
+                    
                     Maturity = DateTime.Now,
                     Exposure = DateTime.Now,
                     TaxableTransaction = DateTime.Now,

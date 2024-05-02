@@ -38,6 +38,6 @@ namespace InvoiceForgeApi.Models.Interfaces
     }
     public interface IUpdateClient<TEntity>
     {
-        Task<bool> Update(int entityId, TEntity entity, ClientType? type);
+        Task<bool> Update(int entityId, TEntity entity, ClientType type);
     }
 }

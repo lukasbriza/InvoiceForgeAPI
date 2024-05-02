@@ -1,6 +1,6 @@
 ﻿using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,22 +17,21 @@ namespace InvoiceForgeApi.Repository
             DbSet<UserAccount> userAccounts = _dbContext.UserAccount;
             if (plain == false)
             {
-                userAccounts.Include(u => u.Bank);
+                await userAccounts.Include(u => u.Bank).LoadAsync();
             }
             
             var userAccountsList = await userAccounts
-                .Select( u => new UserAccountGetRequest(u, plain))
                 .Where(u => u.Owner == userId)
                 .ToListAsync();
 
-            return userAccountsList;
+            return userAccountsList.ConvertAll(u => new UserAccountGetRequest(u, plain));
         }
         public async Task<UserAccountGetRequest?> GetById(int userAccountId, bool? plain)
         {
             DbSet<UserAccount> userAccount = _dbContext.UserAccount;
             if (plain == false)
             {
-                userAccount.Include(u => u.Bank);
+                await userAccount.Include(u => u.Bank).LoadAsync();
             }
             
             var userAccountCall = await userAccount.FindAsync(userAccountId);
@@ -50,15 +49,15 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int userAccountId, UserAccountUpdateRequest userAccount)
         {
             var localUserAccount = await Get(userAccountId);
+            if (localUserAccount is null) throw new DatabaseCallError("User account is not in database.");
 
-            if (localUserAccount is null)
-            {
-                throw new DatabaseCallError("User account is not in database.");
-            }
+            var localSelect = new { localUserAccount.BankId, localUserAccount.AccountNumber, localUserAccount.IBAN };
+            var updateSelect = new { userAccount.BankId, userAccount.AccountNumber, userAccount.IBAN };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
 
-            localUserAccount.BankId = userAccount.BankId ?? localUserAccount.BankId;
-            localUserAccount.AccountNumber = userAccount.AccountNumber ?? localUserAccount.AccountNumber;
-            localUserAccount.IBAN = userAccount.IBAN ?? localUserAccount.IBAN;
+            localUserAccount.BankId = userAccount.BankId;
+            localUserAccount.AccountNumber = userAccount.AccountNumber;
+            localUserAccount.IBAN = userAccount.IBAN;
             
             var update = _dbContext.Update(localUserAccount);
             return update.State == EntityState.Modified; 

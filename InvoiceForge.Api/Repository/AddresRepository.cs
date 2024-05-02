@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -15,23 +15,23 @@ namespace InvoiceForgeApi.Repository
 
         public async Task<List<AddressGetRequest>?> GetAll(int userId, bool? plain = false)
         {
-            await _dbContext.Database.BeginTransactionAsync();
             DbSet<Address> addresses = _dbContext.Address;
             if (plain == false){
-                addresses.Include(a => a.Country);
+                await addresses.Include(a => a.Country).LoadAsync();
             }
             var addressList = await addresses
-                .Select(a => new AddressGetRequest(a, plain))
                 .Where(a => a.Owner == userId)
                 .ToListAsync();
-            return addressList;
+            
+
+            return addressList.ConvertAll(a => new AddressGetRequest(a, plain));
         }
         public async Task<AddressGetRequest?> GetById(int addressId, bool? plain = false)
         {
                 var address = _dbContext.Address;
                 if (plain == false)
                 {
-                    address.Include(a => a.Country);
+                    await address.Include(a => a.Country).LoadAsync();
                 }
                 var addressCall = await address.FindAsync(addressId);
                 if (addressCall is null) throw new DatabaseCallError("Adress is not in database.");
@@ -41,16 +41,17 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int addressId, AddressUpdateRequest address)
         {
             var localAddress = await Get(addressId);
-            if (localAddress is null)
-            {
-                throw new DatabaseCallError("Address is not in database.");
-            }
+            if (localAddress is null) throw new DatabaseCallError("Address is not in database.");
 
-            localAddress.CountryId = address.CountryId ?? localAddress.CountryId;
-            localAddress.City = address.City ?? localAddress.City;
-            localAddress.Street = address.Street ?? localAddress.Street;
-            localAddress.StreetNumber = address.StreetNumber ?? localAddress.StreetNumber;
-            localAddress.PostalCode = address.PostalCode ?? localAddress.PostalCode;
+            var localSelect = new { localAddress.CountryId, localAddress.City, localAddress.Street, localAddress.StreetNumber, localAddress.PostalCode};
+            var updateSelect = new { address.CountryId, address.City, address.Street, address.StreetNumber, address.PostalCode };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+
+            localAddress.CountryId = address.CountryId;
+            localAddress.City = address.City;
+            localAddress.Street = address.Street;
+            localAddress.StreetNumber = address.StreetNumber;
+            localAddress.PostalCode = address.PostalCode;
             
             var update = _dbContext.Update(localAddress);
             return update.State == EntityState.Modified;
@@ -68,10 +69,10 @@ namespace InvoiceForgeApi.Repository
             return !isInDatabase;
         }
 
-        public async Task<bool> IsUnique(int userId, AddressUpdateRequest address)
+        public async Task<bool> IsUnique(int userId, Address address)
         {
-            var isInDatabase = await _dbContext.Address.AnyAsync((a) => 
-                a.Owner == userId && 
+            var isInDatabase = await _dbContext.Address.AnyAsync((a) =>
+                a.Owner == userId &&
                 a.City == address.City && 
                 a.Street == address.Street && 
                 a.StreetNumber == address.StreetNumber && 

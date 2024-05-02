@@ -1,9 +1,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForge.Tests.Data;
+using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Models.DTO;
 using Xunit;
 
-namespace AddressRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class UpdateAddress: WebApplicationFactory
@@ -14,7 +16,7 @@ namespace AddressRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var addressToCompare = await db._repository.Address.GetById(1);
 
                 //ASSERT
@@ -22,13 +24,15 @@ namespace AddressRepository
 
                 if (addressToCompare is not null)
                 {
+                    var tAddress = new TestAddress();
                     var updateAddress = new AddressUpdateRequest
                     {
+                        CountryId = 1,
                         Owner = addressToCompare.Owner,
-                        Street = "TestStreet",
-                        StreetNumber = 1000,
-                        City = "TestCity",
-                        PostalCode = 123456789
+                        Street = tAddress.Street,
+                        StreetNumber = tAddress.StreetNumber,
+                        City = tAddress.City,
+                        PostalCode = tAddress.PostalCode
                     };
 
                     var updateAddressResult = await db._repository.Address.Update(addressToCompare.Id,updateAddress);
@@ -41,13 +45,46 @@ namespace AddressRepository
 
                     if (updatedAddress is not null)
                     {
-                        Assert.Equal("TestStreet", updatedAddress.Street);
-                        Assert.Equal(1000, updatedAddress.StreetNumber);
-                        Assert.Equal("TestCity", updatedAddress.City);
-                        Assert.Equal(123456789, updatedAddress.PostalCode);
+                        Assert.Equal(tAddress.Street, updatedAddress.Street);
+                        Assert.Equal(tAddress.StreetNumber, updatedAddress.StreetNumber);
+                        Assert.Equal(tAddress.City, updatedAddress.City);
+                        Assert.Equal(tAddress.PostalCode, updatedAddress.PostalCode);
                     }
                 }
                 
+                //CLEAN
+                db.Dispose();
+            });
+        }
+
+        [Fact]
+        public Task ThrowErrorWhenUpdateIdenticValues()
+        {
+            return RunTest(async (client) => {
+                //SETUP
+                var db = new DatabaseHelper();
+                var address = await db._context.Address.FindAsync(1);
+                
+                //ASSERT
+                Assert.NotNull(address);
+                var updateAddress = new AddressUpdateRequest {
+                    Owner = address.Owner,
+                    CountryId = address.CountryId,
+                    Street = address.Street,
+                    StreetNumber = address.StreetNumber,
+                    City = address.City,
+                    PostalCode = address.PostalCode
+                };
+
+                try
+                {
+                    var result = await db._repository.Address.Update(1, updateAddress);
+                }
+                catch (Exception ex)
+                {
+                    Assert.IsType<ValidationError>(ex);
+                }
+
                 //CLEAN
                 db.Dispose();
             });

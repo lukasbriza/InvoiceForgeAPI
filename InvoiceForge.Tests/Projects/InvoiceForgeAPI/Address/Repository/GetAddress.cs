@@ -2,11 +2,11 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace AddressRepository
+namespace Repository
 {
     [Collection("Sequential")]
     public class GetAddress: WebApplicationFactory
@@ -17,14 +17,14 @@ namespace AddressRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var users = await db._context.User.Select(u => u.Id).ToListAsync();
                 
                 //ASSERT
                 Assert.NotNull(users);
                 Assert.IsType<List<int>>(users);
 
-                users.ForEach(async userId => {
+                async Task call(int userId){
                     var addressesValidation = new AddressSeed().Populate().FindAll(a => a.Owner == userId);
                     var addresses = await db._repository.Address.GetAll(userId);
                     
@@ -34,6 +34,10 @@ namespace AddressRepository
                     {
                         Assert.Equal(addressesValidation.Count, addresses.Count);
                     }
+                }
+                users.ForEach(userId => {
+                    var task = call(userId);
+                    task.Wait();
                 });
 
                 //CLEAN
@@ -47,14 +51,14 @@ namespace AddressRepository
             return RunTest(async (client) => {
                 //SETUP
                 var db = new DatabaseHelper();
-                db.InitializeDbForTest();
+                
                 var addresses = await db._context.Address.Select(a => a.Id).ToListAsync();
 
                 //ASSERT
                 Assert.NotNull(addresses);
                 Assert.IsType<List<int>>(addresses);
 
-                addresses.ForEach(async addressId => {
+                async Task call(int addressId){
                     var repoAddress = await db._repository.Address.GetById(addressId);
                     Assert.NotNull(repoAddress);
 
@@ -63,6 +67,11 @@ namespace AddressRepository
                         Assert.IsType<AddressGetRequest>(repoAddress);
                         Assert.Equal(repoAddress.Id, addressId);
                     }
+                }
+
+                addresses.ForEach(addressId => {
+                    var task = call(addressId);
+                    task.Wait();
                 });
 
                 //CLEAN

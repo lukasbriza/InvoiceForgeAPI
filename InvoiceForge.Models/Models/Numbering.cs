@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Models

@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.Interfaces;
 
 namespace InvoiceForgeApi.Abl.user

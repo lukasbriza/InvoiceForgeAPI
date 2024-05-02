@@ -1,5 +1,5 @@
 ﻿
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models.CodeLists;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,7 +16,7 @@ namespace InvoiceForgeApi.Models
             AccountNumber = userAccount.AccountNumber;
             IBAN = userAccount.IBAN;
         }
-        [ForeignKey("Bank")] public int? BankId { get; set; }
+        [ForeignKey("Bank")] public int BankId { get; set; }
 
         [Required] public string AccountNumber { get; set; } = null!;
         public string? IBAN { get; set; } = null;

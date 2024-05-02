@@ -1,6 +1,6 @@
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.DTO.Model;
+using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Helpers;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
@@ -24,22 +24,23 @@ namespace InvoiceForgeApi.Repository
             var numberingTemplate = numbering.NumberingTemplate;
 
             //GET INVOICE WITH MAXIMUM ORDER
-            var maxOrderInvoice = _dbContext.Invoice
-                .Select(i => new {i.OrderNumber, i.InvoiceNumber, i.NumberingId})
-                .Where(i => i.NumberingId == numberingId)
-                .MaxBy(i => i.OrderNumber);
+            var maxOrderInvoice = await _dbContext.Invoice
+            .Where(i => i.NumberingId == numberingId)
+            .Select(i => new {i.OrderNumber, i.InvoiceNumber})
+            .ToListAsync();
 
+            var lastInvoice = maxOrderInvoice.MaxBy(i => i.OrderNumber);
             var invoiceNumberObject = new GenerateInvoiceNumber();
 
             //ASSIGN NUMBERS BASED ON TEMPLATE
-            if (maxOrderInvoice is null)
+            if (maxOrderInvoice is null || maxOrderInvoice.Count == 0)
             {
                 invoiceNumberObject.invoiceOrder = 1;
             } else {
-                invoiceNumberObject.invoiceOrder = maxOrderInvoice.OrderNumber + 1;
+                invoiceNumberObject.invoiceOrder = lastInvoice!.OrderNumber + 1;
             }
 
-            var invoiceNumber = new InvoiceNumberMatrix(numberingTemplate, maxOrderInvoice?.InvoiceNumber).GetNumbering();
+            var invoiceNumber = new InvoiceNumberMatrix(numberingTemplate, lastInvoice?.InvoiceNumber).GetNumbering();
             
             if (invoiceNumber.Resolved == false || invoiceNumber.InvoiceNumber is null) throw new ValidationError("Something unexpected happened in InvoicENumberMatrix.");
             if (invoiceNumber.Overflowed)
@@ -54,11 +55,14 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int numberingId, NumberingUpdateRequest numbering)
         {
             var localNumbering = await Get(numberingId);
-
             if (localNumbering is null) throw new DatabaseCallError("Numbering is not in database.");
 
-            localNumbering.NumberingTemplate = numbering.NumberingTemplate ?? localNumbering.NumberingTemplate;
-            localNumbering.NumberingPrefix = numbering.NumberingPrefix ?? localNumbering.NumberingPrefix;
+            var localSelect = new { localNumbering.NumberingTemplate, localNumbering.NumberingPrefix };
+            var updateSelect = new { numbering.NumberingTemplate, numbering.NumberingPrefix };
+            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+
+            localNumbering.NumberingTemplate = numbering.NumberingTemplate;
+            localNumbering.NumberingPrefix = numbering.NumberingPrefix;
 
             var update = _dbContext.Update(localNumbering);
             return update.State == EntityState.Modified;    
@@ -71,7 +75,9 @@ namespace InvoiceForgeApi.Repository
             var lastNumberIndex = numbering.NumberingTemplate.FindLastIndex(v => v == NumberingVariable.Number);
             numbering.NumberingTemplate.Insert(lastNumberIndex, NumberingVariable.Number);
             
-            return _dbContext.Entry(numbering).State == EntityState.Modified;
+            var updateCall =  _dbContext.Update(numbering);
+            var saveResult = await _dbContext.SaveChangesAsync();
+            return saveResult > 0;
         }
     }
 }
