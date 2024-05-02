@@ -1,7 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
 using InvoiceForgeApi.Models;
 using Xunit;
 
@@ -85,7 +84,7 @@ namespace Repository
                 Assert.NotNull(userAccount);
                 var updateUserAccount = new UserAccountUpdateRequest
                 {
-                    BankId = userAccount.BankId,
+                    BankId = userAccount!.BankId,
                     AccountNumber = userAccount.AccountNumber,
                     IBAN = userAccount.IBAN
                 };

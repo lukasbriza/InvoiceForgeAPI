@@ -1,6 +1,15 @@
-﻿namespace InvoiceForgeApi.Models.DTO
+﻿namespace InvoiceForgeApi.Models
 {
-    public class AddressGetRequest
+    public class AddressEntityBase
+    {
+        public int CountryId { get; set; }
+        public string Street { get; set; } = null!;
+        public int StreetNumber { get; set; }
+        public string City { get; set; } = null!;
+        public int PostalCode { get; set; }
+    }
+
+    public class AddressGetRequest: AddressEntityBase
     {
         public AddressGetRequest() {}
         public AddressGetRequest(Address? address, bool? plain = false)
@@ -18,24 +27,12 @@
             }
         }
         public int Id { get; set; }
-        public int CountryId { get; set; }
         public int Owner {  get; set; }
-        public string Street { get; set; } = null!;
-        public int StreetNumber { get; set; }
-        public string City { get; set; } = null!;
-        public int PostalCode { get; set; }
         public CountryGetRequest? Country { get; set; } = null!;
     }
-    public class AddressAddRequest
-    {
-        public int CountryId { get; set; }
-        public string Street { get; set; } = null!;
-        public int StreetNumber { get; set; }
-        public string City { get; set; } = null!;
-        public int PostalCode { get; set; }
-    }
+    public class AddressAddRequest: AddressEntityBase {}
 
-    public class AddressUpdateRequest: AddressAddRequest
+    public class AddressUpdateRequest: AddressEntityBase
     {
         public int Owner {  get; set; }
     }

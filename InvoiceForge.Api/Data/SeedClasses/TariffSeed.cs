@@ -1,4 +1,4 @@
-using InvoiceForgeApi.Models.CodeLists;
+using InvoiceForgeApi.Models;
 
 namespace InvoiceForgeApi.Data.SeedClasses
 {

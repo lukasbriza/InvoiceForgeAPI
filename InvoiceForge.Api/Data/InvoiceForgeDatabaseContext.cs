@@ -1,5 +1,4 @@
 ﻿using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.CodeLists;
 using InvoiceForgeApi.Models.Enum;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;

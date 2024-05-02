@@ -3,7 +3,7 @@ using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.Abl.address;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

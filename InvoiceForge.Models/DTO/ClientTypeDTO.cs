@@ -1,4 +1,4 @@
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
     public class ClientTypeGetRequest
     {

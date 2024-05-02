@@ -2,7 +2,7 @@ using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using Xunit;
 
 namespace Repository
@@ -68,7 +68,7 @@ namespace Repository
                 //ASSERT
                 Assert.NotNull(address);
                 var updateAddress = new AddressUpdateRequest {
-                    Owner = address.Owner,
+                    Owner = address!.Owner,
                     CountryId = address.CountryId,
                     Street = address.Street,
                     StreetNumber = address.StreetNumber,

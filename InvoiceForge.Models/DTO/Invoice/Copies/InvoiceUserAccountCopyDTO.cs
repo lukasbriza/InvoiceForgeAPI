@@ -1,7 +1,16 @@
 
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class InvoiceUserAccountCopyGetRequest
+    public class InvoiceUserAccountCopyEntityBase
+    {
+        public int OriginId {  get; set; }
+        public int BankId { get; set; }
+        public int Owner { get; set; }
+        public string AccountNumber { get; set; } = null!;
+        public string? IBAN { get; set; } = null;
+    }
+
+    public class InvoiceUserAccountCopyGetRequest: InvoiceUserAccountCopyEntityBase
     {
         public InvoiceUserAccountCopyGetRequest() {}
 
@@ -20,16 +29,10 @@ namespace InvoiceForgeApi.Models.DTO
         }
 
         public int Id { get; set; }
-        public int OriginId {  get; set; }
-        public int Owner { get; set; }
-        public int BankId { get; set; }
-        public string AccountNumber { get; set; } = null!;
-        public string? IBAN { get; set; }
-
         public BankGetRequest? Bank { get; set; } = null!;
     }
 
-    public class InvoiceUserAccountCopyAddRequest
+    public class InvoiceUserAccountCopyAddRequest: InvoiceUserAccountCopyEntityBase
     {
         public InvoiceUserAccountCopyAddRequest() {}
         public InvoiceUserAccountCopyAddRequest(UserAccountGetRequest? userAccount)
@@ -43,10 +46,5 @@ namespace InvoiceForgeApi.Models.DTO
                 IBAN = userAccount?.IBAN;
             }
         }
-        public int OriginId {  get; set; }
-        public int BankId { get; set; }
-        public int Owner { get; set; }
-        public string AccountNumber { get; set; } = null!;
-        public string? IBAN { get; set; } = null;
     }
 }

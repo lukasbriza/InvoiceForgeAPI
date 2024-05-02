@@ -1,8 +1,24 @@
 using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class InvoiceEntityCopyGetRequest
+    public class InvoiceEntityCopyEntityBase
+    {
+        public int Owner { get; set; }
+        public int? OriginClientId {  get; set; } = null;
+        public int? OriginContractorId { get; set; } = null;
+        public int AddressCopyId { get; set; }
+        public ClientType Type { get; set; }
+        public string Name { get; set; } = null!;
+        public long IN { get; set; }
+        public string TIN { get; set; } = null!;
+        public string? Mobil { get; set; }
+        public string? Tel { get; set; }
+        public string? Email { get; set; }
+        public string? Www { get; set; }
+    }
+
+    public class InvoiceEntityCopyGetRequest: InvoiceEntityCopyEntityBase
     {
         public InvoiceEntityCopyGetRequest() {}
         public InvoiceEntityCopyGetRequest(InvoiceEntityCopy? invoiceEntity, bool? plain = false)
@@ -26,22 +42,10 @@ namespace InvoiceForgeApi.Models.DTO
             }
         }
         public int Id { get; set; }
-        public int? OriginClientId {  get; set; } = null;
-        public int? OriginContractorId { get; set; } = null;
-        public int Owner { get; set; }
-        public int AddressCopyId { get; set; }
-        public ClientType Type { get; set; }
-        public string Name { get; set; } = null!;
-        public long IN { get; set; }
-        public string TIN { get; set; } = null!;
-        public string? Mobil { get; set; }
-        public string? Tel { get; set; }
-        public string? Email { get; set; }
-        public string? Www { get; set; }
         public InvoiceAddressCopyGetRequest? AddressCopy { get; set;}
     }
 
-    public class InvoiceEntityCopyAddRequest
+    public class InvoiceEntityCopyAddRequest: InvoiceEntityCopyEntityBase
     {
         public InvoiceEntityCopyAddRequest() {}
         public InvoiceEntityCopyAddRequest(ClientGetRequest? client, int? copyAddressId)
@@ -80,19 +84,6 @@ namespace InvoiceForgeApi.Models.DTO
                 Www = contractor?.Www;
             }
         }
-
-        public int Owner { get; set; }
-        public int? OriginClientId {  get; set; } = null;
-        public int? OriginContractorId { get; set; } = null;
-        public int AddressCopyId { get; set; }
-        public ClientType Type { get; set; }
-        public string Name { get; set; } = null!;
-        public long IN { get; set; }
-        public string TIN { get; set; } = null!;
-        public string? Mobil { get; set; }
-        public string? Tel { get; set; }
-        public string? Email { get; set; }
-        public string? Www { get; set; }
     }
 
 }

@@ -1,6 +1,16 @@
-﻿namespace InvoiceForgeApi.Models.DTO
+﻿namespace InvoiceForgeApi.Models
 {
-    public class InvoiceTemplateGetRequest
+    public class InvoiceTemplateEntityBase
+    {
+        public  int ClientId { get; set; }
+        public int ContractorId { get; set; }
+        public int UserAccountId { get; set; }
+        public int CurrencyId { get; set; }
+        public string TemplateName { get; set; } = null!;
+        public int NumberingId { get; set; }
+    }
+
+    public class InvoiceTemplateGetRequest: InvoiceTemplateEntityBase
     {
         public InvoiceTemplateGetRequest() {}
         public InvoiceTemplateGetRequest(InvoiceTemplate? template, bool? plain = false) 
@@ -21,27 +31,13 @@
         }
         public int Id { get; set; }
         public int Owner { get; set; }
-        public  int ClientId { get; set; }
-        public int ContractorId { get; set; }
-        public int UserAccountId { get; set; }
-        public string TemplateName { get; set; } = null!;
-        public int NumberingId { get; set; }
-        public int CurrencyId { get; set; }
         public  NumberingGetRequest? Numbering { get; set; }
         public DateTime Created { get; set; }
     }
 
-    public class InvoiceTemplateAddRequest
-    {
-        public  int ClientId { get; set; }
-        public int ContractorId { get; set; }
-        public int UserAccountId { get; set; }
-        public int CurrencyId { get; set; }
-        public string TemplateName { get; set; } = null!;
-        public int NumberingId { get; set; }
-    }
+    public class InvoiceTemplateAddRequest: InvoiceTemplateEntityBase {}
 
-    public class InvoiceTemplateUpdateRequest: InvoiceTemplateAddRequest
+    public class InvoiceTemplateUpdateRequest: InvoiceTemplateEntityBase
     {
         public int Owner { get; set; }
     }

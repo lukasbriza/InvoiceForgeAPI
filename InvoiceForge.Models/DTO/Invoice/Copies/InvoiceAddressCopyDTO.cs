@@ -1,6 +1,16 @@
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
-    public class InvoiceAddressCopyGetRequest
+    public class InvoiceAddressCopyEntityBase
+    {
+        public int OriginId {  get; set; }
+        public int CountryId { get; set; }
+        public string Street { get; set; } = null!;
+        public int StreetNumber { get; set; }
+        public string City { get; set; } = null!;
+        public int PostalCode { get; set; }
+    }
+
+    public class InvoiceAddressCopyGetRequest: InvoiceAddressCopyEntityBase
     {
         public InvoiceAddressCopyGetRequest() {}
         public InvoiceAddressCopyGetRequest(InvoiceAddressCopy? addressCopy, bool? plain = false)
@@ -19,21 +29,8 @@ namespace InvoiceForgeApi.Models.DTO
         }
 
         public int Id { get; set; }
-        public int OriginId {  get; set; }
-        public int CountryId { get; set; }
-        public string Street { get; set; } = null!;
-        public int StreetNumber { get; set; }
-        public string City { get; set; } = null!;
-        public int PostalCode { get; set; }
         public CountryGetRequest? Country {get; set;}
     }
-    public class InvoiceAddressCopyAddRequest
-    {
-        public int OriginId {  get; set; }
-        public int CountryId { get; set; }
-        public string Street { get; set; } = null!;
-        public int StreetNumber { get; set; }
-        public string City { get; set; } = null!;
-        public int PostalCode { get; set; }
-    }
+
+    public class InvoiceAddressCopyAddRequest: InvoiceAddressCopyEntityBase {}
 }

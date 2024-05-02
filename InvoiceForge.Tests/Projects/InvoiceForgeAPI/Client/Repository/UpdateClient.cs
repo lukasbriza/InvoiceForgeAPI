@@ -4,7 +4,7 @@ using FunctionalTests.Projects.InvoiceForgeApi;
 using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using Xunit;
 
@@ -77,7 +77,7 @@ namespace Repository
                 Assert.NotNull(tclient);
                 var updateClient = new ClientUpdateRequest
                 {
-                    AddressId = tclient.AddressId,
+                    AddressId = tclient!.AddressId,
                     Name = tclient.Name,
                     IN = tclient.IN,
                     TIN = tclient.TIN,

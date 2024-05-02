@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace InvoiceForgeApi.Models.CodeLists
+namespace InvoiceForgeApi.Models
 {
     public class Tariff
     {

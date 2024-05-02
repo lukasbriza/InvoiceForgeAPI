@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace InvoiceForgeApi.Models.CodeLists
+namespace InvoiceForgeApi.Models
 {
     public class Country: CodeListBase
     {

@@ -4,7 +4,6 @@ using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.Abl.client;
 using InvoiceForgeApi.DTO;
 using InvoiceForgeApi.Models;
-using InvoiceForgeApi.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 

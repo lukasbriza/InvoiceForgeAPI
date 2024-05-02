@@ -1,4 +1,4 @@
-using InvoiceForgeApi.Models.DTO;
+using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Models.Interfaces

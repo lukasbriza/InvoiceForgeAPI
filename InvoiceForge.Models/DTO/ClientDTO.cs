@@ -1,9 +1,19 @@
 ﻿using InvoiceForgeApi.Models.Enum;
 
-namespace InvoiceForgeApi.Models.DTO
+namespace InvoiceForgeApi.Models
 {
+    public class ClientEntityBase
+    {
+        public int AddressId { get; set; }
+        public string Name { get; set; } = null!;
+        public long IN { get; set; }
+        public string TIN { get; set; } = null!;
+        public string? Mobil { get; set; } = null!;
+        public string? Tel { get; set; } = null!;
+        public string? Email { get; set; } = null!;
+    }
 
-    public class ClientGetRequest
+    public class ClientGetRequest: ClientEntityBase
     {
         public ClientGetRequest(){}
         public ClientGetRequest(Client? client, bool? plain = false)
@@ -24,32 +34,19 @@ namespace InvoiceForgeApi.Models.DTO
             }
         }
         public int Id { get; set; }
-        public int AddressId { get; set; }
         public int Owner { get; set; }
         public ClientType Type { get; set; }
-        public string Name { get; set; } = null!;
-        public long IN { get; set; }
-        public string TIN { get; set; } = null!;
-        public string? Mobil { get; set; } = null!;
-        public string? Tel { get; set; } = null!;
-        public string? Email { get; set; } = null!;
         public AddressGetRequest? Address { get; set; } = null!;
     }
 
-    public class ClientAddRequest
+    public class ClientAddRequest: ClientEntityBase
     {
-        public int AddressId { get; set; }
         public int TypeId { get; set; }
-        public string Name { get; set; } = null!;
-        public long IN { get; set; }
-        public string TIN { get; set; } = null!;
-        public string? Mobil { get; set; } = null!;
-        public string? Tel { get; set; } = null!;
-        public string? Email { get; set; } = null!;
     }
 
-    public class ClientUpdateRequest: ClientAddRequest
+    public class ClientUpdateRequest: ClientEntityBase
     {
         public int Owner { get; set; }
+        public int TypeId { get; set; }
     }
 }
