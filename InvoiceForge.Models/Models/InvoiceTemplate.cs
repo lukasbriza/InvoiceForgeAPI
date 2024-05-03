@@ -14,7 +14,6 @@ namespace InvoiceForgeApi.Models
             UserAccountId = template.UserAccountId;
             CurrencyId = template.CurrencyId;
             TemplateName = template.TemplateName;
-            Created = new DateTime().ToUniversalTime();
             NumberingId = template.NumberingId;
         }
 
@@ -24,7 +23,6 @@ namespace InvoiceForgeApi.Models
         [ForeignKey("Contractor")] public int ContractorId { get; set; }
         [ForeignKey("UserAccount")] public int UserAccountId { get; set; }
         [Required] public string TemplateName { get; set; } = null!;
-        [Required] public DateTime Created { get; set; }
 
         // Reference
         public virtual User User { get; set; } = null!; 

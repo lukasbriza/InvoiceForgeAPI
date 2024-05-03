@@ -7,6 +7,8 @@ namespace InvoiceForgeApi.Models
     public class ModelBase: WithIdModel, IEntityBase
     {
         [ForeignKey("User")] public int Owner {  get; set; }
+        [Required] public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; } = null;
     }
 
     public class WithIdModel: IEntityId
@@ -22,5 +24,7 @@ namespace InvoiceForgeApi.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required] public string Value { get; set; } = null!;
+        [Required] public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; } = null;
     }
 }

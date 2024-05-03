@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace InvoiceForgeApi.Migrations
+namespace InvoiceForge.Api.Migrations
 {
     public partial class InitialCreate : Migration
     {
@@ -15,9 +15,11 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Shortcut = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SWIFT = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    SWIFT = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -30,8 +32,10 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Shortcut = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Shortcut = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -44,7 +48,9 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -78,17 +84,42 @@ namespace InvoiceForgeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InvoiceUserAccountCopy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Outdated = table.Column<bool>(type: "bit", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    OriginId = table.Column<int>(type: "int", nullable: false),
+                    BankId = table.Column<int>(type: "int", nullable: false),
+                    AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IBAN = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvoiceUserAccountCopy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InvoiceUserAccountCopy_Bank_BankId",
+                        column: x => x.BankId,
+                        principalTable: "Bank",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Address",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CountryId = table.Column<int>(type: "int", nullable: false),
-                    Owner = table.Column<int>(type: "int", nullable: false),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StreetNumber = table.Column<int>(type: "int", nullable: false),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PostalCode = table.Column<int>(type: "int", nullable: false)
+                    PostalCode = table.Column<int>(type: "int", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,14 +138,48 @@ namespace InvoiceForgeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InvoiceAddressCopy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Outdated = table.Column<bool>(type: "bit", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    OriginId = table.Column<int>(type: "int", nullable: false),
+                    CountryId = table.Column<int>(type: "int", nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StreetNumber = table.Column<int>(type: "int", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostalCode = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvoiceAddressCopy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InvoiceAddressCopy_Country_CountryId",
+                        column: x => x.CountryId,
+                        principalTable: "Country",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InvoiceAddressCopy_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "InvoiceItem",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Owner = table.Column<int>(type: "int", nullable: false),
                     ItemName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TariffId = table.Column<int>(type: "int", nullable: false)
+                    TariffId = table.Column<int>(type: "int", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,9 +203,11 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Owner = table.Column<int>(type: "int", nullable: false),
                     NumberingTemplate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NumberingPrefix = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    NumberingPrefix = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,10 +226,12 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Owner = table.Column<int>(type: "int", nullable: false),
-                    BankId = table.Column<int>(type: "int", nullable: true),
+                    BankId = table.Column<int>(type: "int", nullable: false),
                     AccountNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IBAN = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    IBAN = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -186,15 +255,17 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AddressId = table.Column<int>(type: "int", nullable: true),
-                    Owner = table.Column<int>(type: "int", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    ClientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IN = table.Column<long>(type: "bigint", nullable: false),
                     TIN = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Mobil = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Tel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -218,16 +289,18 @@ namespace InvoiceForgeApi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AddressId = table.Column<int>(type: "int", nullable: true),
-                    Owner = table.Column<int>(type: "int", nullable: false),
-                    ClientType = table.Column<int>(type: "int", nullable: false),
-                    ContractorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IN = table.Column<long>(type: "bigint", nullable: false),
                     TIN = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Mobil = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Tel = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Www = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Www = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -246,19 +319,57 @@ namespace InvoiceForgeApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InvoiceEntityCopy",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Outdated = table.Column<bool>(type: "bit", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    OriginClientId = table.Column<int>(type: "int", nullable: true),
+                    OriginContractorId = table.Column<int>(type: "int", nullable: true),
+                    AddressCopyId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IN = table.Column<long>(type: "bigint", nullable: false),
+                    TIN = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Mobil = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Tel = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Www = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvoiceEntityCopy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InvoiceEntityCopy_InvoiceAddressCopy_AddressCopyId",
+                        column: x => x.AddressCopyId,
+                        principalTable: "InvoiceAddressCopy",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InvoiceEntityCopy_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "InvoiceTemplate",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Owner = table.Column<int>(type: "int", nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
                     NumberingId = table.Column<int>(type: "int", nullable: false),
                     ClientId = table.Column<int>(type: "int", nullable: false),
                     ContractorId = table.Column<int>(type: "int", nullable: false),
                     UserAccountId = table.Column<int>(type: "int", nullable: false),
                     TemplateName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -304,7 +415,6 @@ namespace InvoiceForgeApi.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Outdated = table.Column<bool>(type: "bit", nullable: false),
-                    Owner = table.Column<int>(type: "int", nullable: false),
                     TemplateId = table.Column<int>(type: "int", nullable: false),
                     NumberingId = table.Column<int>(type: "int", nullable: false),
                     InvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -313,13 +423,15 @@ namespace InvoiceForgeApi.Migrations
                     VATTotal = table.Column<long>(type: "bigint", nullable: false),
                     TotalAll = table.Column<long>(type: "bigint", nullable: false),
                     Currency = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ClientLocal = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ContractorLocal = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserAccountLocal = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientCopyId = table.Column<int>(type: "int", nullable: false),
+                    ContractorCopyId = table.Column<int>(type: "int", nullable: false),
+                    UserAccountCopyId = table.Column<int>(type: "int", nullable: false),
                     Maturity = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Exposure = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TaxableTransaction = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Created = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Created = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Owner = table.Column<int>(type: "int", nullable: false),
+                    Updated = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -330,9 +442,38 @@ namespace InvoiceForgeApi.Migrations
                         principalTable: "InvoiceTemplate",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Invoice_InvoiceUserAccountCopy_UserAccountCopyId",
+                        column: x => x.UserAccountCopyId,
+                        principalTable: "InvoiceUserAccountCopy",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Invoice_User_Owner",
                         column: x => x.Owner,
                         principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InvoiceInvoiceEntityCopy",
+                columns: table => new
+                {
+                    InvoiceEntityCopiesId = table.Column<int>(type: "int", nullable: false),
+                    InvoicesId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvoiceInvoiceEntityCopy", x => new { x.InvoiceEntityCopiesId, x.InvoicesId });
+                    table.ForeignKey(
+                        name: "FK_InvoiceInvoiceEntityCopy_Invoice_InvoicesId",
+                        column: x => x.InvoicesId,
+                        principalTable: "Invoice",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InvoiceInvoiceEntityCopy_InvoiceEntityCopy_InvoiceEntityCopiesId",
+                        column: x => x.InvoiceEntityCopiesId,
+                        principalTable: "InvoiceEntityCopy",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -408,6 +549,37 @@ namespace InvoiceForgeApi.Migrations
                 column: "TemplateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Invoice_UserAccountCopyId",
+                table: "Invoice",
+                column: "UserAccountCopyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceAddressCopy_CountryId",
+                table: "InvoiceAddressCopy",
+                column: "CountryId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceAddressCopy_UserId",
+                table: "InvoiceAddressCopy",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceEntityCopy_AddressCopyId",
+                table: "InvoiceEntityCopy",
+                column: "AddressCopyId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceEntityCopy_UserId",
+                table: "InvoiceEntityCopy",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceInvoiceEntityCopy_InvoicesId",
+                table: "InvoiceInvoiceEntityCopy",
+                column: "InvoicesId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InvoiceItem_Owner",
                 table: "InvoiceItem",
                 column: "Owner");
@@ -458,6 +630,11 @@ namespace InvoiceForgeApi.Migrations
                 column: "UserAccountId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InvoiceUserAccountCopy_BankId",
+                table: "InvoiceUserAccountCopy",
+                column: "BankId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Numbering_Owner",
                 table: "Numbering",
                 column: "Owner");
@@ -476,7 +653,13 @@ namespace InvoiceForgeApi.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "InvoiceInvoiceEntityCopy");
+
+            migrationBuilder.DropTable(
                 name: "InvoiceService");
+
+            migrationBuilder.DropTable(
+                name: "InvoiceEntityCopy");
 
             migrationBuilder.DropTable(
                 name: "Invoice");
@@ -485,7 +668,13 @@ namespace InvoiceForgeApi.Migrations
                 name: "InvoiceItem");
 
             migrationBuilder.DropTable(
+                name: "InvoiceAddressCopy");
+
+            migrationBuilder.DropTable(
                 name: "InvoiceTemplate");
+
+            migrationBuilder.DropTable(
+                name: "InvoiceUserAccountCopy");
 
             migrationBuilder.DropTable(
                 name: "Tariff");
