@@ -21,6 +21,7 @@ builder.Services.AddDbContext<InvoiceForgeDatabaseContext>(options =>
         triggerOptions.AddTrigger<InvoiceTemplateUpdateTrigger>();
         triggerOptions.AddTrigger<UserAccountUpdateTrigger>();
         triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>();
+        triggerOptions.AddTrigger<TrackableTrigger>();
     });
 });
 

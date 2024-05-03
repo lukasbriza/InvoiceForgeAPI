@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace InvoiceForgeApi.Migrations
+namespace InvoiceForge.Api.Migrations
 {
     [DbContext(typeof(InvoiceForgeDatabaseContext))]
-    [Migration("20240417185245_RemoveConvert")]
-    partial class RemoveConvert
+    [Migration("20240503185830_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,6 +39,9 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("Owner")
                         .HasColumnType("int");
 
@@ -52,6 +55,9 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("StreetNumber")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
@@ -59,6 +65,36 @@ namespace InvoiceForgeApi.Migrations
                     b.HasIndex("Owner");
 
                     b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Models.Bank", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SWIFT")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Shortcut")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Bank");
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Models.Client", b =>
@@ -72,6 +108,9 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -97,6 +136,9 @@ namespace InvoiceForgeApi.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -107,84 +149,6 @@ namespace InvoiceForgeApi.Migrations
                     b.ToTable("Client");
                 });
 
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Bank", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("SWIFT")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Shortcut")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Bank");
-                });
-
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Shortcut")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Country");
-                });
-
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Currency", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Currency");
-                });
-
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Tariff", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Tariff");
-                });
-
             modelBuilder.Entity("InvoiceForgeApi.Models.Contractor", b =>
                 {
                     b.Property<int>("Id")
@@ -193,8 +157,11 @@ namespace InvoiceForgeApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AddressId")
+                    b.Property<int>("AddressId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -222,6 +189,9 @@ namespace InvoiceForgeApi.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Www")
                         .HasColumnType("nvarchar(max)");
@@ -233,6 +203,56 @@ namespace InvoiceForgeApi.Migrations
                     b.HasIndex("Owner");
 
                     b.ToTable("Contractor");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Shortcut")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Country");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Models.Currency", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Currency");
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Models.Invoice", b =>
@@ -290,6 +310,9 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<long>("TotalAll")
                         .HasColumnType("bigint");
 
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserAccountCopyId")
                         .HasColumnType("int");
 
@@ -322,6 +345,15 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
+                    b.Property<int>("OriginId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Outdated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Owner")
+                        .HasColumnType("int");
+
                     b.Property<int>("PostalCode")
                         .HasColumnType("int");
 
@@ -332,9 +364,14 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("StreetNumber")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("InvoiceAddressCopy");
                 });
@@ -347,16 +384,13 @@ namespace InvoiceForgeApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AddressCopyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AddressId")
+                    b.Property<int>("AddressCopyId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("IN")
+                    b.Property<long>("IN")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Mobil")
@@ -366,7 +400,20 @@ namespace InvoiceForgeApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("OriginClientId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OriginContractorId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Outdated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Owner")
+                        .HasColumnType("int");
+
                     b.Property<string>("TIN")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tel")
@@ -375,12 +422,18 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Www")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressCopyId");
+                    b.HasIndex("AddressCopyId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("InvoiceEntityCopy");
                 });
@@ -393,6 +446,9 @@ namespace InvoiceForgeApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("ItemName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -402,6 +458,9 @@ namespace InvoiceForgeApi.Migrations
 
                     b.Property<int>("TariffId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -480,6 +539,9 @@ namespace InvoiceForgeApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserAccountId")
                         .HasColumnType("int");
 
@@ -518,6 +580,15 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<string>("IBAN")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OriginId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Outdated")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Owner")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BankId");
@@ -533,6 +604,9 @@ namespace InvoiceForgeApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("NumberingPrefix")
                         .HasColumnType("nvarchar(max)");
 
@@ -543,11 +617,30 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("Owner")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Owner");
 
                     b.ToTable("Numbering");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Models.Tariff", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tariff");
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Models.User", b =>
@@ -581,11 +674,17 @@ namespace InvoiceForgeApi.Migrations
                     b.Property<int>("BankId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("IBAN")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Owner")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -613,7 +712,7 @@ namespace InvoiceForgeApi.Migrations
 
             modelBuilder.Entity("InvoiceForgeApi.Models.Address", b =>
                 {
-                    b.HasOne("InvoiceForgeApi.Models.CodeLists.Country", "Country")
+                    b.HasOne("InvoiceForgeApi.Models.Country", "Country")
                         .WithMany("Addresses")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.ClientNoAction)
@@ -654,7 +753,8 @@ namespace InvoiceForgeApi.Migrations
                     b.HasOne("InvoiceForgeApi.Models.Address", "Address")
                         .WithMany("Contractors")
                         .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.ClientNoAction);
+                        .OnDelete(DeleteBehavior.ClientNoAction)
+                        .IsRequired();
 
                     b.HasOne("InvoiceForgeApi.Models.User", "User")
                         .WithMany("Contractors")
@@ -696,11 +796,15 @@ namespace InvoiceForgeApi.Migrations
 
             modelBuilder.Entity("InvoiceForgeApi.Models.InvoiceAddressCopy", b =>
                 {
-                    b.HasOne("InvoiceForgeApi.Models.CodeLists.Country", "Country")
-                        .WithMany()
+                    b.HasOne("InvoiceForgeApi.Models.Country", "Country")
+                        .WithMany("AddressCopies")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Models.User", null)
+                        .WithMany("InvoiceAddressCopies")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Country");
                 });
@@ -708,9 +812,14 @@ namespace InvoiceForgeApi.Migrations
             modelBuilder.Entity("InvoiceForgeApi.Models.InvoiceEntityCopy", b =>
                 {
                     b.HasOne("InvoiceForgeApi.Models.InvoiceAddressCopy", "AddressCopy")
+                        .WithOne("InvoiceEntityCopies")
+                        .HasForeignKey("InvoiceForgeApi.Models.InvoiceEntityCopy", "AddressCopyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoiceForgeApi.Models.User", null)
                         .WithMany("InvoiceEntityCopies")
-                        .HasForeignKey("AddressCopyId")
-                        .OnDelete(DeleteBehavior.ClientNoAction);
+                        .HasForeignKey("UserId");
 
                     b.Navigation("AddressCopy");
                 });
@@ -723,7 +832,7 @@ namespace InvoiceForgeApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InvoiceForgeApi.Models.CodeLists.Tariff", "Tariff")
+                    b.HasOne("InvoiceForgeApi.Models.Tariff", "Tariff")
                         .WithMany("InvoiceItems")
                         .HasForeignKey("TariffId")
                         .OnDelete(DeleteBehavior.ClientNoAction)
@@ -767,7 +876,7 @@ namespace InvoiceForgeApi.Migrations
                         .OnDelete(DeleteBehavior.ClientNoAction)
                         .IsRequired();
 
-                    b.HasOne("InvoiceForgeApi.Models.CodeLists.Currency", "Currency")
+                    b.HasOne("InvoiceForgeApi.Models.Currency", "Currency")
                         .WithMany("InvoiceTemplates")
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -806,7 +915,7 @@ namespace InvoiceForgeApi.Migrations
 
             modelBuilder.Entity("InvoiceForgeApi.Models.InvoiceUserAccountCopy", b =>
                 {
-                    b.HasOne("InvoiceForgeApi.Models.CodeLists.Bank", "Bank")
+                    b.HasOne("InvoiceForgeApi.Models.Bank", "Bank")
                         .WithMany("UserAccountCopies")
                         .HasForeignKey("BankId")
                         .OnDelete(DeleteBehavior.ClientNoAction)
@@ -828,7 +937,7 @@ namespace InvoiceForgeApi.Migrations
 
             modelBuilder.Entity("InvoiceForgeApi.Models.UserAccount", b =>
                 {
-                    b.HasOne("InvoiceForgeApi.Models.CodeLists.Bank", "Bank")
+                    b.HasOne("InvoiceForgeApi.Models.Bank", "Bank")
                         .WithMany("UserAccounts")
                         .HasForeignKey("BankId")
                         .OnDelete(DeleteBehavior.ClientNoAction)
@@ -867,34 +976,31 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("Contractors");
                 });
 
-            modelBuilder.Entity("InvoiceForgeApi.Models.Client", b =>
-                {
-                    b.Navigation("InvoiceTemplates");
-                });
-
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Bank", b =>
+            modelBuilder.Entity("InvoiceForgeApi.Models.Bank", b =>
                 {
                     b.Navigation("UserAccountCopies");
 
                     b.Navigation("UserAccounts");
                 });
 
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Country", b =>
-                {
-                    b.Navigation("Addresses");
-                });
-
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Currency", b =>
+            modelBuilder.Entity("InvoiceForgeApi.Models.Client", b =>
                 {
                     b.Navigation("InvoiceTemplates");
                 });
 
-            modelBuilder.Entity("InvoiceForgeApi.Models.CodeLists.Tariff", b =>
+            modelBuilder.Entity("InvoiceForgeApi.Models.Contractor", b =>
                 {
-                    b.Navigation("InvoiceItems");
+                    b.Navigation("InvoiceTemplates");
                 });
 
-            modelBuilder.Entity("InvoiceForgeApi.Models.Contractor", b =>
+            modelBuilder.Entity("InvoiceForgeApi.Models.Country", b =>
+                {
+                    b.Navigation("AddressCopies");
+
+                    b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("InvoiceForgeApi.Models.Currency", b =>
                 {
                     b.Navigation("InvoiceTemplates");
                 });
@@ -906,7 +1012,8 @@ namespace InvoiceForgeApi.Migrations
 
             modelBuilder.Entity("InvoiceForgeApi.Models.InvoiceAddressCopy", b =>
                 {
-                    b.Navigation("InvoiceEntityCopies");
+                    b.Navigation("InvoiceEntityCopies")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("InvoiceForgeApi.Models.InvoiceItem", b =>
@@ -929,6 +1036,11 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("InvoiceTemplates");
                 });
 
+            modelBuilder.Entity("InvoiceForgeApi.Models.Tariff", b =>
+                {
+                    b.Navigation("InvoiceItems");
+                });
+
             modelBuilder.Entity("InvoiceForgeApi.Models.User", b =>
                 {
                     b.Navigation("Addresses");
@@ -936,6 +1048,10 @@ namespace InvoiceForgeApi.Migrations
                     b.Navigation("Clients");
 
                     b.Navigation("Contractors");
+
+                    b.Navigation("InvoiceAddressCopies");
+
+                    b.Navigation("InvoiceEntityCopies");
 
                     b.Navigation("InvoiceItems");
 

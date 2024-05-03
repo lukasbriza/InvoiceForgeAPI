@@ -23,7 +23,8 @@ namespace FunctionalTests.Projects.InvoiceForgeAPI
                     triggerOptions.AddTrigger<ContractorUpdateTrigger>();
                     triggerOptions.AddTrigger<InvoiceTemplateUpdateTrigger>();
                     triggerOptions.AddTrigger<UserAccountUpdateTrigger>();
-                    triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>(); 
+                    triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>();
+                    triggerOptions.AddTrigger<TrackableTrigger>();
                 }).Options;
             _context = new InvoiceForgeDatabaseContext(options);
             _context.Database.EnsureDeleted();

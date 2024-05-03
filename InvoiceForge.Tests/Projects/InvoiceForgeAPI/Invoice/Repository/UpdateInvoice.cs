@@ -45,9 +45,9 @@ namespace Repository
 
                 var updateInvoice = new InvoiceUpdateRequest{
                     Owner = 1,
-                    Maturity = new DateTime(1,1,2020),
-                    Exposure = new DateTime(1,1,2020),
-                    TaxableTransaction = new DateTime(1,1,2020)
+                    Maturity = new DateTime(2020,1,1),
+                    Exposure = new DateTime(2020,1,1),
+                    TaxableTransaction = new DateTime(2020,1,1),
                 };
 
                 var updateResult = await db._repository.Invoice.Update((int)addInvoice, updateInvoice);

@@ -16,7 +16,7 @@ namespace InvoiceForgeApi.Abl.user
                     int? addUser = await _repository.User.Add(user);
                     bool saveCondition = addUser is not null;
 
-                    await SaveResult(saveCondition, transaction);
+                    await SaveResult(saveCondition, transaction, false);
                     return saveCondition;
                 }
                 catch (Exception)

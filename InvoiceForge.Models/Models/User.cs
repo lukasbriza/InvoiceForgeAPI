@@ -1,15 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using InvoiceForgeApi.Models.Interfaces;
 
 namespace InvoiceForgeApi.Models
 {
-    public class User: WithIdModel
+    public class User: WithIdModel, ITrackable
     {
         public User() {}
         public User(UserAddRequest user)
         {
-
+            if (user is not null)
+            {
+                AuthenticationId = user.AuthenticationId;
+            }
         }
         [Required] public int AuthenticationId { get; set; }
+        [Required] public DateTime Created { get; set; }
+        public DateTime? Updated { get; set; } = null;
 
         //Reference
         public virtual ICollection<Client> Clients { get; set; } = new List<Client>();
