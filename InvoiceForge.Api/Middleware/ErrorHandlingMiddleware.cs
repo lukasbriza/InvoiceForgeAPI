@@ -1,5 +1,5 @@
-﻿using InvoiceForgeApi.DTO;
-using InvoiceForgeApi.Models.Enum;
+﻿using InvoiceForgeApi.Errors;
+using InvoiceForgeApi.Helpers;
 using Newtonsoft.Json;
 using System.Net;
 
@@ -19,26 +19,26 @@ namespace InvoiceForgeApi.Middleware
             {
                 await _next(context);
             }
-            catch (ApiError ex)
-            {
-                await HandleEsceptionAsync(context, ex);
-            }
-            catch (Exception ex)
-            {
-                await HandleEsceptionAsync(context, new ApiError(ex));
-            }
-        }
-        private static Task HandleEsceptionAsync(HttpContext context, ApiError ex)
-        {
-            Console.Write(ex.StackTrace);
+            catch (NotUniqueEntityError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);}
+            catch (NoPossessionError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);}
+            catch (NoEntityError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);}
+            catch (InvalidModelError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);}
+            catch (EntityReferenceError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);}
+
+            catch (OperationError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.InternalServerError);}
+            catch (DbSetError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.InternalServerError);}
+            catch (ContextSaveError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.InternalServerError);}
             
-            var code = ex.Code == ErrorCodes.U_E ? HttpStatusCode.InternalServerError : HttpStatusCode.BadRequest;
-            var result = JsonConvert.SerializeObject(new {
-                code = ex.Code.ToString(),
-                error = ex.Message, 
-            });
+            catch (ApiError ex) {await HandleExceptionAsync(context, ex, HttpStatusCode.BadRequest);}
+            catch (Exception ex) {await HandleExceptionAsync(context, new ApiError(ex), HttpStatusCode.InternalServerError);}
+        }
+        private static Task HandleExceptionAsync(HttpContext context, ApiError ex, HttpStatusCode code)
+        {   
+            ResponseBuilder<bool> repsonseBuilder = new ResponseBuilder<bool>(false, ex);
+            CustomResponse<bool> response = repsonseBuilder.Get();
+            var result = JsonConvert.SerializeObject(response);
+
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)code;
             return context.Response.WriteAsync(result);
         }
     }

@@ -1,7 +1,7 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
-using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Abl.userAccount;
-using InvoiceForgeApi.DTO;
+
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -68,7 +68,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<DatabaseCallError>(ex);
+                    Assert.IsType<NoEntityError>(ex);
                 }
 
                 //CLENA
@@ -115,7 +115,7 @@ namespace Abl
             }
             catch (Exception ex)
             {
-                Assert.IsType<ValidationError>(ex);
+                Assert.IsType<NotUniqueEntityError>(ex);
             }
 
             try
@@ -124,7 +124,7 @@ namespace Abl
             }
             catch (Exception ex)
             {
-                Assert.IsType<ValidationError>(ex);
+                Assert.IsType<NotUniqueEntityError>(ex);
             }
 
             //CLEAN

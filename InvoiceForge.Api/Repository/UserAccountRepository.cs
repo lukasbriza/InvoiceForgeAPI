@@ -1,5 +1,5 @@
 ﻿using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -48,11 +48,11 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int userAccountId, UserAccountUpdateRequest userAccount)
         {
             var localUserAccount = await Get(userAccountId);
-            if (localUserAccount is null) throw new DatabaseCallError("User account is not in database.");
+            if (localUserAccount is null) throw new NoEntityError();
 
             var localSelect = new { localUserAccount.BankId, localUserAccount.AccountNumber, localUserAccount.IBAN };
             var updateSelect = new { userAccount.BankId, userAccount.AccountNumber, userAccount.IBAN };
-            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            if (localSelect.Equals(updateSelect)) throw new EqualEntityError();
 
             localUserAccount.BankId = userAccount.BankId;
             localUserAccount.AccountNumber = userAccount.AccountNumber;

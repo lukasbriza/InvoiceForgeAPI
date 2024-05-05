@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,12 +14,11 @@ namespace InvoiceForgeApi.Abl.invoice
             {
                 try
                 {
-                    User isUser = await IsInDatabase<User>(invoice.Owner, "Invalid user Id.");
-                    Invoice isInvoice = await IsInDatabase<Invoice>(invoiceId, "Invalid invoice Id.");
-                    if(isUser.Id != isInvoice.Owner) throw new ValidationError("Provided invoice is not in your possession.");
+                    User isUser = await IsInDatabase<User>(invoice.Owner);
+                    Invoice isInvoice = await IsInDatabase<Invoice>(invoiceId);
+                    if(isUser.Id != isInvoice.Owner) throw new NoPossessionError();
 
                     bool invoiceUpdate = await _repository.Invoice.Update(invoiceId, invoice);
-                    if (!invoiceUpdate) throw new ValidationError("Invoice update failed.");
 
                     await SaveResult(invoiceUpdate, transaction);
                     return invoiceUpdate;

@@ -13,7 +13,7 @@ namespace InvoiceForgeApi.Abl.user
             {
                 try
                 {
-                    await IsInDatabase<User>(user.Id, "Invalid user Id.");
+                    await IsInDatabase<User>(user.Id);
 
                     bool updateUser = await _repository.User.Update(user.Id, user);
 

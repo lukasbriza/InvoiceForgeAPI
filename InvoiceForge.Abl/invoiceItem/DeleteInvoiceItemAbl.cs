@@ -1,6 +1,4 @@
-
-
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -17,7 +15,7 @@ namespace InvoiceForgeApi.Abl.invoiceItem
                 try
                 {
                     List<InvoiceService>? invoiceServiceReferences = await _repository.InvoiceService.GetByCondition(s => s.InvoiceItemId == invoiceItemId);
-                    if (invoiceServiceReferences is not null && invoiceServiceReferences.Any()) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+                    if (invoiceServiceReferences is not null && invoiceServiceReferences.Any()) throw new EntityReferenceError();
 
                     bool deleteInvoiceItem = await _repository.InvoiceItem.Delete(invoiceItemId);
                     await SaveResult(deleteInvoiceItem, transaction);

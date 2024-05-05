@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,19 +14,14 @@ namespace InvoiceForgeApi.Abl.address
             {
                 try
                 {
-                    await IsInDatabase<Country>(address.CountryId, "Invalid country id.");
-                    await IsInDatabase<User>(userId, "Invalid user Id.");
+                    await IsInDatabase<Country>(address.CountryId);
+                    await IsInDatabase<User>(userId);
 
                     bool isAddressUnique = await _repository.Address.IsUnique(userId, address);
-                    if (!isAddressUnique) throw new ValidationError("Address is not unique.");
+                    if (!isAddressUnique) throw new NotUniqueEntityError();
                     
                     int? addAddress = await _repository.Address.Add(userId, address);
                     bool saveCondition = addAddress is not null;
-
-                    if (!saveCondition)
-                    {
-                        throw new DatabaseCallError("Id was not generated.");
-                    }
 
                     await SaveResult(saveCondition, transaction, false);
                     return saveCondition;

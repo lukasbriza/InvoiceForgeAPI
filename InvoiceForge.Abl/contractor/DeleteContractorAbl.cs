@@ -1,5 +1,4 @@
-
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models.Interfaces;
 
 namespace InvoiceForgeApi.Abl.contractor
@@ -15,7 +14,7 @@ namespace InvoiceForgeApi.Abl.contractor
                 try
                 {
                     var hasInvoiceTemplatesReference = await _repository.InvoiceTemplate.GetByCondition((t) => t.ContractorId == contractorId);
-                    if (hasInvoiceTemplatesReference is not null && hasInvoiceTemplatesReference.Count > 0) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+                    if (hasInvoiceTemplatesReference is not null && hasInvoiceTemplatesReference.Count > 0) throw new EntityReferenceError();
 
                     bool deleteContractor = await _repository.Contractor.Delete(contractorId);
 

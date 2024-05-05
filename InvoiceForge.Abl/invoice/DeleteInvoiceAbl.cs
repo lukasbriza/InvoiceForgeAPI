@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,11 +14,11 @@ namespace InvoiceForgeApi.Abl.invoice
             {
                 try
                 {
-                    Invoice isInvoice = await IsInDatabase<Invoice>(invoiceId, "Invalid invoice id.");
+                    Invoice isInvoice = await IsInDatabase<Invoice>(invoiceId);
                     List<InvoiceService>? services = await _repository.InvoiceService.GetByCondition(s => s.InvoiceId == invoiceId);
                     services?.ForEach(async s => {
                         bool deleteService = await _repository.InvoiceService.Delete(s.Id);
-                        if (!deleteService) throw new ValidationError("Removing invoice service failed.");
+                        if (!deleteService) throw new OperationError("Removing invoice service failed.");
                     });
 
                     bool invoiceDelete = await _repository.Invoice.Delete(invoiceId);

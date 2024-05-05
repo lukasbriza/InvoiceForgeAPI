@@ -1,7 +1,7 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
-using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Abl.address;
-using InvoiceForgeApi.DTO;
+
+using InvoiceForgeApi.Errors;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -60,7 +60,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<ValidationError>(ex);
+                    Assert.IsType<EntityReferenceError>(ex);
                 }
 
                 var contractors = await db._context.Contractor.Select(c => c.Id).ToListAsync();
@@ -75,7 +75,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<ValidationError>(ex);
+                    Assert.IsType<EntityReferenceError>(ex);
                 }
 
                 //CLEAN
@@ -99,7 +99,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<DatabaseCallError>(ex);
+                    Assert.IsType<NoEntityError>(ex);
                 }
 
                 //CLEAN

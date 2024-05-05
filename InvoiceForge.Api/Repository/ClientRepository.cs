@@ -1,5 +1,5 @@
 ﻿using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -38,7 +38,7 @@ namespace InvoiceForgeApi.Repository
             }
 
             var clientCall = await client.FindAsync(clientId);
-            if (clientCall is null) throw new DatabaseCallError("Client is not in database.");
+            if (clientCall is null) throw new NoEntityError();
             var clientResult = new ClientGetRequest(clientCall, plain);
             return clientResult;
         }
@@ -46,7 +46,7 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int clientId, ClientUpdateRequest client, ClientType clientType)
         {
             var localClient = await Get(clientId);
-            if (localClient is null) throw new DatabaseCallError("Client is not in database.");
+            if (localClient is null) throw new NoEntityError();
             
             var localSelect = new { 
                 localClient.AddressId,
@@ -68,7 +68,7 @@ namespace InvoiceForgeApi.Repository
                 client.Tel,
                 client.Email
             };
-            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            if (localSelect.Equals(updateSelect)) throw new EqualEntityError();
             
             localClient.AddressId = client.AddressId;
             localClient.Type = clientType;

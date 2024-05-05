@@ -1,5 +1,5 @@
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -172,7 +172,7 @@ namespace InvoiceForgeApi.Repository
             int save = await _context.SaveChangesAsync();
             if (!(save > 0))
             {
-                throw new DatabaseCallError("Saving failed. Modifications was not applied.");
+                throw new ContextSaveError();
             }
         }
         public async Task<DbSet<TEntity>?> GetSet<TEntity>() where TEntity: class

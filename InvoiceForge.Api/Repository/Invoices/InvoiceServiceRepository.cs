@@ -1,5 +1,5 @@
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -66,7 +66,7 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int invoiceServiceId, InvoiceServiceUpdateRequest invoiceService)
         {
             var localInvoiceservice = await Get(invoiceServiceId);
-            if (localInvoiceservice is null) throw new DatabaseCallError("Invoice service is not provided.");
+            if (localInvoiceservice is null) throw new NoEntityError();
 
             var localSelect = new { 
                 localInvoiceservice.Units, 
@@ -80,7 +80,7 @@ namespace InvoiceForgeApi.Repository
                 InvoiceItemId = invoiceService.ItemId,
                 invoiceService.BasePrice
             };
-            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            if (localSelect.Equals(updateSelect)) throw new EqualEntityError();
 
             localInvoiceservice.Units = invoiceService.Units;
             localInvoiceservice.PricePerUnit = invoiceService.PricePerUnit;

@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,31 +14,29 @@ namespace InvoiceForgeApi.Abl.invoiceTemplate
             {
                 try
                 {
-                    User isUser = await IsInDatabase<User>(template.Owner, "Invalid user Id.");
-                    InvoiceTemplate isTemplate = await IsInDatabase<InvoiceTemplate>(templateId, "Invalid template Id.");
-                    if (isUser.Id != isTemplate.Owner) throw new ValidationError("Template is not in your possession.");
+                    User isUser = await IsInDatabase<User>(template.Owner);
+                    InvoiceTemplate isTemplate = await IsInDatabase<InvoiceTemplate>(templateId);
+                    if (isUser.Id != isTemplate.Owner) throw new NoPossessionError();
 
-                    Client isClient = await IsInDatabase<Client>(template.ClientId, "Invalid client Id.");
-                    if (isClient.Owner != isUser.Id) throw new ValidationError("Provided client is not in your possession.");
+                    Client isClient = await IsInDatabase<Client>(template.ClientId);
+                    if (isClient.Owner != isUser.Id) throw new NoPossessionError();
 
-                    Contractor isContractor = await IsInDatabase<Contractor>(template.ContractorId, "Invalid contractor Id.");
-                    if (isContractor.Owner != isUser.Id) throw new ValidationError("Provided contractor is not in your possession.");
+                    Contractor isContractor = await IsInDatabase<Contractor>(template.ContractorId);
+                    if (isContractor.Owner != isUser.Id) throw new NoPossessionError();
 
-                    UserAccount isUserAccount = await IsInDatabase<UserAccount>(template.UserAccountId, "Invalid user account Id.");
-                    if (isUserAccount.Owner != isUser.Id) throw new ValidationError("Provided user account is not in your possession."); 
+                    UserAccount isUserAccount = await IsInDatabase<UserAccount>(template.UserAccountId);
+                    if (isUserAccount.Owner != isUser.Id) throw new NoPossessionError(); 
 
-                    await IsInDatabase<Currency>(template.CurrencyId, "Invalid currency Id.");
-                    await IsInDatabase<Numbering>(template.NumberingId, "Invlaid numbering Id.");
+                    await IsInDatabase<Currency>(template.CurrencyId);
+                    await IsInDatabase<Numbering>(template.NumberingId);
                     
                     var templateNamevalidation = await _repository.InvoiceTemplate.GetByCondition(t => 
                         t.TemplateName == template.TemplateName && 
                         t.Owner == isUser.Id
                     );
-                    if (templateNamevalidation is not null && templateNamevalidation.Any()) throw new ValidationError("Template name must be unique.");
+                    if (templateNamevalidation is not null && templateNamevalidation.Any()) throw new NotUniqueEntityError("Template name");
 
                     bool invoiceTemplateUpdate = await _repository.InvoiceTemplate.Update(templateId, template);
-                    if (!invoiceTemplateUpdate) throw new ValidationError("Update invoice template failed.");
-
                     await SaveResult(invoiceTemplateUpdate, transaction);
                     return invoiceTemplateUpdate;
                 }

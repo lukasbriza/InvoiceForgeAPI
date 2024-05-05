@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +18,7 @@ namespace InvoiceForgeApi.Repository
         public virtual async Task<bool> Delete(int id)
         {
             var entity = await Get(id);
-            var typeToString = entity?.GetType().FullName;
-            if (entity is null) throw new DatabaseCallError($"{typeToString} is not in database.");
+            if (entity is null) throw new NoEntityError();
 
             var dbSet = _dbContext.Set<TEntity>();
             var removeResult = dbSet.Remove(entity);
@@ -46,7 +45,7 @@ namespace InvoiceForgeApi.Repository
         public virtual async Task<int?> Add(int userId, TAddRequest addRequest)
         {
         var newEntity = Activator.CreateInstance(typeof(TEntity), userId, addRequest) as TEntity;
-        if(newEntity is null) throw new DatabaseCallError("Dynamic entity creation failed.");
+        if(newEntity is null) throw new NoEntityError();
         
         var dbSet = _dbContext.Set<TEntity>();
         var entityAddResult = await dbSet.AddAsync(newEntity);
@@ -65,7 +64,7 @@ namespace InvoiceForgeApi.Repository
         public virtual async Task<int?> Add(TAddRequest addRequest)
         {
             var newEntity = Activator.CreateInstance(typeof(TEntity), addRequest) as TEntity;
-            if(newEntity is null) throw new ValidationError("Dynamic entity creation failed.");
+            if(newEntity is null) throw new NoEntityError();
 
             var dbSet = _dbContext.Set<TEntity>();
             var entityAddResult = await dbSet.AddAsync(newEntity);
@@ -84,7 +83,7 @@ namespace InvoiceForgeApi.Repository
         public virtual async Task<int?> Add(int userId, TAddRequest addRequest, ClientType clientType)
         {
             var newEntity = Activator.CreateInstance(typeof(TEntity), userId, addRequest, clientType) as TEntity;
-            if(newEntity is null) throw new ValidationError("Dynamic entity creation failed.");
+            if(newEntity is null) throw new NoEntityError();
 
             var dbSet = _dbContext.Set<TEntity>();
             var entityAddResult = await dbSet.AddAsync(newEntity);

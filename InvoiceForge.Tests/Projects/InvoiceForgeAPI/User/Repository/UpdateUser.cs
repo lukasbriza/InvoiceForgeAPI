@@ -1,7 +1,7 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
-using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForgeApi.Data.SeedClasses;
-using InvoiceForgeApi.DTO;
+
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using Xunit;
 
@@ -57,7 +57,7 @@ namespace Repository
                     var updateResult = await db._repository.User.Update(100, entity);
                     await db._repository.Save();
                 } catch(Exception error) {
-                    Assert.IsType<DatabaseCallError>(error);
+                    Assert.IsType<NoEntityError>(error);
                 }
 
                 //CLEAN
@@ -84,7 +84,7 @@ namespace Repository
                 }
                 catch (Exception error)
                 {
-                    Assert.IsType<DatabaseCallError>(error);
+                    Assert.IsType<NoEntityError>(error);
                 }
 
                 //CLEAN

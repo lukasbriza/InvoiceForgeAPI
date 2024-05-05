@@ -1,5 +1,5 @@
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -40,7 +40,7 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int contractorId, ContractorUpdateRequest contractor, ClientType clientType)
         {
             var localContractor = await Get(contractorId);
-            if(localContractor is null) throw new DatabaseCallError("Contractor is not in database.");
+            if(localContractor is null) throw new NoEntityError();
             
             var localSelect = new {
                 localContractor.AddressId,
@@ -64,7 +64,7 @@ namespace InvoiceForgeApi.Repository
                 contractor.Tel,
                 contractor.Www
             };
-            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            if (localSelect.Equals(updateSelect)) throw new EqualEntityError();
 
             localContractor.AddressId = contractor.AddressId;
             localContractor.Type = clientType;
