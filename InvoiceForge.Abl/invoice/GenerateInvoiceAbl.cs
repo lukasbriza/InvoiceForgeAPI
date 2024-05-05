@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -15,12 +15,12 @@ namespace InvoiceForgeApi.Abl.invoice
             {
                 try
                 {
-                    User isUser = await IsInDatabase<User>(userId, "Invalid user Id.");
-                    InvoiceTemplate isTemplate = await IsInDatabase<InvoiceTemplate>(invoice.TemplateId, "Invalid template Id.");
-                    if (isTemplate.Owner != userId) throw new ValidationError("Template is not in your possession.");
+                    User isUser = await IsInDatabase<User>(userId);
+                    InvoiceTemplate isTemplate = await IsInDatabase<InvoiceTemplate>(invoice.TemplateId);
+                    if (isTemplate.Owner != userId) throw new NoPossessionError();
 
                     GenerateInvoiceNumber? invoiceNumber = await _repository.Numbering.GenerateInvoiceNumber(isTemplate.NumberingId);
-                    if (invoiceNumber is null) throw new ValidationError("Generating invoice number failed.");
+                    if (invoiceNumber is null) throw new OperationError("Generating invoice number failed.");
 
                     var invoiceServiceList = new List<InvoiceServiceExtendedAddRequest>();
 
@@ -50,7 +50,7 @@ namespace InvoiceForgeApi.Abl.invoice
                         task.Wait();
                     });
 
-                    if (invoiceServiceList.Count != invoice.InvoiceServices.Count) throw new ValidationError("Some invoice item id is invalid.");
+                    if (invoiceServiceList.Count != invoice.InvoiceServices.Count) throw new OperationError("Some invoice item id is invalid.");
                     var agregatedObject = invoiceServiceList
                         .Select(s => new {s.VAT, s.BasePrice, s.Total})
                         .Aggregate((a,b) => new {
@@ -69,7 +69,7 @@ namespace InvoiceForgeApi.Abl.invoice
                         invoiceContractor is null || 
                         invoiceUserAccount is null || 
                         templateCurrency is null
-                    ) throw new ValidationError("Unable to find local entities.");
+                    ) throw new NoEntityError();
                      
                     List<InvoiceEntityCopy>? isDuplicitClientInEntities = await _repository.InvoiceEntityCopy.GetByCondition(e => 
                         e.Outdated == false &&
@@ -135,12 +135,12 @@ namespace InvoiceForgeApi.Abl.invoice
                             PostalCode = invoiceClient.Address.PostalCode
                         };
                         int? addressId = await _repository.InvoiceAddressCopy.Add(userId, address);
-                        if (addressId is null) throw new ValidationError("Address copy insertion failed.");
+                        if (addressId is null) throw new OperationError("Address copy insertion failed.");
                         
                         var entity = new InvoiceEntityCopyAddRequest(invoiceClient, addressId);
                         invoiceClientCopyId = await _repository.InvoiceEntityCopy.Add(userId, entity);
                     } else if (isDuplicitClientInEntities.Count == 1) invoiceClientCopyId = isDuplicitClientInEntities[0].Id;
-                    else throw new ValidationError("There is more than one local client.");
+                    else throw new OperationError("There is more than one local client.");
                     
                     if (isDuplicitContractorInEntities is null || isDuplicitContractorInEntities.Count == 0)
                     {
@@ -155,12 +155,12 @@ namespace InvoiceForgeApi.Abl.invoice
                             PostalCode = invoiceContractor.Address.PostalCode
                         };
                         int? addressId = await _repository.InvoiceAddressCopy.Add(userId, address);
-                        if (addressId is null) throw new ValidationError("Address copy insertion failed.");
+                        if (addressId is null) throw new OperationError("Address copy insertion failed.");
 
                         var entity = new InvoiceEntityCopyAddRequest(invoiceContractor, addressId);
                         invoiceContractorCopyId = await _repository.InvoiceEntityCopy.Add(userId, entity);
                     } else if (isDuplicitContractorInEntities.Count == 1) invoiceContractorCopyId = isDuplicitContractorInEntities[0].Id;
-                    else throw new ValidationError("There is more than one local contractor.");
+                    else throw new OperationError("There is more than one local contractor.");
 
                     if (isDuplicitUserAccountCopy is null || isDuplicitUserAccountCopy.Count == 0)
                     {
@@ -168,9 +168,9 @@ namespace InvoiceForgeApi.Abl.invoice
                         var entity = new InvoiceUserAccountCopyAddRequest(invoiceUserAccount);
                         invoiceUserAccountCopyId = await _repository.InvoiceUserAccountCopy.Add(userId, entity);
                     } else if (isDuplicitUserAccountCopy.Count == 1) invoiceUserAccountCopyId = isDuplicitUserAccountCopy[0].Id;
-                    else throw new ValidationError("There is more than one local user account.");
+                    else throw new OperationError("There is more than one local user account.");
 
-                    if (invoiceClientCopyId == null || invoiceContractorCopyId == null || invoiceUserAccountCopyId == null) throw new ValidationError("Unasigned one of id variables.");
+                    if (invoiceClientCopyId == null || invoiceContractorCopyId == null || invoiceUserAccountCopyId == null) throw new OperationError("One of id variables is wrong.");
                     
                     var newInvoiceObject = new InvoiceAddRequestRepository
                     {
@@ -198,7 +198,7 @@ namespace InvoiceForgeApi.Abl.invoice
                     
                     if (addInvoiceId is not null) {
                         var addServiceLists = await _repository.InvoiceService.Add((int)addInvoiceId, invoiceServiceList);
-                        if (!addServiceLists) throw new ValidationError("Add services list failed.");
+                        if (!addServiceLists) throw new OperationError("Add services list failed.");
                     }
 
                     await SaveResult(saveCondition, transaction);

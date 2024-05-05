@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,13 +14,12 @@ namespace InvoiceForgeApi.Abl.address
             {
                 try
                 {
-                    await IsInDatabase<User>(address.Owner, "Invalid user Id.");
-                    await IsInDatabase<Country>(address.CountryId, "Provided countryId is invalid.");
-                    Address? isAddress = await IsInDatabase<Address>(addressId, "Invalid Address Id.");
-                    if (isAddress?.Owner != address.Owner) throw new ValidationError("Provided address is not in your possession.");
+                    await IsInDatabase<User>(address.Owner);
+                    await IsInDatabase<Country>(address.CountryId);
+                    Address? isAddress = await IsInDatabase<Address>(addressId);
+                    if (isAddress?.Owner != address.Owner) throw new NoPossessionError();
 
                     bool addressUpdate = await _repository.Address.Update(addressId, address);
-                    if (!addressUpdate) throw new ValidationError("Address update failed.");
 
                     await SaveResult(addressUpdate, transaction);
                     return addressUpdate;

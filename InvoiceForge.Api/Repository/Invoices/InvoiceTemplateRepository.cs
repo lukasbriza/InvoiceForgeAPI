@@ -1,5 +1,5 @@
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +28,7 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int templateId, InvoiceTemplateUpdateRequest template)
         {
             var localTemplate = await Get(templateId);
-            if (localTemplate is null) throw new DatabaseCallError("Invoice template is not provided.");
+            if (localTemplate is null) throw new NoEntityError();
 
             var localSelect = new {
                 localTemplate.ClientId,
@@ -44,7 +44,7 @@ namespace InvoiceForgeApi.Repository
                 template.TemplateName,
                 template.NumberingId
             };
-            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            if (localSelect.Equals(updateSelect)) throw new EqualEntityError();
 
             localTemplate.ClientId = template.ClientId;
             localTemplate.ContractorId = template.ContractorId;

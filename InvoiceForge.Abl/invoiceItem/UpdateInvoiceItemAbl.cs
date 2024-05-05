@@ -1,6 +1,4 @@
-
-
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -16,20 +14,19 @@ namespace InvoiceForgeApi.Abl.invoiceItem
            {
             try
             {
-                User isUser = await IsInDatabase<User>(invoiceItem.Owner, "Invalid user Id.");
-                InvoiceItem isInvoiceItem = await IsInDatabase<InvoiceItem>(invoiceItemId, "Invalid invoice item Id.");
-                if (isUser.Id != isInvoiceItem.Owner) throw new ValidationError("Invoice item is not in your possession.");
+                User isUser = await IsInDatabase<User>(invoiceItem.Owner);
+                InvoiceItem isInvoiceItem = await IsInDatabase<InvoiceItem>(invoiceItemId);
+                if (isUser.Id != isInvoiceItem.Owner) throw new NoPossessionError();
 
                 List<InvoiceService>? invoiceServiceReferences = await _repository.InvoiceService.GetByCondition(s => s.InvoiceItemId == invoiceItemId);
-                if (invoiceServiceReferences is not null && invoiceServiceReferences.Any()) throw new ValidationError("Can´t update. Still assigned to some entity.");
+                if (invoiceServiceReferences is not null && invoiceServiceReferences.Any()) throw new EntityReferenceError();
 
-                await IsInDatabase<Tariff>(invoiceItem.TariffId, "Invalid tariff Id.");
+                await IsInDatabase<Tariff>(invoiceItem.TariffId);
 
                 var isInvoiceItemNameDuplicit = await _repository.InvoiceItem.GetByCondition(i => i.ItemName == invoiceItem.ItemName && i.Owner == isUser.Id);
-                if (isInvoiceItemNameDuplicit is not null && isInvoiceItemNameDuplicit.Any()) throw new ValidationError("Invoice item name must be unique.");
+                if (isInvoiceItemNameDuplicit is not null && isInvoiceItemNameDuplicit.Any()) throw new NotUniqueEntityError("Item name");
 
                 bool updateInvoiceItem = await _repository.InvoiceItem.Update(invoiceItemId, invoiceItem);
-                if (!updateInvoiceItem) throw new ValidationError("Invoice item update failed.");
 
                 await SaveResult(updateInvoiceItem, transaction);
                 return updateInvoiceItem;

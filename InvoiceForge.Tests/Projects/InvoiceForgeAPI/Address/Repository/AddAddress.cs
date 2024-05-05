@@ -1,5 +1,4 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
-using FunctionalTests.Projects.InvoiceForgeAPI;
 using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.Models;
 using Xunit;

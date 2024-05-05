@@ -1,5 +1,4 @@
-
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -16,13 +15,13 @@ namespace InvoiceForgeApi.Abl.contractor
             {
                 try
                 {
-                    await IsInDatabase<User>(userId, "Invalid user Id.");
+                    await IsInDatabase<User>(userId);
                     
-                    var isAddress = await IsInDatabase<Address>(contractor.AddressId, "Invalid address Id.");
-                    if (isAddress.Owner != userId) throw new ValidationError("Provided address is not in your possession.");
+                    var isAddress = await IsInDatabase<Address>(contractor.AddressId);
+                    if (isAddress.Owner != userId) throw new NoPossessionError();
 
                     var isClientType = _repository.CodeLists.GetClientTypeById(contractor.TypeId);
-                    if (isClientType is null) throw new ValidationError("Invalid TypeId.");
+                    if (isClientType is null) throw new NoEntityError();
 
                     int? addContractor = await _repository.Contractor.Add(userId, contractor, (ClientType)isClientType);
                     bool saveCondition = addContractor is not null;

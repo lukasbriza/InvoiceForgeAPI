@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models.Enum;
 
 namespace InvoiceForgeApi.Helpers
@@ -124,7 +124,7 @@ namespace InvoiceForgeApi.Helpers
                 {
                     if (locked) 
                     {
-                        throw new ValidationError("Number variable can be only in one sequence in numbering template.");
+                        throw new OperationError("Number variable can be only in one sequence in numbering template.");
                     }
                     if (nextIndex is not null && charArray[(int)nextIndex].ToString() != "*")
                     {

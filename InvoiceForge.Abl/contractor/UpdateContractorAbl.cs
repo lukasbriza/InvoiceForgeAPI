@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Enum;
 using InvoiceForgeApi.Models.Interfaces;
@@ -15,19 +15,18 @@ namespace InvoiceForgeApi.Abl.contractor
             {
                 try
                 {
-                    User isUser = await IsInDatabase<User>(contractor.Owner, "Invalid user Id.");
+                    User isUser = await IsInDatabase<User>(contractor.Owner);
 
-                    Contractor isContractor = await IsInDatabase<Contractor>(contractorId, "Contractor is not in database.");
-                    if (isContractor.Owner != contractor.Owner) throw new ValidationError("Contractor is not in your possession.");
+                    Contractor isContractor = await IsInDatabase<Contractor>(contractorId);
+                    if (isContractor.Owner != contractor.Owner) throw new NoPossessionError();
 
-                    Address isAddress = await IsInDatabase<Address>(contractor.AddressId, "Address is not in database.");
-                    if (isAddress.Owner != isUser.Id) throw new ValidationError("Provided address is not in your possession.");
+                    Address isAddress = await IsInDatabase<Address>(contractor.AddressId);
+                    if (isAddress.Owner != isUser.Id) throw new NoPossessionError();
 
                     ClientType? clientType = _repository.CodeLists.GetClientTypeById(contractor.TypeId);
-                    if (clientType is null) throw new ValidationError("Client type is not in database.");
+                    if (clientType is null) throw new NoEntityError();
 
                     bool contractorUpdate = await _repository.Contractor.Update(contractorId, contractor, (ClientType)clientType);
-                    if (!contractorUpdate) throw new ValidationError("Contractor update failed.");
 
                     await SaveResult(contractorUpdate, transaction);
                     return contractorUpdate;

@@ -1,6 +1,6 @@
 using FunctionalTests.Projects.InvoiceForgeApi;
-using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForgeApi.DTO;
+
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using Xunit;
 
@@ -64,7 +64,7 @@ namespace Repository
                 }
                 catch (Exception error)
                 {
-                    Assert.IsType<DatabaseCallError>(error);
+                    Assert.IsType<NoEntityError>(error);
                 }
 
                 //CLEAN
@@ -95,7 +95,7 @@ namespace Repository
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<ValidationError>(ex);
+                    Assert.IsType<EqualEntityError>(ex);
                 }
 
                 //CLEAN

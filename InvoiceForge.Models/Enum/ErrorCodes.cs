@@ -8,7 +8,7 @@ namespace InvoiceForgeApi.Models.Enum
         U_E,
         [Description("DatabaseCallError")]
         DB_C_E,
-        [Description("ValidationError")]
+        [Description("NoPossessionError")]
         V_E
     }
 }

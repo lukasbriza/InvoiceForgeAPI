@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,10 +14,10 @@ namespace InvoiceForgeApi.Abl.invoiceItem
             {
                 try
                 {
-                    Tariff isTariff = await IsInDatabase<Tariff>(invoiceItem.TariffId, "Invalid tariff Id.");
+                    Tariff isTariff = await IsInDatabase<Tariff>(invoiceItem.TariffId);
                     
                     List<InvoiceItem>? isDuplicitInvoiceItemName = await _repository.InvoiceItem.GetByCondition(i => i.ItemName == invoiceItem.ItemName && i.Owner == userId);
-                    if (isDuplicitInvoiceItemName is not null && isDuplicitInvoiceItemName.Any()) throw new ValidationError("Invoice item name must be unique.");
+                    if (isDuplicitInvoiceItemName is not null && isDuplicitInvoiceItemName.Any()) throw new NotUniqueEntityError("Item name");
 
                     int? addInvoiceItem = await _repository.InvoiceItem.Add(userId, invoiceItem);
                     bool saveCondition = addInvoiceItem is not null;

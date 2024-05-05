@@ -1,5 +1,5 @@
 using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -33,18 +33,18 @@ namespace InvoiceForgeApi.Repository
                     await address.Include(a => a.Country).LoadAsync();
                 }
                 var addressCall = await address.FindAsync(addressId);
-                if (addressCall is null) throw new DatabaseCallError("Adress is not in database.");
+                if (addressCall is null) throw new NoEntityError();
                 var addressResult  = new AddressGetRequest(addressCall, plain);
                 return addressResult;
         }
         public async Task<bool> Update(int addressId, AddressUpdateRequest address)
         {
             var localAddress = await Get(addressId);
-            if (localAddress is null) throw new DatabaseCallError("Address is not in database.");
+            if (localAddress is null) throw new NoEntityError();
 
             var localSelect = new { localAddress.CountryId, localAddress.City, localAddress.Street, localAddress.StreetNumber, localAddress.PostalCode};
             var updateSelect = new { address.CountryId, address.City, address.Street, address.StreetNumber, address.PostalCode };
-            if (localSelect.Equals(updateSelect)) throw new ValidationError("One of properties must be different from actual ones.");
+            if (localSelect.Equals(updateSelect)) throw new EqualEntityError();
 
             localAddress.CountryId = address.CountryId;
             localAddress.City = address.City;

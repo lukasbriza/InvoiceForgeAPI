@@ -5,7 +5,7 @@ using InvoiceForgeApi.Repository;
 using InvoiceForgeApi.Triggers;
 using Microsoft.EntityFrameworkCore;
 
-namespace FunctionalTests.Projects.InvoiceForgeAPI
+namespace FunctionalTests.Projects.InvoiceForgeApi
 {
     public class DatabaseHelper
     {

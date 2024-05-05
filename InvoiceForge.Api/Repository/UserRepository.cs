@@ -1,8 +1,8 @@
 ﻿using InvoiceForgeApi.Data;
-using InvoiceForgeApi.DTO;
 using Microsoft.EntityFrameworkCore;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
+using InvoiceForgeApi.Errors;
 
 namespace InvoiceForgeApi.Repository
 {
@@ -33,10 +33,10 @@ namespace InvoiceForgeApi.Repository
         public async Task<bool> Update(int userId, UserUpdateRequest user)
         {
             var localUser = await Get(userId);
-            if (localUser == null) throw new DatabaseCallError("User is not in database.");
+            if (localUser == null) throw new NoEntityError();
 
             var userWithNewAuthIdExists = await _dbContext.User.Where(u => u.AuthenticationId == user.AuthenticationId).ToListAsync();
-            if (userWithNewAuthIdExists.Count > 0) throw new ValidationError("Provided values are incorrect.");
+            if (userWithNewAuthIdExists.Count > 0) throw new OperationError("Provided values are incorrect.");
             
             localUser.AuthenticationId = user.AuthenticationId;
             

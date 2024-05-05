@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -14,10 +14,10 @@ namespace InvoiceForgeApi.Abl.userAccount
             {
                 try
                 {
-                    User isUser = await IsInDatabase<User>(userId, "Invalid user Id.");
+                    User isUser = await IsInDatabase<User>(userId);
 
                     bool isDuplicitIbanOrAccountNumber = await _repository.UserAccount.HasDuplicitIbanOrAccountNumber(userId, userAccount);
-                    if (isDuplicitIbanOrAccountNumber) throw new ValidationError("There is already account with that IBAN or account number.");
+                    if (isDuplicitIbanOrAccountNumber) throw new NotUniqueEntityError("IBAN and account number");
 
                     int? addUserAccount = await _repository.UserAccount.Add(userId, userAccount);
                     bool saveCondition = addUserAccount is not null;

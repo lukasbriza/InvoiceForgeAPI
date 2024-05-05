@@ -1,4 +1,4 @@
-using InvoiceForgeApi.DTO;
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using InvoiceForgeApi.Models.Interfaces;
 
@@ -15,7 +15,7 @@ namespace InvoiceForgeApi.Abl.userAccount
                 try
                 {
                     List<InvoiceTemplate>? invoiceTemplateReference = await _repository.InvoiceTemplate.GetByCondition((t) => t.UserAccountId == userAccountId);
-                    if (invoiceTemplateReference is not null && invoiceTemplateReference.Any()) throw new ValidationError("Can´t delete. Still assigned to some entity.");
+                    if (invoiceTemplateReference is not null && invoiceTemplateReference.Any()) throw new EntityReferenceError();
 
                     bool deleteUserAccount = await _repository.UserAccount.Delete(userAccountId);
 

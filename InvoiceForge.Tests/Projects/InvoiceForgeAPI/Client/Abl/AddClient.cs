@@ -1,8 +1,7 @@
-using FunctionalTests.Projects.InvoiceForgeApi;
-using FunctionalTests.Projects.InvoiceForgeAPI;
-using InvoiceForge.Tests.Data;
+using FunctionalTests.Projects.InvoiceForgeApi;using InvoiceForge.Tests.Data;
 using InvoiceForgeApi.Abl.client;
-using InvoiceForgeApi.DTO;
+
+using InvoiceForgeApi.Errors;
 using InvoiceForgeApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -89,7 +88,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<DatabaseCallError>(ex); 
+                    Assert.IsType<NoEntityError>(ex); 
                 }
 
                 //CLEAN
@@ -125,7 +124,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<DatabaseCallError>(ex); 
+                    Assert.IsType<NoEntityError>(ex); 
                 }
 
                 //CLEAN
@@ -175,7 +174,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<ValidationError>(ex); 
+                    Assert.IsType<NoPossessionError>(ex); 
                 }
 
                 //CLEAN
@@ -211,7 +210,7 @@ namespace Abl
                 }
                 catch (Exception ex)
                 {
-                    Assert.IsType<ValidationError>(ex); 
+                    Assert.IsType<NoEntityError>(ex); 
                 }
 
                 //CLEAN
