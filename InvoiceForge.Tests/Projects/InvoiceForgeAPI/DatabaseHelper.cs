@@ -1,8 +1,8 @@
-
+using InvoiceForge.Tests;
+using InvoiceForgeApi.Configuration;
 using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Data.SeedClasses;
 using InvoiceForgeApi.Repository;
-using InvoiceForgeApi.Triggers;
 using Microsoft.EntityFrameworkCore;
 
 namespace FunctionalTests.Projects.InvoiceForgeApi
@@ -13,20 +13,12 @@ namespace FunctionalTests.Projects.InvoiceForgeApi
         public readonly RepositoryWrapper _repository;
         public DatabaseHelper(bool init = true)
         {
-            var options = new DbContextOptionsBuilder<InvoiceForgeDatabaseContext>()
-                .UseSqlServer("Data Source=LB_NTB;Initial Catalog=InvoiceForgeAPI_Test;Integrated Security=True;MultipleActiveResultSets=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False")
-                .UseTriggers(triggerOptions => {
-                    triggerOptions.AddTrigger<AddressUpdateTrigger>();
-                    triggerOptions.AddTrigger<InvoiceAddressCopyUpdateTrigger>();
-                    triggerOptions.AddTrigger<InvoiceEntityCopyUpdateTrigger>();
-                    triggerOptions.AddTrigger<ClientUpdateTrigger>();
-                    triggerOptions.AddTrigger<ContractorUpdateTrigger>();
-                    triggerOptions.AddTrigger<InvoiceTemplateUpdateTrigger>();
-                    triggerOptions.AddTrigger<UserAccountUpdateTrigger>();
-                    triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>();
-                    triggerOptions.AddTrigger<TrackableTrigger>();
-                }).Options;
-            _context = new InvoiceForgeDatabaseContext(options);
+            var config = GetConfiguration.Get();
+            var connectionString = ConnectionStringBuilder.Build(config, "Test");
+            var options = new DbContextOptionsBuilder<InvoiceForgeDatabaseContext>();
+            DatabaseConfiguration.Configure(options, connectionString);
+
+            _context = new InvoiceForgeDatabaseContext(options.Options);
             _context.Database.EnsureDeleted();
             _context.Database.Migrate();
             

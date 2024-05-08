@@ -1,0 +1,19 @@
+services:
+  sql:
+    build: ./InvoiceForge.SQL
+    image: invoiceforgesql
+    container_name: invoiceforge_sql
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=yourPassword
+  
+  api:
+    build: .
+    image: invoiceforgeapi
+    container_name: invoiceforge_web_api
+    ports:
+      - "80:80"
+    depends_on:
+      - sql
