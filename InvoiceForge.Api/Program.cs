@@ -2,52 +2,46 @@ using InvoiceForgeApi.Data;
 using InvoiceForgeApi.Models.Interfaces;
 using InvoiceForgeApi.Middleware;
 using InvoiceForgeApi.Repository;
+using InvoiceForgeApi.Configuration;
 using Microsoft.EntityFrameworkCore;
-using InvoiceForgeApi.Triggers;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = ConnectionStringBuilder.Build(builder.Configuration, "Production");
+var isDevelopment = builder.Configuration["Development"];
 
 //Add services to the container.
 builder.Services.AddScoped<IRepositoryWrapper, RepositoryWrapper>();
 builder.Services.AddDbContext<InvoiceForgeDatabaseContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.UseTriggers(triggerOptions => {
-        triggerOptions.AddTrigger<AddressUpdateTrigger>();
-        triggerOptions.AddTrigger<InvoiceAddressCopyUpdateTrigger>();
-        triggerOptions.AddTrigger<InvoiceEntityCopyUpdateTrigger>();
-        triggerOptions.AddTrigger<ClientUpdateTrigger>();
-        triggerOptions.AddTrigger<ContractorUpdateTrigger>();
-        triggerOptions.AddTrigger<InvoiceTemplateUpdateTrigger>();
-        triggerOptions.AddTrigger<UserAccountUpdateTrigger>();
-        triggerOptions.AddTrigger<InvoiceUserAccountCopyUpdateTrigger>();
-        triggerOptions.AddTrigger<TrackableTrigger>();
-    });
+    DatabaseConfiguration.Configure(options, connectionString);
 });
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 );
-
-//Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
+//Build
 var app = builder.Build();
-app.UseDeveloperExceptionPage();
 
-//Seed setup
-if (args.Length == 1 && args[0].ToLower() == "seed")
+//Migrate database
+using (var scope = app.Services.CreateScope())
 {
-    Seed.SeedData(app);
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<InvoiceForgeDatabaseContext>();
+    context?.Database.Migrate();
 }
 
+//Seed codelists setup
+Seed.SeedData(app);
+
 //Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (isDevelopment == "true")
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 //Add middleware

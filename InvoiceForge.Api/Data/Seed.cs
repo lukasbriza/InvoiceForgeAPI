@@ -39,7 +39,6 @@ namespace InvoiceForgeApi.Data
                     context.Tariff.AddRange(new TariffSeed().Populate());
                     context.SaveChanges();
                 }
-            context.SaveChanges();
         }
         
     }
